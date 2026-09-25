@@ -1,0 +1,87 @@
+export async function listDecisions(db, userId, limit = 100) {
+  return db.prepare(
+    `SELECT id, tool_id, decision_key, decision_name, title, status, primary_result,
+            summary, review_due_at, created_at, updated_at
+       FROM decisions
+      WHERE user_id = ?
+      ORDER BY updated_at DESC
+      LIMIT ?`
+  ).bind(userId, limit).all();
+}
+
+export async function getDecision(db, userId, decisionId) {
+  return db.prepare(
+    `SELECT *
+       FROM decisions
+      WHERE id = ? AND user_id = ?`
+  ).bind(decisionId, userId).first();
+}
+
+export async function listDecisionVersions(db, userId, decisionId) {
+  return db.prepare(
+    `SELECT v.*
+       FROM decision_versions v
+       JOIN decisions d ON d.id = v.decision_id
+      WHERE v.decision_id = ? AND d.user_id = ?
+      ORDER BY v.version_number DESC`
+  ).bind(decisionId, userId).all();
+}
+
+export async function upsertDecisionWithVersion(db, userId, input) {
+  const now = new Date().toISOString();
+  const decisionId = input.decisionId || crypto.randomUUID();
+  const decisionKey = input.decisionKey || `${input.toolId}::${input.decisionName || input.title}`;
+  const reviewDueAt = input.reviewDueAt || null;
+
+  const existing = await db.prepare(
+    "SELECT id FROM decisions WHERE id = ? AND user_id = ?"
+  ).bind(decisionId, userId).first();
+
+  const decisionStatement = existing
+    ? db.prepare(
+        `UPDATE decisions
+            SET tool_id = ?, decision_key = ?, decision_name = ?, title = ?, status = ?,
+                inputs_json = ?, outputs_json = ?, assumptions_json = ?, primary_result = ?,
+                summary = ?, workspace_id = ?, review_due_at = ?, updated_at = ?
+          WHERE id = ? AND user_id = ?`
+      ).bind(
+        input.toolId, decisionKey, input.decisionName || input.title, input.title,
+        input.status || "active", JSON.stringify(input.inputs || {}),
+        JSON.stringify(input.outputs || {}), JSON.stringify(input.assumptions || {}),
+        input.primaryResult || null, input.summary || null, input.workspaceId || null,
+        reviewDueAt, now, decisionId, userId
+      )
+    : db.prepare(
+        `INSERT INTO decisions (
+          id, user_id, tool_id, decision_key, decision_name, title, status,
+          inputs_json, outputs_json, assumptions_json, primary_result, summary,
+          workspace_id, review_due_at, created_at, updated_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      ).bind(
+        decisionId, userId, input.toolId, decisionKey, input.decisionName || input.title,
+        input.title, input.status || "active", JSON.stringify(input.inputs || {}),
+        JSON.stringify(input.outputs || {}), JSON.stringify(input.assumptions || {}),
+        input.primaryResult || null, input.summary || null, input.workspaceId || null,
+        reviewDueAt, now, now
+      );
+
+  const current = await db.prepare(
+    "SELECT COALESCE(MAX(version_number), 0) AS version FROM decision_versions WHERE decision_id = ?"
+  ).bind(decisionId).first();
+  const versionNumber = Number(current?.version || 0) + 1;
+
+  const versionStatement = db.prepare(
+    `INSERT INTO decision_versions (
+      id, decision_id, version_number, scenario_label, inputs_json, outputs_json,
+      assumptions_json, sensitivity_json, primary_result, summary, created_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+  ).bind(
+    crypto.randomUUID(), decisionId, versionNumber, input.scenarioLabel || null,
+    JSON.stringify(input.inputs || {}), JSON.stringify(input.outputs || {}),
+    JSON.stringify(input.assumptions || {}), JSON.stringify(input.sensitivity || []),
+    input.primaryResult || null, input.summary || null, now
+  );
+
+  await db.batch([decisionStatement, versionStatement]);
+  return { decisionId, versionNumber, decisionKey };
+}
