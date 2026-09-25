@@ -89,6 +89,16 @@ function ensureScenarioSnapshotsForReport(){
   let missing=Object.keys(state.scenario.sets).some(id=>!state.scenario.snapshots[id]);
   if(missing){compareScenarios();$('scenarioCompare').classList.add('hidden')}
 }
+function printDecisionReport(){
+  if(!state.last||!state.current)return toast('Calcule primeiro.');
+  const originalTitle=document.title;
+  const safeName=(currentDecisionName()||state.current.title||'Decisão').replace(/[\\/:*?"<>|]+/g,' ').trim();
+  document.title='AMARELO - '+safeName;
+  const restore=()=>{document.title=originalTitle;window.removeEventListener('afterprint',restore)};
+  window.addEventListener('afterprint',restore);
+  window.print();
+  setTimeout(()=>{if(document.title!==originalTitle)document.title=originalTitle},1500);
+}
 function closeDecisionReport(){$('reportModal').classList.add('hidden')}
 function openDecisionReport(){
   if(!state.last)return toast('Calcule primeiro.');
