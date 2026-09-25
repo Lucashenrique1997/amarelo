@@ -500,6 +500,7 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
 .reportEvolution{display:grid;grid-template-columns:.8fr 1.2fr;gap:12px}.reportEvolutionHero{background:#181812;color:#fff;border-radius:18px;padding:18px}.reportEvolutionHero small{font-size:7px;color:#8f8e84}.reportEvolutionHero b{display:block;font-size:22px;margin:12px 0 4px}.reportEvolutionHero p{font-size:9px;color:#aaa99e;margin:0}.reportEvolutionMetrics{display:grid;grid-template-columns:1fr 1fr;gap:7px}.reportEvolutionMetrics div{border:1px solid #ded7c8;border-radius:13px;padding:11px}.reportEvolutionMetrics span{display:block;font-size:7px;color:#867f72}.reportEvolutionMetrics b{font-size:10px}
 @media(max-width:760px){.decisionPulse{grid-template-columns:1fr 1fr}.reviewDecision{align-items:flex-start}.reportSensitivity{grid-template-columns:1fr}.reportEvolution{grid-template-columns:1fr}.reportEvolutionMetrics{grid-template-columns:1fr 1fr}}
 
+.reportEvolutionTableWrap{min-width:0;overflow:auto}.reportEvolutionTableWrap table{min-width:520px}
 </style>
 </head>
 <body>
@@ -877,7 +878,7 @@ function toggleFav(id){let f=favs();f=f.includes(id)?f.filter(x=>x!==id):[...f,i
 function toolCard(t){return `<article class="toolCard ${t.tier==='decision'?'decisionCard':''}" onclick="openTool('${t.id}')"><button class="favStar ${isFav(t.id)?'on':''}" onclick="event.stopPropagation();toggleFav('${t.id}')">${isFav(t.id)?'★':'☆'}</button>${t.new?'<span class="newToolTag">NOVO</span>':''}<div class="toolIcon">${t.icon}</div><div class="cat">${t.cat}</div><h3>${t.title}</h3><p>${t.desc}</p><div class="toolCardFoot"><span class="tierTag ${t.tier}">${t.tier==='decision'?'Decisão PRO':t.tier==='pro'?'PRO':'Grátis'}</span><b>Colocar na conta →</b></div></article>`}
 function renderHome(){$('journeys').innerHTML=journeys.map(j=>`<div class="journey" onclick="state.category='${j[0]}';navigate('tools')"><div class="jicon">${j[1]}</div><h3>${j[2]}</h3><p>${j[3]}</p><small>Explorar ${j[0]} →</small></div>`).join('');$('featured').innerHTML=tools.filter(t=>t.featured).slice(0,8).map(toolCard).join('')}
 function renderTools(q=''){let s=q.toLowerCase();$('filters').innerHTML=categories.map(c=>`<button class="${state.category===c?'active':''}" onclick="state.category='${c}';renderTools(document.getElementById('toolSearch').value)">${c}</button>`).join('');let arr=tools.filter(t=>(state.category==='Todas'||t.cat===state.category)&&(!s||(t.title+' '+t.desc+' '+t.cat).toLowerCase().includes(s)));if($('toolCount'))$('toolCount').textContent=arr.length;$('toolLibrary').innerHTML=arr.length?arr.map(toolCard).join(''):`<div class="emptyState"><span>0 resultados</span><h3>Nenhuma decisão encontrada.</h3><p>Tente outro termo ou volte para “Todas”.</p><button onclick="state.category='Todas';document.getElementById('toolSearch').value='';renderTools('')">Limpar filtros →</button></div>`}
-function renderAskExamples(){let ex=[['Tenho R$ 100 mil e um financiamento. Amortizo ou invisto?','amortizar-investir'],['LCI 92% do CDI ou CDB 110%?','gross-up'],['Comprar imóvel ou continuar alugando?','comprar-alugar'],['Quanto preciso para aposentar recebendo R$ 10 mil?','aposentadoria'],['Me ofereceram portabilidade com taxa menor. A troca reduz meu custo?','portabilidade-divida'],['Troco meu carro agora ou continuo com o atual?','trocar-carro']];$('askSuggestions').innerHTML=ex.map(x=>`<div class="askSuggestion" onclick="document.getElementById('askText').value='${x[0]}';openTool('${x[1]}')"><b>${x[0]}</b><p>Abrir análise relacionada →</p></div>`).join('')}
+function renderAskExamples(){let ex=[['Tenho R$ 100 mil e um financiamento. Amortizo ou invisto?','amortizar-investir'],['LCI 92% do CDI ou CDB 110%?','gross-up'],['Comprar imóvel ou continuar alugando?','comprar-alugar'],['Quanto preciso para aposentar recebendo R$ 10 mil?','aposentadoria'],['Me ofereceram portabilidade com taxa menor. A troca reduz meu custo?','portabilidade-divida'],['Tenho duas propostas de financiamento. Qual tem menor custo econômico?','comparar-financiamentos'],['Troco meu carro agora ou continuo com o atual?','trocar-carro']];$('askSuggestions').innerHTML=ex.map(x=>`<div class="askSuggestion" onclick="document.getElementById('askText').value='${x[0]}';openTool('${x[1]}')"><b>${x[0]}</b><p>Abrir análise relacionada →</p></div>`).join('')}
 function parseMoneyBR(raw){
   if(!raw)return null;
   let s=String(raw).toLowerCase().trim(),mult=1;
@@ -1043,6 +1044,22 @@ function interpretAsk(raw){
     if(newPrice===null)missing.push('preço do carro desejado');
     if(rate===null)missing.push('taxa do financiamento');
     if(years===null)missing.push('horizonte da comparação');
+  }else if(toolId==='comparar-financiamentos'){
+    let price=firstMoney(text,['(?:imóvel|imovel|bem|casa|apartamento)(?:\s+(?:de|custa|valor))?\s+MONEY','(?:valor do bem|valor do imóvel|valor do imovel)(?:\s+de)?\s+MONEY']);
+    let down=firstMoney(text,['entrada(?:\s+de)?\s+MONEY']);
+    let rateA=firstRate(text,[/(?:proposta a|banco a).*?(\d+(?:[.,]\d+)?)%/]);
+    let rateB=firstRate(text,[/(?:proposta b|banco b).*?(\d+(?:[.,]\d+)?)%/]);
+    let nA=firstInt(text,[/(?:proposta a|banco a).*?(\d+)\s+meses/]);
+    let nB=firstInt(text,[/(?:proposta b|banco b).*?(\d+)\s+meses/]);
+    add('cmpPrice',price,'Valor do bem',price?BRL(price):null);
+    add('cmpDown',down,'Entrada',down?BRL(down):null);
+    add('cmpARate',rateA,'Taxa proposta A',rateA!==null?PCT(rateA)+' a.m.':null);
+    add('cmpBRate',rateB,'Taxa proposta B',rateB!==null?PCT(rateB)+' a.m.':null);
+    add('cmpAN',nA,'Prazo proposta A',nA?nA+' meses':null);
+    add('cmpBN',nB,'Prazo proposta B',nB?nB+' meses':null);
+    if(price===null)missing.push('valor do bem');
+    if(rateA===null)missing.push('taxa da proposta A');
+    if(rateB===null)missing.push('taxa da proposta B');
   }else if(toolId==='imovel-na-planta'){
     let price=firstMoney(text,['(?:imóvel|imovel|apartamento)(?:\s+na planta)?(?:\s+(?:de|custa|valor))?\s+MONEY']);
     let entry=firstMoney(text,['entrada(?:\s+de)?\s+MONEY']);
@@ -1837,8 +1854,8 @@ function openDecisionReport(){
   const decisionKey=makeDecisionKey(state.current.id,name),savedVersions=saved().filter(x=>savedDecisionKey(x)===decisionKey).sort((a,b)=>new Date(b.date)-new Date(a.date)),previous=savedVersions[0]||null;
   let evolutionSection='';
   if(previous){
-    const prevMetrics=(previous.metrics||[]).slice(0,5);
-    evolutionSection=`<section class="reportSection"><div class="reportSectionHead"><h3>Desde a última versão</h3><span>EVOLUÇÃO</span></div><div class="reportEvolution"><div class="reportEvolutionHero"><small>ÚLTIMA VERSÃO SALVA · ${escapeHtml(new Date(previous.date).toLocaleDateString('pt-BR'))}</small><b>${escapeHtml(previous.primary)}</b><p>${escapeHtml(previous.subtitle||'')}</p></div><div class="reportEvolutionMetrics">${prevMetrics.map(m=>`<div><span>${escapeHtml(m[0])}</span><b>${escapeHtml(m[1])}</b></div>`).join('')}</div></div></section>`;
+    const currentMetrics=state.last.metrics||[],prevMetrics=previous.metrics||[],labels=[...new Set([...currentMetrics.map(m=>m[0]),...prevMetrics.map(m=>m[0])])].slice(0,6);
+    evolutionSection=`<section class="reportSection"><div class="reportSectionHead"><h3>Desde a última versão</h3><span>EVOLUÇÃO</span></div><div class="reportEvolution"><div class="reportEvolutionHero"><small>ÚLTIMA VERSÃO SALVA · ${escapeHtml(new Date(previous.date).toLocaleDateString('pt-BR'))}</small><b>${escapeHtml(previous.primary)}</b><p>${escapeHtml(previous.subtitle||'')}</p></div><div class="reportEvolutionTableWrap"><table class="reportScenarioTable"><thead><tr><th>Métrica</th><th>Agora</th><th>Última versão</th></tr></thead><tbody>${labels.map(label=>{let cur=currentMetrics.find(m=>m[0]===label),old=prevMetrics.find(m=>m[0]===label);return`<tr><td>${escapeHtml(label)}</td><td>${escapeHtml(cur?cur[1]:'—')}</td><td>${escapeHtml(old?old[1]:'—')}</td></tr>`}).join('')}</tbody></table></div></div></section>`;
   }
   const drivers=decisionDrivers().map(d=>`<div class="reportDriver"><small>${escapeHtml(d[0])}</small><b>${escapeHtml(d[1])}</b><p>${escapeHtml(d[2])}</p></div>`).join('');
   const assumptions=reportAssumptionRows().map(a=>`<div class="reportAssumption"><span>${escapeHtml(a[0])}</span><b>${escapeHtml(a[1])}</b></div>`).join('');
@@ -1870,8 +1887,13 @@ function renderDashboard(){
   $('savedDecisions').querySelectorAll('[data-history-key]').forEach(b=>b.addEventListener('click',()=>openVersionCompare(b.dataset.historyKey)));
   let f=favs().map(id=>tools.find(t=>t.id===id)).filter(Boolean);
   $('favoriteTools').innerHTML=f.length?f.slice(0,6).map(t=>`<div class="miniTool" onclick="openTool('${t.id}')"><i>${t.icon}</i><b>${t.title}</b></div>`).join(''):'<div class="dashEmpty compact"><span>☆</span><h4>Fixe o que você usa mais.</h4><p>Seus favoritos aparecem aqui.</p></div>';
-  let next=review.length?[review[0].versions[0].toolId,'Existe uma decisão antiga que vale reabrir.']:p.reserve<p.essentials*6&&p.essentials>0?['reserva','Sua reserva informada está abaixo de 6 meses.']:p.monthly>0?['meta-financeira','Transforme seu aporte mensal em uma meta.']:['diagnostico','Comece pelo diagnóstico financeiro.'];
-  $('nextDecision').innerHTML=`<div class="miniTool" onclick="openTool('${next[0]}')"><i>→</i><div><b>${tools.find(t=>t.id===next[0])?.title||'Próxima análise'}</b><p class="muted">${next[1]}</p></div></div>`;
+  if(review.length){
+    let x=review[0].versions[0];
+    $('nextDecision').innerHTML=`<div class="miniTool" onclick="openSavedDecision(${x.id})"><i>↻</i><div><b>${escapeHtml(x.decisionName||x.title)}</b><p class="muted">Reabra a última versão e atualize as premissas.</p></div></div>`;
+  }else{
+    let next=p.reserve<p.essentials*6&&p.essentials>0?['reserva','Sua reserva informada está abaixo de 6 meses.']:p.monthly>0?['meta-financeira','Transforme seu aporte mensal em uma meta.']:['diagnostico','Comece pelo diagnóstico financeiro.'];
+    $('nextDecision').innerHTML=`<div class="miniTool" onclick="openTool('${next[0]}')"><i>→</i><div><b>${tools.find(t=>t.id===next[0])?.title||'Próxima análise'}</b><p class="muted">${next[1]}</p></div></div>`;
+  }
 }
 function openProfile(){let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0});for(const k in p){let el=$('profile'+k[0].toUpperCase()+k.slice(1));if(el)el.value=p[k]}$('profileModal').classList.remove('hidden')}
 function closeProfile(){$('profileModal').classList.add('hidden')}
