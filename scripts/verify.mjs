@@ -168,13 +168,13 @@ if (!/name\s*=\s*"amarelo"/.test(wrangler)) throw new Error("Cloudflare Worker m
 if (!/main\s*=\s*"src\/worker\.js"/.test(wrangler)) throw new Error("Unexpected Worker entrypoint.");
 if (!worker.includes('import { handleApi }')) throw new Error("Worker entrypoint must delegate API routing.");
 if (!apiRouter.includes("/api/health") || !apiRouter.includes("/api/capabilities")) throw new Error("API router is missing core endpoints.");
-if (!productConfig.includes('phase: "beta"')) throw new Error("Product capability phase must remain explicit.");
+if (!productConfig.includes('defaultPhase: "beta"') || !productConfig.includes("AUTH_ENABLED") || !productConfig.includes("BILLING_ENABLED")) throw new Error("Product capability flags are incomplete.");
 if (!decisionsRepo.includes("upsertDecisionWithVersion")) throw new Error("Decision repository is missing version persistence.");
 if (!decisionsRepo.includes("deleteDecisionVersion")) throw new Error("Decision version deletion contract is missing.");
 if (!profilesRepo.includes("upsertProfile")) throw new Error("Profile repository is missing.");
 if (!workspacesRepo.includes("createPersonalWorkspace")) throw new Error("Workspace repository is missing.");
 if (!goalsRepo.includes("upsertGoal")) throw new Error("Goals repository is missing.");
-if (!subscriptionsRepo.includes("getEntitlements")) throw new Error("Entitlement repository is missing.");
+if (!subscriptionsRepo.includes("getEntitlements") || !subscriptionsRepo.includes("proBeta")) throw new Error("Entitlement repository is missing beta/commercial gating.");
 if (!authSession.includes("authenticatedUserId")) throw new Error("Session guard is missing.");
 if (!privateApi.includes("/api/v1/decisions") || !privateApi.includes("/api/v1/entitlements")) throw new Error("Private API contract is incomplete.");
 if (!security.includes("X-Content-Type-Options")) throw new Error("Security header middleware is missing.");
@@ -187,6 +187,7 @@ for (const marker of ["decision_versions", "workspaces", "workspace_members", "f
 }
 if (!migration3.includes("client_version_id")) throw new Error("Sync safety migration is missing client_version_id.");
 if (!migration4.includes("client_goal_id")) throw new Error("Goal sync migration is missing client_goal_id.");
+if (!decisionHistory.includes("decisionDocumentId") || !decisionHistory.includes("versionTimeline")) throw new Error("Decision timeline/report identity is incomplete.");
 
 if (frontend.includes("setDemoPlan('family')") || frontend.includes("setDemoPlan('professional')")) {
   throw new Error("Unbuilt paid tiers must not be activatable.");
