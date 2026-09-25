@@ -9,17 +9,21 @@ const catalog = read("public/assets/catalog.js");
 const financeCore = read("public/assets/finance-core.js");
 const decisionConfig = read("public/assets/decision-config.js");
 const decisionEngines = read("public/assets/decision-engines.js");
+const dataStore = read("public/assets/data-store.js");
 const app = read("public/assets/app.js");
 const wrangler = read("wrangler.toml");
 const worker = read("src/worker.js");
 const apiRouter = read("src/api/router.js");
 const apiHealth = read("src/api/health.js");
 const productConfig = read("src/config/product.js");
+const decisionsRepo = read("src/db/decisions.js");
+const profilesRepo = read("src/db/profiles.js");
+const workspacesRepo = read("src/db/workspaces.js");
 const migration1 = read("migrations/0001_initial.sql");
 const migration2 = read("migrations/0002_commercial_readiness.sql");
 
-const frontend = [html, css, catalog, financeCore, decisionConfig, decisionEngines, app].join("\n");
-const backend = [worker, apiRouter, apiHealth, productConfig, wrangler, migration1, migration2].join("\n");
+const frontend = [html, css, catalog, financeCore, decisionConfig, decisionEngines, dataStore, app].join("\n");
+const backend = [worker, apiRouter, apiHealth, productConfig, decisionsRepo, profilesRepo, workspacesRepo, wrangler, migration1, migration2].join("\n");
 const productionSurface = (frontend + "\n" + backend).toLowerCase();
 
 if (html !== rootHtml) throw new Error("Root preview and public application shell are out of sync.");
@@ -32,6 +36,7 @@ const requiredAssets = [
   "/assets/finance-core.js",
   "/assets/decision-config.js",
   "/assets/decision-engines.js",
+  "/assets/data-store.js",
   "/assets/app.js"
 ];
 let previous = -1;
@@ -47,6 +52,7 @@ for (const [name, code] of [
   ["finance-core.js", financeCore],
   ["decision-config.js", decisionConfig],
   ["decision-engines.js", decisionEngines],
+  ["data-store.js", dataStore],
   ["app.js", app]
 ]) {
   try {
@@ -62,6 +68,8 @@ if (app.includes("const tools=[")) throw new Error("Tools catalog leaked back in
 if (app.includes("function loanFlow(")) throw new Error("Financial core leaked back into app.js.");
 if (app.includes("function buildForm(")) throw new Error("Decision config leaked back into app.js.");
 if (app.includes("function calculateTool(")) throw new Error("Decision engine execution leaked back into app.js.");
+if (app.includes("const storage={")) throw new Error("Data adapter leaked back into app.js.");
+if (!dataStore.includes("const storage=")) throw new Error("Client data adapter contract is missing.");
 
 const requiredProductMarkers = [
   "<title>AMARELO",
@@ -123,6 +131,9 @@ if (!/main\s*=\s*"src\/worker\.js"/.test(wrangler)) throw new Error("Unexpected 
 if (!worker.includes('import { handleApi }')) throw new Error("Worker entrypoint must delegate API routing.");
 if (!apiRouter.includes("/api/health") || !apiRouter.includes("/api/capabilities")) throw new Error("API router is missing core endpoints.");
 if (!productConfig.includes('phase: "beta"')) throw new Error("Product capability phase must remain explicit.");
+if (!decisionsRepo.includes("upsertDecisionWithVersion")) throw new Error("Decision repository is missing version persistence.");
+if (!profilesRepo.includes("upsertProfile")) throw new Error("Profile repository is missing.");
+if (!workspacesRepo.includes("createPersonalWorkspace")) throw new Error("Workspace repository is missing.");
 
 for (const marker of ["users", "sessions", "decisions", "subscriptions"]) {
   if (!migration1.includes(marker)) throw new Error(`Initial D1 schema missing: ${marker}`);
