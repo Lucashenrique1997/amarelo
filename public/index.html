@@ -933,6 +933,40 @@ function interpretAsk(raw){
     if(cash===null)missing.push('capital disponível/entrada');
     if(fin===null)missing.push('taxa do financiamento');
     if(inv===null)missing.push('retorno alternativo');
+  }else if(toolId==='portabilidade-divida'){
+    let bal=firstMoney(text,['(?:saldo|saldo devedor|dívida|divida|financiamento)(?:\\s+(?:de|é|e))?\\s+MONEY']);
+    let currentRate=firstRate(text,[/(?:taxa atual|hoje pago|juros atuais).*?(\d+(?:[.,]\d+)?)%/,/(\d+(?:[.,]\d+)?)%.*?(?:taxa atual|juros atuais)/]);
+    let newRate=firstRate(text,[/(?:nova taxa|ofereceram|proposta|portabilidade).*?(\d+(?:[.,]\d+)?)%/,/(\d+(?:[.,]\d+)?)%.*?(?:nova taxa|proposta|portabilidade)/]);
+    let currentN=firstInt(text,[/(?:restam|faltam)\s+(\d+)\s+(?:meses|parcelas)/]);
+    let newN=firstInt(text,[/(?:novo prazo|em)\s+(\d+)\s+meses.*?(?:portabilidade|proposta)?/]);
+    let fee=firstMoney(text,['(?:tarifa|custo|custos|taxa de contratação)(?:\\s+de)?\\s+MONEY']);
+    add('portBalance',bal,'Saldo devedor',bal?BRL(bal):null);
+    add('portCurrentRate',currentRate,'Taxa atual',currentRate!==null?PCT(currentRate)+' a.m.':null);
+    add('portNewRate',newRate,'Nova taxa',newRate!==null?PCT(newRate)+' a.m.':null);
+    add('portCurrentN',currentN,'Prazo atual',currentN?currentN+' meses':null);
+    add('portNewN',newN,'Novo prazo',newN?newN+' meses':null);
+    add('portFee',fee,'Custos iniciais',fee?BRL(fee):null);
+    if(bal===null)missing.push('saldo devedor');
+    if(currentRate===null)missing.push('taxa atual');
+    if(newRate===null)missing.push('nova taxa');
+    if(currentN===null)missing.push('prazo restante');
+  }else if(toolId==='trocar-carro'){
+    let currentValue=firstMoney(text,['(?:meu carro vale|carro atual vale|valor do carro atual)(?:\\s+)?MONEY']);
+    let newPrice=firstMoney(text,['(?:novo carro|outro carro|carro que quero)(?:\\s+(?:custa|vale|de))?\\s+MONEY']);
+    let cash=firstMoney(text,['(?:tenho|capital|dinheiro disponível|dinheiro disponivel)(?:\\s+de)?\\s+MONEY']);
+    let rate=firstRate(text,[/(?:financiamento|taxa).*?(\d+(?:[.,]\d+)?)%\s*(?:a\.m\.|ao mês|ao mes)?/]);
+    let maint=firstMoney(text,['(?:manutenção|manutencao)(?:\\s+anual|\\s+por ano|\\s+de)?\\s+MONEY']);
+    let years=firstInt(text,[/(\d+)\s+anos?\s+(?:para comparar|de horizonte|comparando)/]);
+    add('carCurrentValue',currentValue,'Valor do carro atual',currentValue?BRL(currentValue):null);
+    add('carNewPrice',newPrice,'Preço do novo carro',newPrice?BRL(newPrice):null);
+    add('carCash',cash,'Capital adicional',cash?BRL(cash):null);
+    add('carRate',rate,'Taxa do financiamento',rate!==null?PCT(rate)+' a.m.':null);
+    add('carCurrentMaint',maint,'Manutenção atual',maint?BRL(maint)+'/ano':null);
+    add('carYears',years,'Horizonte',years?years+' anos':null);
+    if(currentValue===null)missing.push('valor do carro atual');
+    if(newPrice===null)missing.push('preço do carro desejado');
+    if(rate===null)missing.push('taxa do financiamento');
+    if(years===null)missing.push('horizonte da comparação');
   }
   return{raw:String(raw||''),toolId,values,understood,missing};
 }
