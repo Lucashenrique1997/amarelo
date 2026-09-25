@@ -117,9 +117,9 @@ Quando aplicável:
 - [x] API autenticada de perfil (implementada; ativação depende de D1 + login)
 - [x] API autenticada de decisões (implementada; ativação depende de D1 + login)
 - [x] API autenticada de versões (implementada; ativação depende de D1 + login)
-- [ ] migração localStorage -> conta
-- [ ] sincronização multi-dispositivo
-- [ ] conflito/versionamento
+- [x] migração localStorage -> conta (implementada; ativação depende de D1 + login)
+- [x] sincronização multi-dispositivo (camada implementada; ativação depende de D1 + login)
+- [x] conflito/versionamento append-only com IDs idempotentes
 
 **Gate:** decisões sobrevivem a logout, navegador e dispositivo.
 
@@ -129,9 +129,9 @@ Quando aplicável:
 - [x] fila de revisão
 - [x] comparação de versões
 - [ ] persistência online
-- [ ] metas persistentes
-- [ ] linha do tempo da decisão
-- [ ] estado vazio/onboarding final
+- [x] metas persistentes (UI + API + sync implementados; ativação depende de D1 + login)
+- [x] linha do tempo da decisão
+- [x] estado vazio/onboarding final
 
 **Gate:** existe motivo real para retornar ao produto.
 
@@ -139,7 +139,7 @@ Quando aplicável:
 - [x] Free x PRO conceitualmente separados
 - [x] PRO Beta sem cobrança
 - [x] pricing honesto
-- [ ] entitlement vindo do backend
+- [x] entitlement vindo do backend (feature-gated; ativação depende de login)
 - [ ] checkout
 - [ ] assinatura
 - [ ] cancelamento
@@ -154,9 +154,9 @@ Quando aplicável:
 - [x] sensibilidade
 - [x] versão anterior
 - [ ] impressão/PDF revisada em desktop e mobile
-- [ ] cabeçalho/rodapé final
-- [ ] identificação da decisão
-- [ ] disclaimer final
+- [x] cabeçalho/rodapé final
+- [x] identificação da decisão
+- [x] disclaimer final
 
 ### H. Segurança, privacidade e operação
 - [ ] política de privacidade
