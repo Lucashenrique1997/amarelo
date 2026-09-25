@@ -441,6 +441,14 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
 .scenarioMatrix th:first-child,.scenarioMatrix td:first-child{text-align:left}.scenarioMatrix th{font-size:6px;letter-spacing:.1em;text-transform:uppercase;color:#958d7f;background:#faf8f1}.scenarioMatrix td:first-child{font-weight:850;color:#6d665b}
 .scenarioMatrix tr:last-child td{border-bottom:0}
 
+
+/* V12 question interpretation */
+.askContextBanner{display:grid;grid-template-columns:42px 1fr;gap:14px;margin-top:18px;padding:17px 18px;border:1px solid #dfcf86;border-radius:20px;background:linear-gradient(135deg,#fffdf4,#fff5bd)}
+.askContextIcon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--v11-ink);color:var(--v11-yellow);font-weight:950;font-size:13px}.askContextBody>span{display:block;font-size:6px;font-weight:950;letter-spacing:.13em;color:#9b8220}
+.askContextBody h3{font-size:14px;letter-spacing:-.02em;margin:4px 0 10px}.askUnderstood{display:flex;flex-wrap:wrap;gap:6px}.askUnderstood>span{border:1px solid rgba(19,19,14,.08);background:rgba(255,255,255,.62);border-radius:12px;padding:7px 9px}.askUnderstood small{display:block;font-size:6px;color:#8b8374;margin-bottom:2px}.askUnderstood b{font-size:9px}
+.askMissing{margin-top:9px;font-size:8px;color:#796f5e;line-height:1.5}.askMissing b{color:#4f493f}
+@media(max-width:600px){.askContextBanner{grid-template-columns:1fr}.askContextIcon{width:32px;height:32px}}
+
 </style>
 </head>
 <body>
@@ -628,6 +636,15 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
       <div><span class="kicker gold">RECURSO PRO</span><h2>Veja a decisão completa.</h2><p>O modo gratuito mostra a conta básica. O PRO libera cenários, ponto de equilíbrio, “E se?”, gráfico e histórico.</p></div>
       <button class="btn yellow" onclick="setDemoPlan('pro'); openCurrentTool()">Testar PRO nesta versão</button>
     </div>
+    <div id="askContextBanner" class="askContextBanner hidden">
+      <div class="askContextIcon">?</div>
+      <div class="askContextBody">
+        <span>O AMARELO ENTENDEU</span>
+        <h3 id="askContextTitle">Transformei sua pergunta em premissas.</h3>
+        <div id="askUnderstood" class="askUnderstood"></div>
+        <div id="askMissing" class="askMissing"></div>
+      </div>
+    </div>
     <div class="toolWorkspaceMeta"><span><i></i> Motor determinístico</span><span>premissas visíveis</span><span>cenários comparáveis</span></div>
     <section id="scenarioLab" class="scenarioLab hidden">
       <div class="scenarioLabHead">
@@ -714,7 +731,7 @@ const storage={
  get(k,f){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}},
  set(k,v){localStorage.setItem(k,JSON.stringify(v))}
 };
-let state={route:'home',category:'Todas',current:null,mode:'simple',last:null,plan:storage.get('amarelo_plan','free'),scenario:null,scenarioBusy:false};
+let state={route:'home',category:'Todas',current:null,mode:'simple',last:null,plan:storage.get('amarelo_plan','free'),scenario:null,scenarioBusy:false,pendingAsk:null,askContext:null};
 
 const journeys=[
 ['Investir','↗','Quero investir melhor','Renda fixa, juros, inflação, metas e aposentadoria.'],
@@ -784,7 +801,154 @@ function toolCard(t){return `<article class="toolCard ${t.tier==='decision'?'dec
 function renderHome(){$('journeys').innerHTML=journeys.map(j=>`<div class="journey" onclick="state.category='${j[0]}';navigate('tools')"><div class="jicon">${j[1]}</div><h3>${j[2]}</h3><p>${j[3]}</p><small>Explorar ${j[0]} →</small></div>`).join('');$('featured').innerHTML=tools.filter(t=>t.featured).slice(0,8).map(toolCard).join('')}
 function renderTools(q=''){let s=q.toLowerCase();$('filters').innerHTML=categories.map(c=>`<button class="${state.category===c?'active':''}" onclick="state.category='${c}';renderTools(document.getElementById('toolSearch').value)">${c}</button>`).join('');let arr=tools.filter(t=>(state.category==='Todas'||t.cat===state.category)&&(!s||(t.title+' '+t.desc+' '+t.cat).toLowerCase().includes(s)));if($('toolCount'))$('toolCount').textContent=arr.length;$('toolLibrary').innerHTML=arr.length?arr.map(toolCard).join(''):`<div class="emptyState"><span>0 resultados</span><h3>Nenhuma decisão encontrada.</h3><p>Tente outro termo ou volte para “Todas”.</p><button onclick="state.category='Todas';document.getElementById('toolSearch').value='';renderTools('')">Limpar filtros →</button></div>`}
 function renderAskExamples(){let ex=[['Tenho R$ 100 mil e um financiamento. Amortizo ou invisto?','amortizar-investir'],['LCI 92% do CDI ou CDB 110%?','gross-up'],['Comprar imóvel ou continuar alugando?','comprar-alugar'],['Quanto preciso para aposentar recebendo R$ 10 mil?','aposentadoria']];$('askSuggestions').innerHTML=ex.map(x=>`<div class="askSuggestion" onclick="document.getElementById('askText').value='${x[0]}';openTool('${x[1]}')"><b>${x[0]}</b><p>Abrir análise relacionada →</p></div>`).join('')}
-function askAmarelo(q){q=(q||'').toLowerCase();let id='quanto-rende';const map=[['financiamento-consorcio',['consórc','consorc','financiar ou']],['comprar-alugar',['alugar','aluguel']],['amortizar-investir',['amort','quitar financiamento']],['aposentadoria',['aposent','previd']],['viver-renda',['viver de renda','renda mensal']],['salario-liquido',['salário','salario','quanto cai']],['gross-up',['lci','lca','gross','cdb']],['plano-dividas',['dívida','divida','cartão','cartao']],['avista-parcelado',['à vista','a vista','parcelado']],['meta-financeira',['meta','chegar em']]];for(const [i,words] of map)if(words.some(w=>q.includes(w))){id=i;break}openTool(id)}
+function parseMoneyBR(raw){
+  if(!raw)return null;
+  let s=String(raw).toLowerCase().trim(),mult=1;
+  if(/milh|milhão|milhões|\bmi\b/.test(s))mult=1e6;
+  else if(/\bmil\b|\bk\b/.test(s))mult=1e3;
+  s=s.replace(/[^\d,.\-]/g,'');
+  if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');
+  else if((s.match(/\./g)||[]).length&&/\.\d{3}(?:\.|$)/.test(s))s=s.replace(/\./g,'');
+  let n=parseFloat(s);
+  return Number.isFinite(n)?n*mult:null;
+}
+function parseRateBR(raw){
+  if(raw==null)return null;
+  let n=parseFloat(String(raw).replace(',','.'));
+  return Number.isFinite(n)?n:null;
+}
+function moneyPattern(){return '(?:R\\$\\s*)?([\\d.]+(?:,\\d+)?\\s*(?:milh(?:ão|ões|oes)|mil|mi|k)?)'}
+function firstMoney(text,patterns){
+  const token=moneyPattern();
+  for(const source of patterns){
+    let re=new RegExp(source.replace('MONEY',token),'i'),m=text.match(re);
+    if(m){
+      let raw=m.slice(1).find(v=>v&&/\d/.test(v)),n=parseMoneyBR(raw);
+      if(n!==null)return n;
+    }
+  }
+  return null;
+}
+function firstRate(text,patterns){
+  for(const re of patterns){let m=text.match(re);if(m){let n=parseRateBR(m[1]);if(n!==null)return n}}
+  return null;
+}
+function firstInt(text,patterns){
+  for(const re of patterns){let m=text.match(re);if(m)return parseInt(m[1],10)}
+  return null;
+}
+function detectAskTool(text){
+  const rules=[
+    ['financiamento-consorcio',['consórc','consorc','financiar ou','financiamento ou investir','dar entrada']],
+    ['comprar-alugar',['comprar ou alugar','alugar ou comprar','aluguel','continuar alugando']],
+    ['amortizar-investir',['amort','quitar financiamento','abater financiamento','reduzir saldo']],
+    ['aposentadoria',['aposent','parar de trabalhar','previdência','previdencia']],
+    ['viver-renda',['viver de renda','renda mensal com patrimônio','renda mensal com patrimonio']],
+    ['salario-liquido',['salário','salario','quanto cai']],
+    ['gross-up',['lci','lca','gross','cdb']],
+    ['plano-dividas',['dívida','divida','cartão','cartao']],
+    ['avista-parcelado',['à vista','a vista','parcelado']],
+    ['meta-financeira',['meta','chegar em']]
+  ];
+  let best=['quanto-rende',0];
+  for(const [id,words] of rules){
+    let score=words.reduce((s,w)=>s+(text.includes(w)?1:0),0);
+    if(score>best[1])best=[id,score];
+  }
+  return best[0];
+}
+function interpretAsk(raw){
+  let text=String(raw||'').toLowerCase(),toolId=detectAskTool(text),values={},understood=[],missing=[];
+  const add=(id,value,label,display)=>{
+    if(value===null||value===undefined||!Number.isFinite(value))return;
+    values[id]=String(value);understood.push([label,display||BRL(value)]);
+  };
+  if(toolId==='aposentadoria'){
+    let age=firstInt(text,[/tenho\s+(\d{1,2})\s+anos/]);
+    let ret=firstInt(text,[/(?:aposentar|aposentadoria|parar de trabalhar).*?(?:aos|com)\s+(\d{1,2})\s+anos/,/(?:aos|com)\s+(\d{1,2})\s+anos.*?(?:aposent|parar)/]);
+    let current=firstMoney(text,['MONEY\\s+(?:investid|aplicad|guardad)','(?:patrimônio|patrimonio|tenho investido|tenho aplicado)(?:\\s+de)?\\s+MONEY']);
+    let pmt=firstMoney(text,['(?:guardo|guardar|aporto|aportar|invisto|investir)(?:\\s+por mês|\\s+por mes|\\s+mensalmente)?\\s+MONEY','MONEY\\s+(?:por mês|por mes|mensais).*?(?:guardar|aportar|investir)']);
+    let income=firstMoney(text,['(?:receber|recebendo|renda desejada|renda de)(?:\\s+de)?\\s+MONEY','MONEY\\s+(?:por mês|por mes).*?(?:aposent|renda)']);
+    add('age',age,'Idade atual',age?age+' anos':null);
+    add('ret',ret,'Aposentadoria',ret?ret+' anos':null);
+    add('current',current,'Patrimônio atual',current?BRL(current):null);
+    add('pmt',pmt,'Aporte mensal',pmt?BRL(pmt)+'/mês':null);
+    add('income',income,'Renda desejada',income?BRL(income)+'/mês':null);
+    if(age===null)missing.push('idade atual');
+    if(ret===null)missing.push('idade de aposentadoria');
+    if(current===null)missing.push('patrimônio atual');
+    if(pmt===null)missing.push('aporte mensal');
+    if(income===null)missing.push('renda desejada');
+  }else if(toolId==='amortizar-investir'){
+    let bal=firstMoney(text,['(?:saldo devedor|financiamento|devo)(?:\\s+de)?\\s+MONEY']);
+    let cash=firstMoney(text,['MONEY\\s+(?:disponível|disponivel|para amortizar)','(?:tenho|capital disponível|capital disponivel)(?:\\s+de)?\\s+MONEY']);
+    let debt=firstRate(text,[/(?:taxa|custo|cet).*?(\d+(?:[.,]\d+)?)%\s*(?:ao ano|a\.a\.)/,/(\d+(?:[.,]\d+)?)%\s*(?:ao ano|a\.a\.).*?(?:financiamento|dívida|divida)/]);
+    let inv=firstRate(text,[/(?:rende|rendimento|retorno).*?(\d+(?:[.,]\d+)?)%/]);
+    let months=firstInt(text,[/(\d+)\s+meses?\s+(?:restantes?|de prazo)/,/(\d+)\s+parcelas?\s+(?:restantes?)/]);
+    add('balance',bal,'Saldo devedor',bal?BRL(bal):null);
+    add('cash',cash,'Capital disponível',cash?BRL(cash):null);
+    add('debtA',debt,'Custo da dívida',debt!==null?PCT(debt)+' a.a.':null);
+    add('invGross',inv,'Retorno esperado',inv!==null?PCT(inv)+' a.a.':null);
+    add('months',months,'Prazo restante',months?months+' meses':null);
+    if(bal===null)missing.push('saldo devedor');
+    if(debt===null)missing.push('custo/taxa anual da dívida');
+    if(months===null)missing.push('prazo restante');
+    if(cash===null)missing.push('capital disponível');
+    if(inv===null)missing.push('retorno esperado do investimento');
+  }else if(toolId==='comprar-alugar'){
+    let asset=firstMoney(text,['(?:imóvel|imovel|apartamento|casa)(?:\\s+(?:de|vale|custa))?\\s+MONEY','MONEY\\s+(?:de imóvel|de imovel|de apartamento|de casa)']);
+    let down=firstMoney(text,['entrada(?:\\s+de)?\\s+MONEY']);
+    let rent=firstMoney(text,['aluguel(?:\\s+de|\\s+por)?\\s+MONEY']);
+    let fin=firstRate(text,[/(?:financiamento|crédito|credito).*?(\d+(?:[.,]\d+)?)%\s*(?:a\.m\.|ao mês|ao mes)/]);
+    let inv=firstRate(text,[/(?:retorno|rende|investimento).*?(\d+(?:[.,]\d+)?)%\s*(?:a\.a\.|ao ano)?/]);
+    let years=firstInt(text,[/(\d+)\s+anos?\s+(?:de horizonte|comparando|para comparar)/]);
+    add('asset',asset,'Valor do imóvel',asset?BRL(asset):null);
+    add('down',down,'Entrada',down?BRL(down):null);
+    add('rent',rent,'Aluguel',rent?BRL(rent)+'/mês':null);
+    add('finM',fin,'Taxa do financiamento',fin!==null?PCT(fin)+' a.m.':null);
+    add('inv',inv,'Retorno investido',inv!==null?PCT(inv)+' a.a.':null);
+    add('years',years,'Horizonte',years?years+' anos':null);
+    if(asset===null)missing.push('valor do imóvel');
+    if(rent===null)missing.push('aluguel mensal');
+    if(inv===null)missing.push('retorno do investimento');
+    if(years===null)missing.push('horizonte da comparação');
+  }else if(toolId==='financiamento-consorcio'){
+    let asset=firstMoney(text,['(?:imóvel|imovel|bem|carro)(?:\\s+(?:de|vale|custa))?\\s+MONEY','MONEY\\s+(?:de imóvel|de imovel|de bem|de carro)']);
+    let cash=firstMoney(text,['(?:entrada|capital disponível|capital disponivel|tenho)(?:\\s+de)?\\s+MONEY']);
+    let fin=firstRate(text,[/(?:financiamento|crédito|credito).*?(\d+(?:[.,]\d+)?)%\s*(?:a\.m\.|ao mês|ao mes)/]);
+    let cont=firstInt(text,[/(?:contemplação|contemplacao|contemplado).*?(\d+)\s+mes/]);
+    let inv=firstRate(text,[/(?:retorno|rende|investimento).*?(\d+(?:[.,]\d+)?)%\s*(?:a\.a\.|ao ano)?/]);
+    add('asset',asset,'Valor do bem',asset?BRL(asset):null);
+    add('cash',cash,'Capital/entrada',cash?BRL(cash):null);
+    add('finM',fin,'Taxa do financiamento',fin!==null?PCT(fin)+' a.m.':null);
+    add('cont',cont,'Contemplação simulada',cont?cont+' meses':null);
+    add('inv',inv,'Retorno alternativo',inv!==null?PCT(inv)+' a.a.':null);
+    if(asset===null)missing.push('valor do bem');
+    if(cash===null)missing.push('capital disponível/entrada');
+    if(fin===null)missing.push('taxa do financiamento');
+    if(inv===null)missing.push('retorno alternativo');
+  }
+  return{raw:String(raw||''),toolId,values,understood,missing};
+}
+function renderAskContext(ctx){
+  const box=$('askContextBanner');
+  if(!ctx||ctx.toolId!==state.current?.id){box.classList.add('hidden');return}
+  $('askContextTitle').textContent=ctx.understood.length?'Transformei parte da sua pergunta em premissas.':'Encontrei o motor mais adequado para sua pergunta.';
+  $('askUnderstood').innerHTML=ctx.understood.length?ctx.understood.map(x=>'<span><small>'+x[0]+'</small><b>'+x[1]+'</b></span>').join(''):'<span><small>ROTEAMENTO</small><b>'+state.current.title+'</b></span>';
+  $('askMissing').innerHTML=ctx.missing.length?'<b>Ainda falta:</b> '+ctx.missing.join(' · '):'<b>Dados principais identificados.</b> Revise as premissas antes de calcular.';
+  box.classList.remove('hidden');
+}
+function applyPendingAsk(){
+  if(!state.pendingAsk||state.pendingAsk.toolId!==state.current?.id){state.askContext=null;renderAskContext(null);return}
+  state.askContext=state.pendingAsk;state.pendingAsk=null;
+  setAssumptions(state.askContext.values);
+  renderAskContext(state.askContext);
+}
+function askAmarelo(q){
+  let ctx=interpretAsk(q);
+  state.pendingAsk=ctx;
+  openTool(ctx.toolId);
+}
 function planAllows(t){return t.tier==='free'||state.plan!=='free'}
 function setDemoPlan(p){state.plan=p;storage.set('amarelo_plan',p);toast('Plano de demonstração: '+p.toUpperCase());if(state.current)openCurrentTool();renderDashboard()}
 
@@ -1023,7 +1187,7 @@ function restoreScenarioState(savedState){
 }
 
 function openTool(id){state.current=tools.find(t=>t.id===id);navigate('tool');openCurrentTool()}
-function openCurrentTool(){const t=state.current;state.scenario=null;state.scenarioBusy=false;$('scenarioLab').classList.add('hidden');$('scenarioCompare').classList.add('hidden');$('toolTitle').textContent=t.title;$('toolDescription').textContent=t.desc;$('toolCategory').textContent=t.cat.toUpperCase();$('toolTier').textContent=t.tier==='decision'?'DECISÃO PRO':t.tier==='pro'?'PRO':'GRÁTIS';$('toolTier').className='tier '+t.tier;$('toolForm').innerHTML=buildForm(t.engine);$('methodology').textContent=method(t.engine);state.mode='simple';setMode('simple');updateFav();state.last=null;clearResult();let allowed=planAllows(t);$('paywall').classList.toggle('hidden',allowed);$('calculator').classList.toggle('hidden',!allowed);if(allowed){calculateTool();initScenarioLab()}}
+function openCurrentTool(){const t=state.current;state.scenario=null;state.scenarioBusy=false;$('scenarioLab').classList.add('hidden');$('scenarioCompare').classList.add('hidden');$('toolTitle').textContent=t.title;$('toolDescription').textContent=t.desc;$('toolCategory').textContent=t.cat.toUpperCase();$('toolTier').textContent=t.tier==='decision'?'DECISÃO PRO':t.tier==='pro'?'PRO':'GRÁTIS';$('toolTier').className='tier '+t.tier;$('toolForm').innerHTML=buildForm(t.engine);$('methodology').textContent=method(t.engine);applyPendingAsk();state.mode='simple';setMode('simple');updateFav();state.last=null;clearResult();let allowed=planAllows(t);$('paywall').classList.toggle('hidden',allowed);$('calculator').classList.toggle('hidden',!allowed);if(allowed){calculateTool();initScenarioLab()}}
 function updateFav(){$('favoriteBtn').textContent=(isFav(state.current.id)?'★':'☆')+' Favoritar'}function toggleFavoriteCurrent(){toggleFav(state.current.id);updateFav()}
 function setMode(m){state.mode=m;$('simpleMode').classList.toggle('active',m==='simple');$('advancedMode').classList.toggle('active',m==='advanced');$('toolForm').classList.toggle('advanced',m==='advanced')}
 function clearResult(){$('resultPrimary').textContent='Calculando...';$('resultSubtitle').textContent='';$('resultMetrics').innerHTML='';['resultInsight','breakEvenBox','sensitivityBox','chartBox','assumptionBox','driverBox'].forEach(id=>$(id).classList.add('hidden'));$('nextTools').innerHTML=''}
