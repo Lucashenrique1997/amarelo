@@ -12,7 +12,12 @@ const required = [
   "AMARELO V9",
   "Premissas usadas nesta conta",
   "function openSavedDecision",
-  "function calculateTool()"
+  "function calculateTool()",
+  "function loanFlow",
+  "finSystem",
+  "loanSystem",
+  "propertyTax",
+  "acumulação + fase de renda"
 ];
 
 for (const marker of required) {
