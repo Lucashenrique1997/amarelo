@@ -1,21 +1,34 @@
 export const PRODUCT = Object.freeze({
   app: "amarelo",
-  phase: "beta",
-  proBeta: true,
-  localDecisions: true
+  defaultPhase: "beta"
 });
 
+function enabled(value) {
+  return String(value || "").toLowerCase() === "true";
+}
+
 export function capabilities(env) {
+  const authentication = enabled(env.AUTH_ENABLED);
+  const billing = enabled(env.BILLING_ENABLED);
+  const aiInterpretation = enabled(env.AI_ENABLED);
+  const persistence = Boolean(env.DB) && authentication;
+  const phase = env.PRODUCT_PHASE || PRODUCT.defaultPhase;
+  const proBeta = !billing && phase === "beta";
+
   return {
     ok: true,
     app: PRODUCT.app,
-    phase: PRODUCT.phase,
+    phase,
     database: env.DB ? "bound" : "not-bound-yet",
-    persistence: false,
-    authentication: false,
-    billing: false,
-    ai_interpretation: false,
-    local_decisions: PRODUCT.localDecisions,
-    pro_beta: PRODUCT.proBeta
+    persistence,
+    authentication,
+    billing,
+    ai_interpretation: aiInterpretation,
+    local_decisions: true,
+    pro_beta: proBeta
   };
+}
+
+export function proBetaEnabled(env) {
+  return capabilities(env).pro_beta;
 }
