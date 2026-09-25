@@ -103,6 +103,20 @@ body{background:
 
 .toolCard{display:flex;flex-direction:column}.toolCard p{flex:1}.toolCardFoot{display:flex;justify-content:space-between;align-items:end;gap:8px;margin-top:14px}.toolCardFoot .tierTag{margin-top:0}.toolCardFoot b{font-size:9px;color:#7b7050;white-space:nowrap}.decisionCard{background:linear-gradient(180deg,#fffdf8,#fff8d8);border-color:#e3d38c}.decisionCard .toolIcon{background:var(--yellow)}
 
+
+.mobileNav{display:none}
+@media(max-width:760px){
+ body{padding-bottom:76px}
+ .mobileNav{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;z-index:90;left:10px;right:10px;bottom:10px;padding:7px;background:rgba(23,22,15,.94);backdrop-filter:blur(18px);border:1px solid #302f26;border-radius:22px;box-shadow:0 16px 50px rgba(0,0,0,.28)}
+ .mobileNav button{border:0;background:transparent;color:#aaa99f;border-radius:15px;padding:7px 4px;display:grid;place-items:center;gap:3px;cursor:pointer}
+ .mobileNav button span{font-size:15px;color:var(--yellow);line-height:1}
+ .mobileNav button b{font-size:8px;font-weight:850;letter-spacing:.01em}
+ .topbar .nav nav .btn{display:none}
+}
+
+
+@media(max-width:760px){.mobileNav button.active{background:#2a291f;color:#fff}.mobileNav button.active b{color:#fff}}
+
 </style>
 </head>
 <body>
@@ -117,6 +131,13 @@ body{background:
     </nav>
   </div>
 </header>
+
+<nav class="mobileNav" aria-label="Navegação principal">
+  <button data-route="home"><span>⌂</span><b>Início</b></button>
+  <button data-route="tools"><span>◎</span><b>Decisões</b></button>
+  <button data-route="dashboard"><span>▦</span><b>Meu AMARELO</b></button>
+  <button data-route="ask"><span>?</span><b>Pergunte</b></button>
+</nav>
 
 <main id="app">
   <section id="route-home" class="route">
@@ -393,7 +414,7 @@ const tools=[
 const deepIds=new Set(['renda-fixa','gross-up','financiamento-consorcio','comprar-alugar','avista-parcelado','amortizar-investir','plano-dividas','meta-financeira','viver-renda','aposentadoria','salario-liquido','quanto-rende']);
 const categories=['Todas',...new Set(tools.map(t=>t.cat))];
 
-function navigate(route){state.route=route;document.querySelectorAll('.route').forEach(x=>x.classList.add('hidden'));$('route-'+route).classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});if(route==='home')renderHome();if(route==='tools')renderTools('');if(route==='dashboard')renderDashboard();if(route==='ask')renderAskExamples()}
+function navigate(route){state.route=route;document.querySelectorAll('.route').forEach(x=>x.classList.add('hidden'));$('route-'+route).classList.remove('hidden');document.querySelectorAll('.mobileNav button').forEach(b=>b.classList.toggle('active',b.dataset.route===(route==='tool'?'tools':route)));window.scrollTo({top:0,behavior:'smooth'});if(route==='home')renderHome();if(route==='tools')renderTools('');if(route==='dashboard')renderDashboard();if(route==='ask')renderAskExamples()}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-route]');if(b)navigate(b.dataset.route)});
 function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 function favs(){return storage.get('amarelo_favs',[])}function saved(){return storage.get('amarelo_decisions',[])}
