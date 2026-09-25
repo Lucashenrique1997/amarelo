@@ -421,6 +421,17 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
 @media(max-width:900px){.scenarioLabHead{display:block}.scenarioLabActions{justify-content:flex-start;margin-top:14px}.whatIfBlock{grid-template-columns:1fr}.scenarioCompareGrid{grid-template-columns:1fr}.decisionDrivers{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){.scenarioLab{border-radius:23px}.scenarioLabHead{padding:18px 17px 14px}.scenarioTabs{padding:0 17px 14px}.scenarioTab{min-width:118px}.whatIfBlock{padding:14px 17px}.whatIfQuick{grid-template-columns:1fr}.scenarioCompare{padding:17px}.decisionDrivers{grid-template-columns:1fr 1fr}}
 
+
+/* V12 version history */
+.decisionTitleLine{display:flex;align-items:center;gap:7px}.decisionTitleLine h4{margin:0}.decisionTitleLine span{font-size:6px;font-weight:950;letter-spacing:.08em;background:var(--v11-cream);color:#927b18;border-radius:999px;padding:4px 6px}
+.versionModalCard{width:min(1040px,100%);max-height:90vh;overflow:auto}.versionModalLead{font-size:10px;color:#817a6e;margin-top:-8px;margin-bottom:20px}
+.versionCompareGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.versionCard{border:1px solid rgba(19,19,14,.09);background:#faf8f1;border-radius:19px;padding:15px;display:flex;flex-direction:column;min-height:300px}
+.versionCard.latest{background:linear-gradient(145deg,#fffef9,#fff6c9);border-color:#dfce7e}.versionCardTop{display:flex;justify-content:space-between;gap:8px;font-size:6px;letter-spacing:.09em;color:#8e877a}.versionCardTop span{font-weight:950}.versionCardTop b{font-weight:750}
+.versionCard h3{font-size:12px;margin:14px 0 6px}.versionPrimary{font-size:18px;font-weight:900;letter-spacing:-.035em}.versionCard>p{font-size:7px;color:#8d8679;line-height:1.45;min-height:30px}
+.versionMetrics{margin-top:9px;border-top:1px solid #e6e0d3;padding-top:6px;flex:1}.versionMetrics div{display:flex;justify-content:space-between;gap:8px;padding:4px 0;font-size:7px}.versionMetrics b{font-size:7px;text-align:right}
+.versionCard>button{border:0;background:transparent;text-align:left;padding:10px 0 0;font-size:8px;font-weight:900;color:#6f5d16;cursor:pointer}
+@media(max-width:900px){.versionCompareGrid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.versionCompareGrid{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -670,6 +681,16 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
     </div>
     <button class="btn yellow wide" onclick="saveProfile()">Salvar perfil</button>
     <p class="privacy">Nesta versão os dados ficam somente neste navegador.</p>
+  </div>
+</div>
+
+<div id="versionModal" class="modal hidden">
+  <div class="modalCard versionModalCard">
+    <button class="modalClose naked" onclick="closeVersionCompare()">×</button>
+    <span class="kicker">HISTÓRICO DA DECISÃO</span>
+    <h2 id="versionModalTitle">Compare versões.</h2>
+    <p class="versionModalLead">Veja como a mesma decisão mudou quando as premissas mudaram.</p>
+    <div id="versionCompareGrid" class="versionCompareGrid"></div>
   </div>
 </div>
 
@@ -1174,11 +1195,41 @@ function calculateTool(){if(state.scenario&&!state.scenarioBusy)persistActiveSce
  else if(e==='diagnostic'){let inc=num('income'),debt=inc?num('debt')/inc*100:0,save=inc?num('saving')/inc*100:0,months=num('ess')?num('reserve')/num('ess'):0;setResult('Diagnóstico pronto','Três sinais principais.',[['Dívidas/renda',PCT(debt)],['Taxa de poupança',PCT(save)],['Reserva',months.toFixed(1)+' meses']])}
 }catch(err){console.error(err);toast('Revise os dados da simulação.')}}
 function captureAssumptions(){return [...document.querySelectorAll('#toolForm input,#toolForm select')].reduce((a,el)=>{a[el.id]=el.value;return a},{})}
-function saveDecision(){if(!state.last)return toast('Calcule primeiro.');let d=saved();let limit=state.plan==='free'?3:100;if(state.plan==='free'&&d.length>=limit)return toast('No Free você pode salvar até 3 decisões.');d.unshift({id:Date.now(),toolId:state.current.id,title:state.current.title,primary:state.last.primary,subtitle:state.last.subtitle,metrics:state.last.metrics||[],assumptions:captureAssumptions(),mode:state.mode,date:new Date().toISOString()});storage.set('amarelo_decisions',d.slice(0,100));toast('Decisão e premissas salvas.');renderDashboard()}
-function openSavedDecision(id){let d=saved().find(x=>x.id===id);if(!d)return toast('Decisão não encontrada.');openTool(d.toolId);if(d.assumptions){Object.entries(d.assumptions).forEach(([k,v])=>{let el=$(k);if(el)el.value=v})}if(d.mode==='advanced')setMode('advanced');calculateTool();toast('Premissas restauradas.')}
-function deleteDecision(id){storage.set('amarelo_decisions',saved().filter(x=>x.id!==id));renderDashboard();toast('Decisão removida deste navegador.')}
-function copyResult(){if(!state.last)return;navigator.clipboard?.writeText(`${state.current.title}\n${state.last.primary}\n${state.last.subtitle}\n${state.last.metrics.map(x=>x[0]+': '+x[1]).join('\n')}`);toast('Resumo copiado.')}
-function renderDashboard(){let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0}),months=p.essentials?p.reserve/p.essentials:0;$('profileSummary').innerHTML=[['Renda líquida',BRL(p.income)],['Patrimônio financeiro',BRL(p.wealth)],['Reserva',months?months.toFixed(1)+' meses':'—'],['Investimento mensal',BRL(p.monthly)]].map(x=>`<div class="profileStat"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('');let d=saved();$('savedDecisions').innerHTML=d.length?d.slice(0,8).map(x=>`<div class="decisionRow"><div><h4>${x.title}</h4><p>${new Date(x.date).toLocaleString('pt-BR')} · premissas salvas</p></div><div class="decisionValue"><strong>${x.primary}</strong><div class="decisionActions"><button onclick="openSavedDecision(${x.id})">Reabrir</button><button onclick="deleteDecision(${x.id})">Excluir</button></div></div></div>`).join(''):'<div class="dashEmpty"><span>01</span><h4>Seu histórico começa na primeira decisão.</h4><p>Faça uma simulação e salve as premissas para voltar depois.</p><button onclick="navigate(\'tools\')">Abrir biblioteca →</button></div>';let f=favs().map(id=>tools.find(t=>t.id===id)).filter(Boolean);$('favoriteTools').innerHTML=f.length?f.slice(0,6).map(t=>`<div class="miniTool" onclick="openTool('${t.id}')"><i>${t.icon}</i><b>${t.title}</b></div>`).join(''):'<div class="dashEmpty compact"><span>☆</span><h4>Fixe o que você usa mais.</h4><p>Seus favoritos aparecem aqui.</p></div>';let next=p.reserve<p.essentials*6&&p.essentials>0?['reserva','Sua reserva está abaixo de 6 meses.']:p.monthly>0?['meta-financeira','Transforme seu aporte mensal em uma meta.']:['diagnostico','Comece pelo diagnóstico financeiro.'];$('nextDecision').innerHTML=`<div class="miniTool" onclick="openTool('${next[0]}')"><i>→</i><div><b>${tools.find(t=>t.id===next[0])?.title||'Próxima análise'}</b><p class="muted">${next[1]}</p></div></div>`}
+function saveDecision(){
+ if(!state.last)return toast('Calcule primeiro.');
+ let d=saved(),limit=state.plan==='free'?3:100;
+ if(state.plan==='free'&&d.length>=limit)return toast('No Free você pode salvar até 3 decisões.');
+ let previous=d.filter(x=>x.toolId===state.current.id),version=(previous.reduce((m,x)=>Math.max(m,x.version||1),0)||0)+1;
+ let scenarioState=exportScenarioState(),scenarioId=scenarioState?.active||null,scenarioLabel=scenarioId?getScenarioLabel(scenarioId):null;
+ d.unshift({
+   id:Date.now(),toolId:state.current.id,title:state.current.title,version,
+   scenarioLabel,primary:state.last.primary,subtitle:state.last.subtitle,metrics:state.last.metrics||[],
+   assumptions:captureAssumptions(),scenarioState,mode:state.mode,date:new Date().toISOString()
+ });
+ storage.set('amarelo_decisions',d.slice(0,100));
+ toast(scenarioEnabled()?`Versão ${version} salva com cenários.`:'Decisão e premissas salvas.');
+ renderDashboard();
+}
+function openSavedDecision(id){
+ let d=saved().find(x=>x.id===id);if(!d)return toast('Decisão não encontrada.');
+ openTool(d.toolId);
+ let restored=false;
+ if(d.scenarioState&&state.scenario)restored=restoreScenarioState(d.scenarioState);
+ if(!restored&&d.assumptions){setAssumptions(d.assumptions);calculateTool()}
+ if(d.mode==='advanced')setMode('advanced');
+ toast(`Versão ${d.version||1} restaurada.`);
+}
+function deleteDecision(id){storage.set('amarelo_decisions',saved().filter(x=>x.id!==id));renderDashboard();toast('Versão removida deste navegador.')}
+function closeVersionCompare(){$('versionModal').classList.add('hidden')}
+function openVersionCompare(toolId){
+ let versions=saved().filter(x=>x.toolId===toolId).sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,4);
+ if(versions.length<2)return toast('Salve pelo menos duas versões desta decisão.');
+ $('versionModalTitle').textContent=(versions[0]?.title||'Decisão')+' — versões';
+ $('versionCompareGrid').innerHTML=versions.map((v,i)=>`<article class="versionCard ${i===0?'latest':''}"><div class="versionCardTop"><span>VERSÃO ${v.version||versions.length-i}</span><b>${new Date(v.date).toLocaleDateString('pt-BR')}</b></div><h3>${v.scenarioLabel||'Cenário salvo'}</h3><div class="versionPrimary">${v.primary}</div><p>${v.subtitle||''}</p><div class="versionMetrics">${(v.metrics||[]).slice(0,4).map(m=>`<div><span>${m[0]}</span><b>${m[1]}</b></div>`).join('')}</div><button onclick="closeVersionCompare();openSavedDecision(${v.id})">Reabrir esta versão →</button></article>`).join('');
+ $('versionModal').classList.remove('hidden');
+}
+function copyResult(){if(!state.last)return;navigator.clipboard?.writeText(`${state.current.title}\n${state.scenario?getScenarioLabel(state.scenario.active)+'\n':''}${state.last.primary}\n${state.last.subtitle}\n${state.last.metrics.map(x=>x[0]+': '+x[1]).join('\n')}`);toast('Resumo copiado.')}
+function renderDashboard(){let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0}),months=p.essentials?p.reserve/p.essentials:0;$('profileSummary').innerHTML=[['Renda líquida',BRL(p.income)],['Patrimônio financeiro',BRL(p.wealth)],['Reserva',months?months.toFixed(1)+' meses':'—'],['Investimento mensal',BRL(p.monthly)]].map(x=>`<div class="profileStat"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('');let d=saved();$('savedDecisions').innerHTML=d.length?d.slice(0,8).map(x=>{let count=d.filter(y=>y.toolId===x.toolId).length;return`<div class="decisionRow"><div><div class="decisionTitleLine"><h4>${x.title}</h4><span>V${x.version||1}</span></div><p>${new Date(x.date).toLocaleString('pt-BR')}${x.scenarioLabel?' · '+x.scenarioLabel:''}</p></div><div class="decisionValue"><strong>${x.primary}</strong><div class="decisionActions"><button onclick="openSavedDecision(${x.id})">Reabrir</button>${count>1?`<button onclick="openVersionCompare('${x.toolId}')">Comparar versões</button>`:''}<button onclick="deleteDecision(${x.id})">Excluir</button></div></div></div>`}).join(''):'<div class="dashEmpty"><span>01</span><h4>Seu histórico começa na primeira decisão.</h4><p>Faça uma simulação e salve as premissas para voltar depois.</p><button onclick="navigate(\'tools\')">Abrir biblioteca →</button></div>';let f=favs().map(id=>tools.find(t=>t.id===id)).filter(Boolean);$('favoriteTools').innerHTML=f.length?f.slice(0,6).map(t=>`<div class="miniTool" onclick="openTool('${t.id}')"><i>${t.icon}</i><b>${t.title}</b></div>`).join(''):'<div class="dashEmpty compact"><span>☆</span><h4>Fixe o que você usa mais.</h4><p>Seus favoritos aparecem aqui.</p></div>';let next=p.reserve<p.essentials*6&&p.essentials>0?['reserva','Sua reserva está abaixo de 6 meses.']:p.monthly>0?['meta-financeira','Transforme seu aporte mensal em uma meta.']:['diagnostico','Comece pelo diagnóstico financeiro.'];$('nextDecision').innerHTML=`<div class="miniTool" onclick="openTool('${next[0]}')"><i>→</i><div><b>${tools.find(t=>t.id===next[0])?.title||'Próxima análise'}</b><p class="muted">${next[1]}</p></div></div>`}
 function openProfile(){let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0});for(const k in p){let el=$('profile'+k[0].toUpperCase()+k.slice(1));if(el)el.value=p[k]}$('profileModal').classList.remove('hidden')}
 function closeProfile(){$('profileModal').classList.add('hidden')}
 function saveProfile(){let p={income:num('profileIncome'),wealth:num('profileWealth'),essentials:num('profileEssentials'),reserve:num('profileReserve'),monthly:num('profileMonthly'),age:num('profileAge')};storage.set('amarelo_profile',p);closeProfile();renderDashboard();toast('Perfil salvo neste navegador.')}
