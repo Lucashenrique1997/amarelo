@@ -6,6 +6,7 @@
   "scripts": {
     "verify": "node scripts/verify.mjs",
     "test:finance": "node scripts/test-finance-core.mjs",
-    "test": "npm run verify && npm run test:finance"
+    "test": "npm run verify && npm run test:finance && npm run test:engines",
+    "test:engines": "node scripts/test-decision-engines.mjs"
   }
 }
