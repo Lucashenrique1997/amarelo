@@ -22,7 +22,15 @@ const required = [
   "decisionCockpit",
   "dashboardSignal",
   "toolWorkspaceMeta",
-  "productSignature"
+  "productSignature",
+  "scenarioLab",
+  "function compareScenarios",
+  "function duplicateScenario",
+  "function renderScenarioCompare",
+  "function decisionDrivers",
+  "function interpretAsk",
+  "function openVersionCompare",
+  "LABORATÓRIO DE CENÁRIOS"
 ];
 
 for (const marker of required) {
