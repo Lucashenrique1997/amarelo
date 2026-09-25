@@ -29,13 +29,26 @@ export async function listDecisionVersions(db, userId, decisionId) {
 
 export async function upsertDecisionWithVersion(db, userId, input) {
   const now = new Date().toISOString();
-  const decisionId = input.decisionId || crypto.randomUUID();
   const decisionKey = input.decisionKey || `${input.toolId}::${input.decisionName || input.title}`;
   const reviewDueAt = input.reviewDueAt || null;
 
-  const existing = await db.prepare(
-    "SELECT id FROM decisions WHERE id = ? AND user_id = ?"
-  ).bind(decisionId, userId).first();
+  let decisionId = input.decisionId || null;
+  let existing = null;
+
+  if (decisionId) {
+    existing = await db.prepare(
+      "SELECT id FROM decisions WHERE id = ? AND user_id = ?"
+    ).bind(decisionId, userId).first();
+  }
+
+  if (!existing && decisionKey) {
+    existing = await db.prepare(
+      "SELECT id FROM decisions WHERE user_id = ? AND decision_key = ?"
+    ).bind(userId, decisionKey).first();
+    if (existing?.id) decisionId = existing.id;
+  }
+
+  if (!decisionId) decisionId = crypto.randomUUID();
 
   const decisionStatement = existing
     ? db.prepare(
@@ -65,6 +78,19 @@ export async function upsertDecisionWithVersion(db, userId, input) {
         reviewDueAt, now, now
       );
 
+  if (input.clientVersionId) {
+    const synced = await db.prepare(
+      `SELECT version_number
+         FROM decision_versions
+        WHERE decision_id = ? AND client_version_id = ?`
+    ).bind(decisionId, String(input.clientVersionId)).first();
+
+    if (synced) {
+      await decisionStatement.run();
+      return { decisionId, versionNumber: Number(synced.version_number), decisionKey, deduplicated: true };
+    }
+  }
+
   const current = await db.prepare(
     "SELECT COALESCE(MAX(version_number), 0) AS version FROM decision_versions WHERE decision_id = ?"
   ).bind(decisionId).first();
@@ -73,15 +99,16 @@ export async function upsertDecisionWithVersion(db, userId, input) {
   const versionStatement = db.prepare(
     `INSERT INTO decision_versions (
       id, decision_id, version_number, scenario_label, inputs_json, outputs_json,
-      assumptions_json, sensitivity_json, primary_result, summary, created_at
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      assumptions_json, sensitivity_json, primary_result, summary, created_at, client_version_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
     crypto.randomUUID(), decisionId, versionNumber, input.scenarioLabel || null,
     JSON.stringify(input.inputs || {}), JSON.stringify(input.outputs || {}),
     JSON.stringify(input.assumptions || {}), JSON.stringify(input.sensitivity || []),
-    input.primaryResult || null, input.summary || null, now
+    input.primaryResult || null, input.summary || null, now,
+    input.clientVersionId ? String(input.clientVersionId) : null
   );
 
   await db.batch([decisionStatement, versionStatement]);
-  return { decisionId, versionNumber, decisionKey };
+  return { decisionId, versionNumber, decisionKey, deduplicated: false };
 }
