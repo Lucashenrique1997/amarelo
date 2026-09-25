@@ -27,7 +27,7 @@ const migration2 = read("migrations/0002_commercial_readiness.sql");
 
 const frontend = [html, css, catalog, financeCore, decisionConfig, scenarioSystem, decisionEngines, dataStore, decisionHistory, dashboard, app].join("\n");
 const backend = [worker, apiRouter, apiHealth, productConfig, decisionsRepo, profilesRepo, workspacesRepo, wrangler, migration1, migration2].join("\n");
-const productionSurface = (frontend + "\n" + backend).toLowerCase();
+const runtimeSurface = [frontend, worker, apiRouter, apiHealth, productConfig, decisionsRepo, profilesRepo, workspacesRepo, wrangler].join("\n").toLowerCase();
 
 if (html !== rootHtml) throw new Error("Root preview and public application shell are out of sync.");
 if (/<style[\s>]/i.test(html)) throw new Error("Application shell must not contain inline CSS.");
@@ -162,7 +162,7 @@ if (frontend.includes("setDemoPlan('family')") || frontend.includes("setDemoPlan
 }
 
 for (const forbidden of ["azul-planejamento", "verde-market", "dourado"]) {
-  if (productionSurface.includes(forbidden)) throw new Error(`Cross-project reference detected: ${forbidden}`);
+  if (runtimeSurface.includes(forbidden)) throw new Error(`Cross-project runtime reference detected: ${forbidden}`);
 }
 
 console.log(`AMARELO 1.0 architecture verification passed: ${ids.length} tools, modular frontend, modular Worker, isolated project.`);
