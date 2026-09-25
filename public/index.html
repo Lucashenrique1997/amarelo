@@ -501,12 +501,23 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
 @media(max-width:760px){.decisionPulse{grid-template-columns:1fr 1fr}.reviewDecision{align-items:flex-start}.reportSensitivity{grid-template-columns:1fr}.reportEvolution{grid-template-columns:1fr}.reportEvolutionMetrics{grid-template-columns:1fr 1fr}}
 
 .reportEvolutionTableWrap{min-width:0;overflow:auto}.reportEvolutionTableWrap table{min-width:520px}
+
+/* ===== V17 — commercial truth ===== */
+.betaBadge{font-style:normal;font-size:6px;letter-spacing:.12em;background:var(--v11-yellow,#ffd522);color:#17160f;border-radius:999px;padding:5px 7px;margin-left:1px}
+.betaCommercialBar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:22px;margin:30px 0 18px;padding:20px 22px;border:1px solid rgba(19,19,14,.09);border-radius:22px;background:rgba(255,254,251,.65)}
+.betaCommercialBar>div{display:grid;gap:4px}.betaCommercialBar span{font-size:7px;letter-spacing:.13em;font-weight:950;color:#9c8421}.betaCommercialBar b{font-size:16px;letter-spacing:-.02em}.betaCommercialBar p{font-size:9px;color:#807a6f;margin:0;line-height:1.5}.betaCommercialBar i{font-style:normal;color:#aaa28f}
+.currentPricing{grid-template-columns:.82fr 1.18fr;max-width:910px}.betaPlan .targetPrice{font-size:9px;color:#aaa99e;margin:-2px 0 18px}.betaPlan .targetPrice b{color:#fff}.betaPlan h2 small{font-size:11px}
+.pricingProof,.futurePlans{margin-top:88px}.pricingProofHead{max-width:820px}.pricingProofHead h2{font-size:42px;line-height:1.02;letter-spacing:-.045em;margin:8px 0 24px}
+.proofGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.proofGrid article{min-height:190px;padding:20px;border:1px solid rgba(19,19,14,.09);border-radius:22px;background:rgba(255,254,251,.68)}.proofGrid article.proofDone{background:#181812;color:#fff;border-color:#181812}.proofGrid span{font-size:7px;letter-spacing:.1em;font-weight:950;color:#a48b20}.proofDone span{color:#ffd522}.proofGrid h3{font-size:15px;margin:30px 0 7px}.proofGrid p{font-size:9px;line-height:1.55;color:#817b70;margin:0}.proofDone p{color:#a6a49a}
+.futurePlanGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.futurePlan{padding:28px;border:1px solid rgba(19,19,14,.09);border-radius:27px;background:rgba(255,254,251,.7)}.futurePlan>div{display:flex;justify-content:space-between;gap:12px}.futurePlan>div span{font-size:8px;font-weight:950;letter-spacing:.12em}.futurePlan>div b{font-size:7px;color:#9a8420}.futurePlan h3{font-size:24px;letter-spacing:-.035em;margin:42px 0 8px}.futurePlan p{font-size:10px;line-height:1.6;color:#817b70;max-width:520px}.futurePlan .btn{margin-top:18px}
+@media(max-width:760px){.betaCommercialBar{grid-template-columns:1fr}.betaCommercialBar>i{transform:rotate(90deg);justify-self:start}.currentPricing,.proofGrid,.futurePlanGrid{grid-template-columns:1fr}.pricingProof,.futurePlans{margin-top:60px}.pricingProofHead h2{font-size:34px}}
+
 </style>
 </head>
 <body>
 <header class="topbar">
   <div class="shell nav">
-    <button class="brand naked" data-route="home"><span class="brandmark"></span><span>AMARELO</span></button>
+    <button class="brand naked" data-route="home"><span class="brandmark"></span><span>AMARELO</span><em class="betaBadge">BETA</em></button>
     <nav>
       <button class="naked navitem" data-route="tools">Decisões</button>
       <button class="naked navitem" data-route="dashboard">Meu AMARELO</button>
@@ -639,32 +650,75 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
   </section>
 
   <section id="route-pricing" class="route hidden shell page pricingPage">
-    <div class="pricingEyebrow"><span class="kicker">PLANOS</span><b>FREE → PRO → FAMÍLIA → PROFESSIONAL</b></div>
-    <h1 class="pricingTitle">Grátis para calcular. PRO para decidir com profundidade.</h1>
-    <p class="pricingLead">Os valores exibidos são hipóteses de validação comercial, não uma oferta definitiva. A diferença central está na profundidade, continuidade e histórico.</p>
-    <div class="pricingPrinciple"><span>FREE</span><b>resolve a conta</b><i>→</i><span>PRO</span><b>acompanha a decisão</b></div>
-    <div class="pricing">
+    <div class="pricingEyebrow"><span class="kicker">PLANOS / BETA</span><b>SEM COBRANÇA NESTA FASE</b></div>
+    <h1 class="pricingTitle">Primeiro provar valor.<br>Depois cobrar por continuidade.</h1>
+    <p class="pricingLead">O AMARELO ainda está em beta. Hoje você pode experimentar a experiência PRO sem cobrança. <b>R$ 24,90/mês é o preço-alvo de lançamento</b> quando conta, sincronização e persistência online estiverem disponíveis.</p>
+
+    <div class="betaCommercialBar">
+      <div><span>HOJE</span><b>Beta aberta</b><p>Dados ficam neste navegador. Não existe cobrança ativa.</p></div>
+      <i>→</i>
+      <div><span>LANÇAMENTO</span><b>PRO · R$ 24,90/mês</b><p>Conta, sincronização, decisões persistentes e acompanhamento.</p></div>
+    </div>
+
+    <div class="pricing currentPricing">
       <article class="plan">
-        <span>FREE</span><h2>R$ 0</h2><p>Para contas rápidas do dia a dia.</p>
-        <ul><li>Ferramentas rápidas</li><li>Simulações básicas</li><li>Até 3 decisões salvas</li><li>Busca por ferramentas</li></ul>
+        <span>FREE</span><h2>R$ 0</h2><p>Para contas rápidas e primeira experiência com o AMARELO.</p>
+        <ul>
+          <li>Ferramentas rápidas</li>
+          <li>Simulações básicas</li>
+          <li>Até 3 decisões salvas no navegador</li>
+          <li>Busca e biblioteca de decisões</li>
+        </ul>
         <button class="btn light" onclick="setDemoPlan('free')">Usar Free</button>
       </article>
-      <article class="plan featuredPlan">
-        <div class="recommended">MAIS COMPLETO</div><span>PRO</span><h2>R$ 24,90<small>/mês</small></h2><p>Para quem quer tomar decisões melhores.</p>
-        <ul><li>Todas as ferramentas</li><li>Motores de decisão PRO</li><li>Cenários e sensibilidade</li><li>Minhas Decisões ilimitadas</li><li>Pergunte ao AMARELO</li><li>Histórico e acompanhamento</li></ul>
-        <button class="btn yellow" onclick="setDemoPlan('pro')">Testar experiência PRO</button>
-      </article>
-      <article class="plan">
-        <span>FAMÍLIA</span><h2>R$ 39,90<small>/mês</small></h2><p>Metas e decisões compartilhadas.</p>
-        <ul><li>Tudo do PRO</li><li>Até 4 perfis</li><li>Metas familiares</li><li>Patrimônio consolidado</li><li>Decisões compartilhadas</li></ul>
-        <button class="btn light" onclick="setDemoPlan('family')">Visualizar Família</button>
-      </article>
-      <article class="plan">
-        <span>PROFESSIONAL</span><h2>R$ 149,90<small>/mês</small></h2><p>Para profissionais que simulam com clientes.</p>
-        <ul><li>Clientes e cenários</li><li>Relatórios profissionais</li><li>Exportação</li><li>Histórico por cliente</li><li>Marca profissional</li></ul>
-        <button class="btn light" onclick="setDemoPlan('professional')">Visualizar Professional</button>
+
+      <article class="plan featuredPlan betaPlan">
+        <div class="recommended">LIBERADO NA BETA</div>
+        <span>PRO PREVIEW</span>
+        <h2>R$ 0<small> durante a beta</small></h2>
+        <p class="targetPrice">Preço-alvo no lançamento: <b>R$ 24,90/mês</b></p>
+        <ul>
+          <li>42 ferramentas e motores de decisão</li>
+          <li>Cenários Base, Conservador e Otimista</li>
+          <li>Break-even, sensibilidade e “E se?”</li>
+          <li>Versões de decisões e fila de revisão</li>
+          <li>Relatório AMARELO para impressão/PDF</li>
+          <li>Pergunte ao AMARELO — roteamento inteligente em beta</li>
+        </ul>
+        <button class="btn yellow" onclick="setDemoPlan('pro')">Ativar PRO Beta</button>
       </article>
     </div>
+
+    <section class="pricingProof">
+      <div class="pricingProofHead">
+        <span class="kicker">O QUE PRECISA EXISTIR PARA COBRAR</span>
+        <h2>Mensalidade exige continuidade, não apenas uma conta boa.</h2>
+      </div>
+      <div class="proofGrid">
+        <article class="proofDone"><span>✓ HOJE</span><h3>Decisão profunda</h3><p>Motores, cenários, break-even, sensibilidade, relatórios e versões locais.</p></article>
+        <article><span>PRÓXIMO</span><h3>Conta e sincronização</h3><p>Decisões salvas no D1 e disponíveis em qualquer dispositivo.</p></article>
+        <article><span>PRÓXIMO</span><h3>Acompanhamento real</h3><p>Revisões, metas e mudanças de premissas persistentes ao longo do tempo.</p></article>
+        <article><span>PRÓXIMO</span><h3>Assinatura real</h3><p>Controle de plano, cobrança e permissões sem modo de demonstração.</p></article>
+      </div>
+    </section>
+
+    <section class="futurePlans">
+      <div class="pricingProofHead"><span class="kicker">PRÓXIMOS PRODUTOS</span><h2>Família e Professional só entram quando forem produtos completos.</h2></div>
+      <div class="futurePlanGrid">
+        <article class="futurePlan">
+          <div><span>FAMÍLIA</span><b>EM DESENVOLVIMENTO</b></div>
+          <h3>Vida financeira compartilhada.</h3>
+          <p>Perfis separados, patrimônio consolidado, metas familiares, permissões e decisões compartilhadas.</p>
+          <button class="btn light" onclick="showFuturePlan('Família')">Ver o que falta →</button>
+        </article>
+        <article class="futurePlan">
+          <div><span>PROFESSIONAL</span><b>EM DESENVOLVIMENTO</b></div>
+          <h3>Workspace para profissionais.</h3>
+          <p>Clientes, histórico por cliente, relatórios com identidade profissional, organização e exportação.</p>
+          <button class="btn light" onclick="showFuturePlan('Professional')">Ver o que falta →</button>
+        </article>
+      </div>
+    </section>
   </section>
 
   <section id="route-ask" class="route hidden shell page askPage">
@@ -690,8 +744,8 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
       </div>
     </div>
     <div id="paywall" class="paywall hidden">
-      <div><span class="kicker gold">RECURSO PRO</span><h2>Veja a decisão completa.</h2><p>O modo gratuito mostra a conta básica. O PRO libera cenários, ponto de equilíbrio, “E se?”, gráfico e histórico.</p></div>
-      <button class="btn yellow" onclick="setDemoPlan('pro'); openCurrentTool()">Testar PRO nesta versão</button>
+      <div><span class="kicker gold">PRO BETA</span><h2>Veja a decisão completa.</h2><p>Na beta, você pode ativar gratuitamente a experiência PRO com cenários, ponto de equilíbrio, “E se?”, gráfico e histórico.</p></div>
+      <button class="btn yellow" onclick="setDemoPlan('pro'); openCurrentTool()">Ativar PRO Beta</button>
     </div>
     <div id="askContextBanner" class="askContextBanner hidden">
       <div class="askContextIcon">?</div>
@@ -1110,8 +1164,14 @@ function askAmarelo(q){
   state.pendingAsk=ctx;
   openTool(ctx.toolId);
 }
-function planAllows(t){return t.tier==='free'||state.plan!=='free'}
-function setDemoPlan(p){state.plan=p;storage.set('amarelo_plan',p);toast('Plano de demonstração: '+p.toUpperCase());if(state.current)openCurrentTool();renderDashboard()}
+function planAllows(t){return t.tier==='free'||state.plan==='pro'}
+function setDemoPlan(p){
+  if(!['free','pro'].includes(p))return showFuturePlan(p);
+  state.plan=p;storage.set('amarelo_plan',p);
+  toast(p==='pro'?'PRO Beta ativado neste navegador. Nenhuma cobrança foi realizada.':'Modo Free ativado.');
+  if(state.current)openCurrentTool();renderDashboard();
+}
+function showFuturePlan(name){toast(name+' ainda está em desenvolvimento. Não existe cobrança nem contratação ativa.');}
 
 const scenarioDecisionIds=new Set(['financiamento-consorcio','comprar-alugar','imovel-na-planta','amortizar-investir','bonus-decidir','aposentadoria','portabilidade-divida','trocar-carro','comparar-financiamentos','renda-fixa','meta-financeira','independencia-financeira','viver-renda']);
 const scenarioNames={base:'Base',conservative:'Conservador',optimistic:'Otimista'};
@@ -1846,7 +1906,7 @@ function ensureScenarioSnapshotsForReport(){
 function closeDecisionReport(){$('reportModal').classList.add('hidden')}
 function openDecisionReport(){
   if(!state.last)return toast('Calcule primeiro.');
-  if(state.plan==='free')return toast('O relatório completo faz parte da experiência PRO.');
+  if(state.plan==='free')return toast('O relatório completo está liberado no PRO Beta.');
   ensureScenarioSnapshotsForReport();
   const name=currentDecisionName(),scenarioLabel=state.scenario?getScenarioLabel(state.scenario.active):'Cenário atual';
   const metrics=(state.last.metrics||[]).map(m=>`<div class="reportMetric"><small>${escapeHtml(m[0])}</small><b>${escapeHtml(m[1])}</b></div>`).join('');
