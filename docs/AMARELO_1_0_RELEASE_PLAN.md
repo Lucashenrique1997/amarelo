@@ -83,7 +83,7 @@ Quando aplicável:
 - [x] repositórios D1 criados
 - [x] testes matemáticos iniciais
 - [x] CI com fronteiras arquiteturais
-- [ ] reduzir responsabilidades restantes do app.js onde trouxer benefício real
+- [x] reduzir responsabilidades restantes do app.js onde trouxer benefício real
 
 **Gate:** código alterável sem editar um monólito.
 
@@ -166,7 +166,7 @@ Quando aplicável:
 - [ ] rate limiting de APIs sensíveis
 - [ ] logs sem dados financeiros sensíveis
 - [ ] tratamento global de erros
-- [ ] backup/exportação básica do usuário
+- [x] backup/exportação básica do usuário
 
 ### I. Lançamento
 - [ ] domínio `oamarelo.com.br`
