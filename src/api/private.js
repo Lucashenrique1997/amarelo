@@ -5,6 +5,7 @@ import { listDecisions, listDecisionVersions, upsertDecisionWithVersion, deleteD
 import { listWorkspaces } from "../db/workspaces.js";
 import { listGoals, upsertGoal, deleteGoal } from "../db/goals.js";
 import { getEntitlements } from "../db/subscriptions.js";
+import { proBetaEnabled } from "../config/product.js";
 
 function databaseRequired(env) {
   return env.DB ? null : jsonError("database_not_configured", 503);
@@ -101,7 +102,7 @@ export async function handlePrivateApi(request, env, url) {
 
   if (url.pathname === "/api/v1/entitlements") {
     if (request.method !== "GET") return jsonError("method_not_allowed", 405);
-    return Response.json({ ok: true, entitlements: await getEntitlements(env.DB, userId) });
+    return Response.json({ ok: true, entitlements: await getEntitlements(env.DB, userId, { proBeta: proBetaEnabled(env) }) });
   }
 
   if (url.pathname === "/api/v1/export") {
@@ -111,7 +112,7 @@ export async function handlePrivateApi(request, env, url) {
       listDecisions(env.DB, userId, 500),
       listGoals(env.DB, userId),
       listWorkspaces(env.DB, userId),
-      getEntitlements(env.DB, userId)
+      getEntitlements(env.DB, userId, { proBeta: proBetaEnabled(env) })
     ]);
     const decisions = decisionList.results || [];
     const versions = {};
