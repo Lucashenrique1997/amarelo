@@ -1,0 +1,11 @@
+{
+  "name": "amarelo",
+  "private": true,
+  "version": "1.0.0-beta",
+  "type": "module",
+  "scripts": {
+    "verify": "node scripts/verify.mjs",
+    "test:finance": "node scripts/test-finance-core.mjs",
+    "test": "npm run verify && npm run test:finance"
+  }
+}
