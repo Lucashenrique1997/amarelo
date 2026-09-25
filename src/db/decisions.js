@@ -87,7 +87,7 @@ export async function upsertDecisionWithVersion(db, userId, input) {
 
     if (synced) {
       await decisionStatement.run();
-      return { decisionId, versionNumber: Number(synced.version_number), decisionKey, deduplicated: true };
+      return { decisionId, versionId: synced.id, versionNumber: Number(synced.version_number), decisionKey, deduplicated: true };
     }
   }
 
@@ -96,19 +96,21 @@ export async function upsertDecisionWithVersion(db, userId, input) {
   ).bind(decisionId).first();
   const versionNumber = Number(current?.version || 0) + 1;
 
+  const versionId = crypto.randomUUID();
+  const versionCreatedAt = input.clientCreatedAt || now;
   const versionStatement = db.prepare(
     `INSERT INTO decision_versions (
       id, decision_id, version_number, scenario_label, inputs_json, outputs_json,
       assumptions_json, sensitivity_json, primary_result, summary, created_at, client_version_id
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   ).bind(
-    crypto.randomUUID(), decisionId, versionNumber, input.scenarioLabel || null,
+    versionId, decisionId, versionNumber, input.scenarioLabel || null,
     JSON.stringify(input.inputs || {}), JSON.stringify(input.outputs || {}),
     JSON.stringify(input.assumptions || {}), JSON.stringify(input.sensitivity || []),
-    input.primaryResult || null, input.summary || null, now,
+    input.primaryResult || null, input.summary || null, versionCreatedAt,
     input.clientVersionId ? String(input.clientVersionId) : null
   );
 
   await db.batch([decisionStatement, versionStatement]);
-  return { decisionId, versionNumber, decisionKey, deduplicated: false };
+  return { decisionId, versionId, versionNumber, decisionKey, deduplicated: false };
 }
