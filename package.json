@@ -1,0 +1,18 @@
+{
+  "name": "amarelo",
+  "private": true,
+  "version": "1.0.0-beta",
+  "type": "module",
+  "scripts": {
+    "verify": "node scripts/verify.mjs",
+    "test:finance": "node scripts/test-finance-core.mjs",
+    "test": "npm run verify && npm run test:migrations && npm run test:finance && npm run test:engines && npm run test:worker && npm run test:security && npm run test:billing && npm run test:ui",
+    "test:engines": "node scripts/test-decision-engines.mjs",
+    "test:worker": "node scripts/test-worker.mjs",
+    "test:sync": "node scripts/test-sync-service.mjs",
+    "test:security": "node scripts/test-security.mjs",
+    "test:ui": "node scripts/test-ui-contracts.mjs",
+    "test:migrations": "python3 scripts/test-migrations.py",
+    "test:billing": "node scripts/test-billing.mjs"
+  }
+}
