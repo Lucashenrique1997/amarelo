@@ -32,5 +32,7 @@ const amareloApi={
   saveGoal(goal){return this.request('/api/v1/goals',{method:goal?.id?'PUT':'POST',body:goal})},
   deleteGoal(id){return this.request('/api/v1/goals/'+encodeURIComponent(id),{method:'DELETE'})},
   entitlements(){return this.request('/api/v1/entitlements')},
-  exportAccount(){return this.request('/api/v1/export')}
+  exportAccount(){return this.request('/api/v1/export')},
+  logout(){return this.request('/api/v1/session',{method:'DELETE'})},
+  logoutEverywhere(){return this.request('/api/v1/sessions',{method:'DELETE'})}
 };
