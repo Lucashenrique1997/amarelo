@@ -33,6 +33,12 @@ public/
     decision-config.js
     decision-engines.js
     data-store.js
+    runtime-capabilities.js
+    api-client.js
+    sync-service.js
+    decision-history.js
+    goals.js
+    dashboard.js
     app.js
 ```
 
@@ -62,11 +68,15 @@ O Worker não expõe CRUD financeiro sem autenticação.
 Migrations:
 - `0001_initial.sql`
 - `0002_commercial_readiness.sql`
+- `0003_sync_safety.sql`
+- `0004_goals_sync.sql`
 
 Repository layer já existe para:
 - decisões e versões;
 - perfil;
-- workspaces.
+- workspaces;
+- metas;
+- entitlements.
 
 O binding D1 ainda não está ativo.
 
