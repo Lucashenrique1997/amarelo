@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 
-const html = readFileSync("index.html", "utf8");
+const html = readFileSync("public/index.html", "utf8");
 
 const required = [
   "<title>AMARELO",
