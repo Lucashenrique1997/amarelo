@@ -55,7 +55,15 @@ const required = [
   "Mapa de Independência Financeira",
   "windDebtSystem",
   "não sustenta preservação",
-  "useExtra?lump:0"
+  "useExtra?lump:0",
+  "comparar-financiamentos",
+  "loanCompare",
+  "fixedIncomeProduct",
+  "fiAType",
+  "decisionPulse",
+  "reviewQueue",
+  "reportSensitivity",
+  "Desde a última versão"
 ];
 
 for (const marker of required) {
@@ -80,7 +88,8 @@ for (const id of [
   "trocar-carro",
   "imovel-na-planta",
   "bonus-decidir",
-  "independencia-financeira"
+  "independencia-financeira",
+  "comparar-financiamentos"
 ]) {
   if (!ids.includes(id)) throw new Error(`Missing priority decision engine: ${id}`);
 }
@@ -98,4 +107,4 @@ for (const forbidden of ["azul-planejamento", "verde-market", "dourado"]) {
   if (productionSurface.includes(forbidden)) throw new Error(`Cross-project reference detected: ${forbidden}`);
 }
 
-console.log(`AMARELO verification passed: ${ids.length} tools, scenarios, reports, new decision engines and isolated Worker.`);
+console.log(`AMARELO verification passed: ${ids.length} tools, V16 PRO depth, retention, reports and isolated Worker.`);

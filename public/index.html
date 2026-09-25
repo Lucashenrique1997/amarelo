@@ -487,6 +487,20 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
  .reportSection,.reportHero{break-inside:avoid}
 }
 
+
+/* ===== V16 — retention + professional reporting ===== */
+.decisionPulse{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:12px 0}
+.pulseStat{min-height:108px;padding:17px;border:1px solid rgba(19,19,14,.08);background:rgba(255,254,251,.7);border-radius:20px;display:flex;flex-direction:column;justify-content:flex-end}
+.pulseStat>span{font-size:7px;letter-spacing:.12em;color:#a18720;margin-bottom:auto}.pulseStat small{font-size:8px;color:#8a8478;margin-bottom:5px}.pulseStat b{font-size:24px;letter-spacing:-.04em}
+.reviewCard{background:linear-gradient(145deg,#fffdf4,#fff9d9);border-color:#e5d693}.reviewCard .cardHead{align-items:flex-start}.reviewRule{font-size:7px;letter-spacing:.08em;color:#94855b;border:1px solid #dfd1a2;border-radius:999px;padding:7px 9px}
+.reviewDecision{display:flex;justify-content:space-between;gap:20px;align-items:center;padding:14px 0;border-top:1px solid rgba(19,19,14,.08)}
+.reviewDecision:first-child{border-top:0}.reviewDecision span{font-size:7px;font-weight:900;letter-spacing:.1em;color:#9a8220}.reviewDecision h4{font-size:12px;margin:4px 0}.reviewDecision p{font-size:8px;color:#817b70;margin:0}.reviewDecision button{border:0;background:#17160f;color:#fff;border-radius:999px;padding:9px 12px;font-size:8px;font-weight:850;cursor:pointer}
+.reviewEmpty{display:flex;gap:14px;align-items:center;min-height:105px}.reviewEmpty i{display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:#e8f3e8;font-style:normal}.reviewEmpty b{font-size:11px}.reviewEmpty p{font-size:8px;color:#817b70;margin:4px 0 0}
+.reportSensitivity{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.reportSensitivityItem{border:1px solid #ded7c8;border-radius:13px;padding:12px}.reportSensitivityItem small{display:block;font-size:7px;color:#867f72;margin-bottom:5px}.reportSensitivityItem b{font-size:10px}
+.reportEvolution{display:grid;grid-template-columns:.8fr 1.2fr;gap:12px}.reportEvolutionHero{background:#181812;color:#fff;border-radius:18px;padding:18px}.reportEvolutionHero small{font-size:7px;color:#8f8e84}.reportEvolutionHero b{display:block;font-size:22px;margin:12px 0 4px}.reportEvolutionHero p{font-size:9px;color:#aaa99e;margin:0}.reportEvolutionMetrics{display:grid;grid-template-columns:1fr 1fr;gap:7px}.reportEvolutionMetrics div{border:1px solid #ded7c8;border-radius:13px;padding:11px}.reportEvolutionMetrics span{display:block;font-size:7px;color:#867f72}.reportEvolutionMetrics b{font-size:10px}
+@media(max-width:760px){.decisionPulse{grid-template-columns:1fr 1fr}.reviewDecision{align-items:flex-start}.reportSensitivity{grid-template-columns:1fr}.reportEvolution{grid-template-columns:1fr}.reportEvolutionMetrics{grid-template-columns:1fr 1fr}}
+
+.reportEvolutionTableWrap{min-width:0;overflow:auto}.reportEvolutionTableWrap table{min-width:520px}
 </style>
 </head>
 <body>
@@ -603,7 +617,12 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
     </div>
     <div class="dashboardSignal"><span><i></i> Visão pessoal</span><p>Seu contexto muda. Suas decisões também. Volte, ajuste premissas e compare versões.</p></div>
     <div id="profileSummary" class="profileSummary"></div>
+    <div id="decisionPulse" class="decisionPulse"></div>
     <div class="dashGrid">
+      <div class="dashCard span2 reviewCard">
+        <div class="cardHead"><div><span class="kicker">ACOMPANHAMENTO</span><h3>Decisões para revisar</h3></div><span class="reviewRule">45+ dias sem nova versão</span></div>
+        <div id="reviewQueue"></div>
+      </div>
       <div class="dashCard span2">
         <div class="cardHead"><h3>Minhas Decisões</h3><button class="link" onclick="navigate('tools')">Nova análise →</button></div>
         <div id="savedDecisions"></div>
@@ -809,6 +828,7 @@ const tools=[
 {id:'comprar-alugar',cat:'Comprar',tier:'decision',icon:'⌂',title:'Comprar x Alugar',desc:'Compare patrimônio líquido dos dois caminhos.',engine:'buyRent',featured:true},
 {id:'avista-parcelado',cat:'Comprar',tier:'decision',icon:'▦',title:'À Vista x Parcelado',desc:'Valor presente e desconto de equilíbrio.',engine:'cashInstallment',featured:true},
 {id:'financiamento-imovel',cat:'Comprar',tier:'free',icon:'⌂',title:'Financiamento Imobiliário',desc:'Parcela e custo total simplificado.',engine:'loan'},
+{id:'comparar-financiamentos',cat:'Comprar',tier:'decision',icon:'⇄',title:'Comparar Propostas de Financiamento',desc:'SAC/Price, taxas, tarifas, seguros, valor presente e saldo futuro.',engine:'loanCompare',new:true},
 {id:'financiamento-carro',cat:'Comprar',tier:'free',icon:'◈',title:'Financiamento de Veículo',desc:'Entrada, parcela e juros totais.',engine:'loan'},
 {id:'custo-carro',cat:'Comprar',tier:'pro',icon:'◈',title:'Custo Real de um Carro',desc:'Depreciação, seguro, impostos, combustível e manutenção.',engine:'carCost'},
 {id:'trocar-carro',cat:'Comprar',tier:'decision',icon:'↔',title:'Trocar de Carro x Manter o Atual',desc:'Financiamento, depreciação, custos de uso e patrimônio final.',engine:'carDecision',new:true},
@@ -846,7 +866,7 @@ const tools=[
 {id:'diagnostico',cat:'Vida financeira',tier:'pro',icon:'◎',title:'Diagnóstico Financeiro',desc:'Comprometimento, poupança, reserva e próximos passos.',engine:'diagnostic'}
 ];
 
-const deepIds=new Set(['renda-fixa','gross-up','financiamento-consorcio','comprar-alugar','avista-parcelado','amortizar-investir','plano-dividas','portabilidade-divida','trocar-carro','meta-financeira','viver-renda','aposentadoria','salario-liquido','quanto-rende']);
+const deepIds=new Set(['renda-fixa','gross-up','financiamento-consorcio','comprar-alugar','avista-parcelado','amortizar-investir','plano-dividas','portabilidade-divida','trocar-carro','comparar-financiamentos','meta-financeira','viver-renda','aposentadoria','salario-liquido','quanto-rende']);
 const categories=['Todas',...new Set(tools.map(t=>t.cat))];
 
 function navigate(route){state.route=route;document.querySelectorAll('.route').forEach(x=>x.classList.add('hidden'));let target=$('route-'+route);target.classList.remove('hidden');target.classList.remove('routeEnter');void target.offsetWidth;target.classList.add('routeEnter');let activeRoute=route==='tool'?'tools':route;document.querySelectorAll('.mobileNav button,.topbar [data-route]').forEach(b=>b.classList.toggle('active',b.dataset.route===activeRoute));window.scrollTo({top:0,behavior:'smooth'});if(route==='home')renderHome();if(route==='tools')renderTools('');if(route==='dashboard')renderDashboard();if(route==='ask')renderAskExamples()}
@@ -858,7 +878,7 @@ function toggleFav(id){let f=favs();f=f.includes(id)?f.filter(x=>x!==id):[...f,i
 function toolCard(t){return `<article class="toolCard ${t.tier==='decision'?'decisionCard':''}" onclick="openTool('${t.id}')"><button class="favStar ${isFav(t.id)?'on':''}" onclick="event.stopPropagation();toggleFav('${t.id}')">${isFav(t.id)?'★':'☆'}</button>${t.new?'<span class="newToolTag">NOVO</span>':''}<div class="toolIcon">${t.icon}</div><div class="cat">${t.cat}</div><h3>${t.title}</h3><p>${t.desc}</p><div class="toolCardFoot"><span class="tierTag ${t.tier}">${t.tier==='decision'?'Decisão PRO':t.tier==='pro'?'PRO':'Grátis'}</span><b>Colocar na conta →</b></div></article>`}
 function renderHome(){$('journeys').innerHTML=journeys.map(j=>`<div class="journey" onclick="state.category='${j[0]}';navigate('tools')"><div class="jicon">${j[1]}</div><h3>${j[2]}</h3><p>${j[3]}</p><small>Explorar ${j[0]} →</small></div>`).join('');$('featured').innerHTML=tools.filter(t=>t.featured).slice(0,8).map(toolCard).join('')}
 function renderTools(q=''){let s=q.toLowerCase();$('filters').innerHTML=categories.map(c=>`<button class="${state.category===c?'active':''}" onclick="state.category='${c}';renderTools(document.getElementById('toolSearch').value)">${c}</button>`).join('');let arr=tools.filter(t=>(state.category==='Todas'||t.cat===state.category)&&(!s||(t.title+' '+t.desc+' '+t.cat).toLowerCase().includes(s)));if($('toolCount'))$('toolCount').textContent=arr.length;$('toolLibrary').innerHTML=arr.length?arr.map(toolCard).join(''):`<div class="emptyState"><span>0 resultados</span><h3>Nenhuma decisão encontrada.</h3><p>Tente outro termo ou volte para “Todas”.</p><button onclick="state.category='Todas';document.getElementById('toolSearch').value='';renderTools('')">Limpar filtros →</button></div>`}
-function renderAskExamples(){let ex=[['Tenho R$ 100 mil e um financiamento. Amortizo ou invisto?','amortizar-investir'],['LCI 92% do CDI ou CDB 110%?','gross-up'],['Comprar imóvel ou continuar alugando?','comprar-alugar'],['Quanto preciso para aposentar recebendo R$ 10 mil?','aposentadoria'],['Me ofereceram portabilidade com taxa menor. A troca reduz meu custo?','portabilidade-divida'],['Troco meu carro agora ou continuo com o atual?','trocar-carro']];$('askSuggestions').innerHTML=ex.map(x=>`<div class="askSuggestion" onclick="document.getElementById('askText').value='${x[0]}';openTool('${x[1]}')"><b>${x[0]}</b><p>Abrir análise relacionada →</p></div>`).join('')}
+function renderAskExamples(){let ex=[['Tenho R$ 100 mil e um financiamento. Amortizo ou invisto?','amortizar-investir'],['LCI 92% do CDI ou CDB 110%?','gross-up'],['Comprar imóvel ou continuar alugando?','comprar-alugar'],['Quanto preciso para aposentar recebendo R$ 10 mil?','aposentadoria'],['Me ofereceram portabilidade com taxa menor. A troca reduz meu custo?','portabilidade-divida'],['Tenho duas propostas de financiamento. Qual tem menor custo econômico?','comparar-financiamentos'],['Troco meu carro agora ou continuo com o atual?','trocar-carro']];$('askSuggestions').innerHTML=ex.map(x=>`<div class="askSuggestion" onclick="document.getElementById('askText').value='${x[0]}';openTool('${x[1]}')"><b>${x[0]}</b><p>Abrir análise relacionada →</p></div>`).join('')}
 function parseMoneyBR(raw){
   if(!raw)return null;
   let s=String(raw).toLowerCase().trim(),mult=1;
@@ -897,7 +917,7 @@ function firstInt(text,patterns){
 }
 function detectAskTool(text){
   const rules=[
-    ['imovel-na-planta',['na planta','imóvel na planta','imovel na planta','incc','entrega do imóvel','entrega do imovel']],
+    ['comparar-financiamentos',['comparar financiamento','comparar financiamentos','duas propostas','proposta a','proposta b','qual financiamento']],['imovel-na-planta',['na planta','imóvel na planta','imovel na planta','incc','entrega do imóvel','entrega do imovel']],
     ['bonus-decidir',['13º','décimo terceiro','decimo terceiro','bônus','bonus','plr','dinheiro extra']],
     ['independencia-financeira',['independência financeira','independencia financeira','liberdade financeira','cobrir meu custo de vida','cobrir meus gastos']],
     ['financiamento-consorcio',['consórc','consorc','financiar ou','financiamento ou investir','dar entrada']],
@@ -1024,6 +1044,22 @@ function interpretAsk(raw){
     if(newPrice===null)missing.push('preço do carro desejado');
     if(rate===null)missing.push('taxa do financiamento');
     if(years===null)missing.push('horizonte da comparação');
+  }else if(toolId==='comparar-financiamentos'){
+    let price=firstMoney(text,['(?:imóvel|imovel|bem|casa|apartamento)(?:\s+(?:de|custa|valor))?\s+MONEY','(?:valor do bem|valor do imóvel|valor do imovel)(?:\s+de)?\s+MONEY']);
+    let down=firstMoney(text,['entrada(?:\s+de)?\s+MONEY']);
+    let rateA=firstRate(text,[/(?:proposta a|banco a).*?(\d+(?:[.,]\d+)?)%/]);
+    let rateB=firstRate(text,[/(?:proposta b|banco b).*?(\d+(?:[.,]\d+)?)%/]);
+    let nA=firstInt(text,[/(?:proposta a|banco a).*?(\d+)\s+meses/]);
+    let nB=firstInt(text,[/(?:proposta b|banco b).*?(\d+)\s+meses/]);
+    add('cmpPrice',price,'Valor do bem',price?BRL(price):null);
+    add('cmpDown',down,'Entrada',down?BRL(down):null);
+    add('cmpARate',rateA,'Taxa proposta A',rateA!==null?PCT(rateA)+' a.m.':null);
+    add('cmpBRate',rateB,'Taxa proposta B',rateB!==null?PCT(rateB)+' a.m.':null);
+    add('cmpAN',nA,'Prazo proposta A',nA?nA+' meses':null);
+    add('cmpBN',nB,'Prazo proposta B',nB?nB+' meses':null);
+    if(price===null)missing.push('valor do bem');
+    if(rateA===null)missing.push('taxa da proposta A');
+    if(rateB===null)missing.push('taxa da proposta B');
   }else if(toolId==='imovel-na-planta'){
     let price=firstMoney(text,['(?:imóvel|imovel|apartamento)(?:\s+na planta)?(?:\s+(?:de|custa|valor))?\s+MONEY']);
     let entry=firstMoney(text,['entrada(?:\s+de)?\s+MONEY']);
@@ -1077,7 +1113,7 @@ function askAmarelo(q){
 function planAllows(t){return t.tier==='free'||state.plan!=='free'}
 function setDemoPlan(p){state.plan=p;storage.set('amarelo_plan',p);toast('Plano de demonstração: '+p.toUpperCase());if(state.current)openCurrentTool();renderDashboard()}
 
-const scenarioDecisionIds=new Set(['financiamento-consorcio','comprar-alugar','imovel-na-planta','amortizar-investir','bonus-decidir','aposentadoria','portabilidade-divida','trocar-carro','renda-fixa','meta-financeira','independencia-financeira','viver-renda']);
+const scenarioDecisionIds=new Set(['financiamento-consorcio','comprar-alugar','imovel-na-planta','amortizar-investir','bonus-decidir','aposentadoria','portabilidade-divida','trocar-carro','comparar-financiamentos','renda-fixa','meta-financeira','independencia-financeira','viver-renda']);
 const scenarioNames={base:'Base',conservative:'Conservador',optimistic:'Otimista'};
 const scenarioNotes={
  base:'Suas premissas atuais. Este é o ponto de partida da comparação.',
@@ -1135,11 +1171,18 @@ function buildScenarioPreset(base,type){
    setScenarioNumber(a,'fiPmt',scenarioNumber(a,'fiPmt')*delta(.9,1.1),0);
  }else if(e==='fixedIncome'){
    setScenarioNumber(a,'cdi',scenarioNumber(a,'cdi')+delta(-2,2),0);
-   setScenarioNumber(a,'fee',scenarioNumber(a,'fee')+delta(.15,-.15),0);
+   setScenarioNumber(a,'fiARate',scenarioNumber(a,'fiARate')+delta(-5,5),0);
+   setScenarioNumber(a,'fiBRate',scenarioNumber(a,'fiBRate')+delta(-5,5),0);
+   setScenarioNumber(a,'fiCRate',scenarioNumber(a,'fiCRate')+delta(-1,1),0);
  }else if(e==='goal'){
    setScenarioNumber(a,'rate',scenarioNumber(a,'rate')+delta(-2,2),0);
    setScenarioNumber(a,'years',Math.max(1,scenarioNumber(a,'years')+delta(-1,1)),1);
    setScenarioNumber(a,'pmt',scenarioNumber(a,'pmt')*delta(.9,1.1),0);
+ }else if(e==='loanCompare'){
+   setScenarioNumber(a,'cmpARate',scenarioNumber(a,'cmpARate')+delta(.12,-.12),0);
+   setScenarioNumber(a,'cmpBRate',scenarioNumber(a,'cmpBRate')+delta(.12,-.12),0);
+   setScenarioNumber(a,'cmpAUpfront',scenarioNumber(a,'cmpAUpfront')*delta(1.15,.9),0);
+   setScenarioNumber(a,'cmpBUpfront',scenarioNumber(a,'cmpBUpfront')*delta(1.15,.9),0);
  }else if(e==='debtPortability'){
    setScenarioNumber(a,'portNewRate',scenarioNumber(a,'portNewRate')+delta(.2,-.2),0);
    setScenarioNumber(a,'portFee',scenarioNumber(a,'portFee')*delta(1.25,.75),0);
@@ -1198,13 +1241,18 @@ function scenarioWhatIfConfig(){
   ],
   fixedIncome:[
    {id:'cdi',label:'CDI anual',step:1,suffix:'% a.a.',min:0},
-   {id:'cdb',label:'CDB',step:2,suffix:'% do CDI',min:0},
-   {id:'lci',label:'LCI/LCA',step:2,suffix:'% do CDI',min:0}
+   {id:'fiARate',label:'Taxa Produto A',step:2,suffix:'',min:0},
+   {id:'fiBRate',label:'Taxa Produto B',step:2,suffix:'',min:0}
   ],
   goal:[
    {id:'rate',label:'Retorno anual',step:1,suffix:'% a.a.',min:0},
    {id:'pmt',label:'Aporte mensal',step:250,prefix:'R$ ',min:0},
    {id:'years',label:'Prazo',step:1,suffix:' anos',min:1}
+  ],
+  loanCompare:[
+   {id:'cmpARate',label:'Taxa proposta A',step:.05,suffix:'% a.m.',min:0},
+   {id:'cmpBRate',label:'Taxa proposta B',step:.05,suffix:'% a.m.',min:0},
+   {id:'cmpHorizon',label:'Horizonte de saldo',step:12,suffix:' meses',min:1}
   ],
   debtPortability:[
    {id:'portNewRate',label:'Nova taxa',step:.1,suffix:'% a.m.',min:0},
@@ -1386,6 +1434,12 @@ function decisionDrivers(){
    ['Retorno real',PCT(num('fiReal'))+' a.a.','mexe no capital-alvo'],
    ['Aporte mensal',BRL(num('fiPmt')),'mexe no tempo até a meta']
   ],
+  loanCompare:()=>[
+   ['Taxa proposta A',PCT(num('cmpARate'))+' a.m.','mexe no custo e na amortização'],
+   ['Taxa proposta B',PCT(num('cmpBRate'))+' a.m.','mexe no custo e na amortização'],
+   ['Custos iniciais',BRL(num('cmpAUpfront'))+' / '+BRL(num('cmpBUpfront')),'mexe no custo econômico'],
+   ['Horizonte de saldo',Math.round(num('cmpHorizon'))+' meses','mostra quanto da dívida ainda permanece']
+  ],
   debtPortability:()=>[
    ['Taxa atual',PCT(num('portCurrentRate'))+' a.m.','define o fluxo existente'],
    ['Nova taxa',PCT(num('portNewRate'))+' a.m.','mexe no custo da proposta'],
@@ -1399,10 +1453,10 @@ function decisionDrivers(){
    ['Retorno do capital',PCT(num('carInv'))+' a.a.','mexe no valor de esperar']
   ],
   fixedIncome:()=>[
-   ['CDI informado',PCT(num('cdi'))+' a.a.','mexe no retorno pós-fixado'],
-   ['CDB',PCT(num('cdb'))+' do CDI','mexe no retorno tributado'],
-   ['LCI/LCA',PCT(num('lci'))+' do CDI','mexe no retorno isento informado'],
-   ['Prazo',Math.round(num('months'))+' meses','mexe na tributação e capitalização']
+   ['CDI informado',PCT(num('cdi'))+' a.a.','mexe nos produtos pós-fixados'],
+   ['Produto A',num('fiARate').toLocaleString('pt-BR')+' · '+fixedIncomeTypeLabel($('fiAType').value),'taxa e tributação do primeiro produto'],
+   ['Produto B',num('fiBRate').toLocaleString('pt-BR')+' · '+fixedIncomeTypeLabel($('fiBType').value),'taxa e tributação do segundo produto'],
+   ['Prazo',Math.round(num('months'))+' meses','mexe em imposto, carência e capitalização']
   ],
   goal:()=>[
    ['Meta',BRL(num('target')),'define o patrimônio desejado'],
@@ -1450,7 +1504,7 @@ function S(id,label,opts,adv=false){return `<div class="field ${adv?'advancedFie
 function G(title,html){return `<div class="groupTitle">${title}</div><div class="formGrid">${html}</div>`}
 function buildForm(e){
  if(e==='compound')return G('Acumulação',F('p','Capital inicial',100000)+F('pmt','Aporte mensal',1000)+F('years','Prazo (anos)',10)+F('rate','Retorno nominal anual (%)',10)+F('inflation','Inflação anual (%)',4.5,true)+F('tax','IR sobre ganhos no fim (%)',0,true));
- if(e==='fixedIncome')return G('Simulação',F('p','Capital inicial',100000)+F('pmt','Aporte mensal',1000)+F('months','Prazo (meses)',24)+F('cdi','CDI anual (%)',13.65))+G('Produtos',F('cdb','CDB (% CDI)',110)+F('lci','LCI/LCA (% CDI)',92)+F('third','Alternativa prefixada (% a.a.)',12)+F('fee','Custo anual alternativa 3 (%)',0.2,true));
+ if(e==='fixedIncome')return G('Simulação',F('p','Capital inicial',100000)+F('pmt','Aporte mensal',1000)+F('months','Prazo (meses)',24)+F('cdi','CDI anual (%)',13.65)+F('fiInflation','Inflação anual (%)',4.5,true))+G('Produto A',S('fiAType','Tipo',[['cdi-taxed','% CDI · tributado'],['cdi-exempt','% CDI · isento'],['prefix-taxed','Prefixado · tributado'],['prefix-exempt','Prefixado · isento']])+F('fiARate','Taxa / % do CDI',110)+F('fiAFee','Custo anual (%)',0,true)+F('fiALock','Carência mínima (dias)',0,true))+G('Produto B',S('fiBType','Tipo',[['cdi-exempt','% CDI · isento'],['cdi-taxed','% CDI · tributado'],['prefix-taxed','Prefixado · tributado'],['prefix-exempt','Prefixado · isento']])+F('fiBRate','Taxa / % do CDI',92)+F('fiBFee','Custo anual (%)',0,true)+F('fiBLock','Carência mínima (dias)',90,true))+G('Produto C',S('fiCType','Tipo',[['prefix-taxed','Prefixado · tributado'],['prefix-exempt','Prefixado · isento'],['cdi-taxed','% CDI · tributado'],['cdi-exempt','% CDI · isento']])+F('fiCRate','Taxa / % do CDI',12)+F('fiCFee','Custo anual (%)',0.2,true)+F('fiCLock','Carência mínima (dias)',0,true));
  if(e==='grossup')return G('Isento',F('p','Capital',100000)+F('days','Prazo em dias',365)+F('cdi','CDI anual (%)',13.65)+F('free','LCI/LCA (% CDI)',92))+G('Comparação',F('actualCdb','CDB disponível (% CDI)',110)+F('du','Dias úteis estimados',252,true));
  if(e==='realReturn')return G('Retorno',F('nom','Retorno nominal (%)',12)+F('inf','Inflação (%)',5)+F('p','Capital',100000));
  if(e==='rateConvert')return G('Conversão',F('rate','Taxa (%)',1)+S('direction','Conversão',[['ma','Mensal → anual'],['am','Anual → mensal']]));
@@ -1461,6 +1515,7 @@ function buildForm(e){
  if(e==='offPlan')return G('Compra na planta',F('offPrice','Preço contratado hoje',650000)+F('offEntry','Entrada hoje',100000)+F('offMonths','Meses até a entrega',36)+F('offMonthly','Parcela mensal durante a obra',3500)+F('offBalloon','Parcela na entrega',50000)+F('offIndex','Correção anual estimada da obra (%)',5,true))+G('Entrega e financiamento',S('offSystem','Sistema',[['price','Price'],['sac','SAC']])+F('offFinanceRate','Taxa financiamento na entrega (% a.m.)',0.85)+F('offFinanceN','Prazo financiamento (meses)',360))+G('Alternativa de esperar',F('offRent','Aluguel mensal enquanto espera',3500)+F('offRentGrow','Reajuste aluguel (% a.a.)',4,true)+F('offInv','Retorno líquido do capital (% a.a.)',8)+F('offApp','Valorização do imóvel/mercado (% a.a.)',5,true));
  if(e==='cashInstallment')return G('Compra',F('cashPrice','Preço à vista',9000)+F('install','Valor de cada parcela',800)+F('n','Número de parcelas',12)+F('returnM','Retorno líquido (% a.m.)',0.8)+S('timing','Primeira parcela',[['now','Hoje'],['month','Em 30 dias']],true)+F('cashback','Cashback parcelado (%)',0,true));
  if(e==='loan')return G('Financiamento',F('price','Preço',500000)+F('down','Entrada',100000)+F('rate','Taxa mensal (%)',0.9)+F('n','Prazo (meses)',360));
+ if(e==='loanCompare')return G('Compra',F('cmpPrice','Valor do bem',700000)+F('cmpDown','Entrada',200000)+F('cmpHorizon','Horizonte para olhar o saldo (meses)',60)+F('cmpDiscount','Taxa alternativa para valor presente (% a.a.)',8,true))+G('Proposta A',S('cmpASystem','Sistema',[['sac','SAC'],['price','Price']])+F('cmpARate','Taxa mensal (%)',0.80)+F('cmpAN','Prazo (meses)',360)+F('cmpAUpfront','Tarifas/custos iniciais',12000)+F('cmpAMonthly','Seguros/tarifas mensais',250,true))+G('Proposta B',S('cmpBSystem','Sistema',[['sac','SAC'],['price','Price']])+F('cmpBRate','Taxa mensal (%)',0.74)+F('cmpBN','Prazo (meses)',420)+F('cmpBUpfront','Tarifas/custos iniciais',20000)+F('cmpBMonthly','Seguros/tarifas mensais',350,true));
  if(e==='carCost')return G('Carro',F('price','Preço do carro',150000)+F('years','Anos com o carro',5)+F('dep','Depreciação total (%)',35)+F('insurance','Seguro anual',4500)+F('tax','IPVA/tributos anuais',6000)+F('fuel','Combustível mensal',900)+F('maint','Manutenção anual',3000));
  if(e==='carDecision')return G('Seu carro atual',F('carCurrentValue','Valor de venda hoje',80000)+F('carCurrentDep','Depreciação anual (%)',12)+F('carCurrentMaint','Manutenção anual',6000)+F('carCurrentInsurance','Seguro anual',3500)+F('carCurrentTax','IPVA/tributos anuais',3200)+F('carCurrentFuel','Combustível mensal',1000))+G('Carro que pretende comprar',F('carNewPrice','Preço do novo carro',150000)+F('carCash','Capital adicional disponível',20000)+F('carBuyFee','Custos de compra (% do preço)',2,true)+S('carSystem','Sistema do financiamento',[['price','Price'],['sac','SAC']])+F('carRate','Taxa do financiamento (% a.m.)',1.2)+F('carN','Prazo (meses)',48)+F('carNewDep','Depreciação anual (%)',18)+F('carNewMaint','Manutenção anual',2500)+F('carNewInsurance','Seguro anual',5500)+F('carNewTax','IPVA/tributos anuais',6000)+F('carNewFuel','Combustível mensal',850))+G('Horizonte',F('carYears','Anos para comparar',5)+F('carInv','Retorno líquido do capital (% a.a.)',8));
  if(e==='amortInvest')return G('Financiamento',F('balance','Saldo devedor',450000)+S('loanSystem','Sistema',[['price','Price'],['sac','SAC']])+F('debtA','Custo efetivo anual (%)',10)+F('months','Prazo restante (meses)',240)+S('amortMode','Ao amortizar',[['term','Reduzir prazo'],['payment','Reduzir parcela']]))+G('Capital alternativo',F('cash','Valor disponível',100000)+F('invGross','Retorno bruto investimento (% a.a.)',11)+F('tax','IR efetivo sobre ganhos (%)',15,true)+F('fee','Custos anuais do investimento (%)',0,true));
@@ -1490,27 +1545,44 @@ function buildForm(e){
  if(e==='diagnostic')return G('Diagnóstico',F('income','Renda líquida',10000)+F('ess','Essenciais',5000)+F('debt','Dívidas mensais',1500)+F('saving','Investimentos mensais',1500)+F('reserve','Reserva atual',15000));
  return ''
 }
-function method(e){const m={buyPaths:'Compara fluxos mensais e valor presente. Financiamento aceita Price ou SAC; contemplação do consórcio é cenário, nunca previsão. Lance, reajuste, espera e retorno alternativo são premissas editáveis.',buyRent:'Compara patrimônio líquido mês a mês. Entrada e custos de aquisição ficam investidos no cenário de aluguel; a diferença mensal de custo de moradia é investida pelo lado mais barato. Inclui manutenção, IPTU/seguros, custo de saída e Price/SAC.',amortInvest:'Compara os dois usos do mesmo capital no horizonte original do financiamento. O caixa mensal liberado pela amortização é reinvestido no cenário de amortização; SAC/Price e redução de prazo/parcela são tratados separadamente.',debtPortability:'Compara fluxos do contrato atual e da nova proposta, em valores nominais e valor presente. Custos iniciais e mensais são premissas abertas. Não considera tarifas ou condições não informadas.',carDecision:'Compara trocar o veículo hoje com manter o atual. O lado com menor desembolso mensal investe a diferença; ambos acumulam valor do veículo e investimentos até o mesmo horizonte. Inclui depreciação, manutenção, seguro, tributos e combustível.',offPlan:'Compara comprar na planta com esperar até a entrega. Correção da obra, valorização de mercado, aluguel, capital investido e financiamento na entrega são premissas informadas pelo usuário; não reproduz contrato específico de incorporadora.',windfallDecision:'Compara o uso do mesmo dinheiro extra em dívida, investimento ou recomposição de reserva. A reserva é contexto de liquidez, não recomendação automática.',financialIndependence:'Calcula capital-alvo e progresso usando a taxa real informada pelo usuário. A taxa não é tratada como garantia de retirada sustentável.',liveIncome:'Projeta renda, duração do patrimônio e legado usando retorno real líquido após custos. Permite preservar principal ou consumir patrimônio no prazo informado.',fixedIncome:'Compara retorno líquido estimado usando a tabela regressiva de renda fixa vigente em 2026. O gross-up exato considera prazo e lotes de aporte; liquidez, carência, risco de crédito e garantias permanecem dimensões separadas.',grossup:'Gross-up convencional + equivalência composta em dinheiro.',retirement:'Acumulação e fase de renda são projetadas em valores reais. O motor calcula capital necessário, aporte de equilíbrio, idade aproximada de fechamento e uma visão nominal usando a inflação informada. Tributação previdenciária específica não está embutida neste motor.',salary:'INSS e IRRF usam parâmetros oficiais de 2026 revisados em 25/09/2026. Folha real pode ter regras, benefícios e descontos específicos.'};return m[e]||'Simulação matemática com premissas informadas pelo usuário.'}
+function method(e){const m={buyPaths:'Compara fluxos mensais e valor presente. Financiamento aceita Price ou SAC; contemplação do consórcio é cenário, nunca previsão. Lance, reajuste, espera e retorno alternativo são premissas editáveis.',buyRent:'Compara patrimônio líquido mês a mês. Entrada e custos de aquisição ficam investidos no cenário de aluguel; a diferença mensal de custo de moradia é investida pelo lado mais barato. Inclui manutenção, IPTU/seguros, custo de saída e Price/SAC.',amortInvest:'Compara os dois usos do mesmo capital no horizonte original do financiamento. O caixa mensal liberado pela amortização é reinvestido no cenário de amortização; SAC/Price e redução de prazo/parcela são tratados separadamente.',debtPortability:'Compara fluxos do contrato atual e da nova proposta, em valores nominais e valor presente. Custos iniciais e mensais são premissas abertas. Não considera tarifas ou condições não informadas.',loanCompare:'Compara duas propostas para o mesmo valor financiado. SAC/Price, taxa, prazo, custos iniciais e custos mensais são tratados separadamente. O valor presente usa a taxa alternativa informada pelo usuário; não substitui o CET oficial da instituição.',carDecision:'Compara trocar o veículo hoje com manter o atual. O lado com menor desembolso mensal investe a diferença; ambos acumulam valor do veículo e investimentos até o mesmo horizonte. Inclui depreciação, manutenção, seguro, tributos e combustível.',offPlan:'Compara comprar na planta com esperar até a entrega. Correção da obra, valorização de mercado, aluguel, capital investido e financiamento na entrega são premissas informadas pelo usuário; não reproduz contrato específico de incorporadora.',windfallDecision:'Compara o uso do mesmo dinheiro extra em dívida, investimento ou recomposição de reserva. A reserva é contexto de liquidez, não recomendação automática.',financialIndependence:'Calcula capital-alvo e progresso usando a taxa real informada pelo usuário. A taxa não é tratada como garantia de retirada sustentável.',liveIncome:'Projeta renda, duração do patrimônio e legado usando retorno real líquido após custos. Permite preservar principal ou consumir patrimônio no prazo informado.',fixedIncome:'Compara três alternativas configuráveis por tipo de remuneração, tributação, custo e carência. Para produtos tributados usa a tabela regressiva de renda fixa vigente em 2026 por lote de aporte. Inflação é usada para visão real; risco de crédito e garantias permanecem dimensões separadas.',grossup:'Gross-up convencional + equivalência composta em dinheiro.',retirement:'Acumulação e fase de renda são projetadas em valores reais. O motor calcula capital necessário, aporte de equilíbrio, idade aproximada de fechamento e uma visão nominal usando a inflação informada. Tributação previdenciária específica não está embutida neste motor.',salary:'INSS e IRRF usam parâmetros oficiais de 2026 revisados em 25/09/2026. Folha real pode ter regras, benefícios e descontos específicos.'};return m[e]||'Simulação matemática com premissas informadas pelo usuário.'}
 function loanPay(pv,m,n){return m===0?pv/n:pv*m/(1-Math.pow(1+m,-n))}
 function loanBalance(pv,m,n,k){let pay=loanPay(pv,m,n);return m===0?Math.max(0,pv-pay*k):Math.max(0,pv*Math.pow(1+m,k)-pay*(Math.pow(1+m,k)-1)/m)}
 function loanFlow(pv,m,n,system='price',monthlyExtra=0){let balance=pv,flows=[],interest=0,first=0,last=0,amort=n?pv/n:0,price=n?loanPay(pv,m,n):0;for(let k=1;k<=n;k++){let j=balance*m,pay;if(system==='sac'){let a=Math.min(amort,balance);pay=a+j;balance=Math.max(0,balance-a)}else{pay=price;let a=Math.max(0,pay-j);balance=Math.max(0,balance-a)}interest+=j;pay+=monthlyExtra;if(k===1)first=pay;if(k===n)last=pay;flows.push(pay)}return{flows,interest,first,last,total:flows.reduce((s,x)=>s+x,0)}}
 function pvFlows(flows,annualRate,startMonth=1){let d=monthly(Math.max(-.99,annualRate));return flows.reduce((s,x,i)=>s+x/Math.pow(1+d,i+startMonth),0)}
 function fv(p,pmt,a,n){let m=monthly(a),b=p;for(let k=0;k<n;k++)b=b*(1+m)+pmt;return b}
 function taxLots(P,pmt,a,N){let m=monthly(a),gross=P*Math.pow(1+m,N),tax=(gross-P)*irDays(N*30);for(let k=0;k<N;k++){let age=N-1-k,end=pmt*Math.pow(1+m,age),gain=end-pmt;gross+=end;if(gain>0)tax+=gain*irDays(Math.max(1,age*30))}return{gross,tax,net:gross-tax,invested:P+pmt*N}}
+function fixedIncomeProduct(name,type,rateValue,feePct,lockDays,P,pmt,N,cdi,inflation){
+  let cdiBased=type.startsWith('cdi'),taxed=type.endsWith('taxed'),annualGross=cdiBased?cdi*(rateValue/100):rateValue/100,annual=Math.max(-.99,annualGross-feePct/100),calc=taxed?taxLots(P,pmt,annual,N):null,gross=taxed?calc.gross:fv(P,pmt,annual,N),tax=taxed?calc.tax:0,net=taxed?calc.net:gross,invested=P+pmt*N,eligible=N*30>=lockDays,real=net/Math.pow(1+inflation,N/12);
+  return{name,type,rateValue,feePct,lockDays,cdiBased,taxed,annual,gross,tax,net,invested,gain:net-invested,real,eligible};
+}
+function fixedIncomeTypeLabel(type){return({'cdi-taxed':'% CDI · tributado','cdi-exempt':'% CDI · isento','prefix-taxed':'Prefixado · tributado','prefix-exempt':'Prefixado · isento'})[type]||type}
+
 function solveRate(fn,target,lo=-.99,hi=3){for(let i=0;i<70;i++){let mid=(lo+hi)/2;if(fn(mid)>target)hi=mid;else lo=mid}return(lo+hi)/2}
 function metric(a,b){return `<div class="metric"><small>${a}</small><b>${b}</b></div>`}
 function renderAssumptions(){let items=[...document.querySelectorAll('#toolForm .field')].map(w=>{let el=w.querySelector('input,select'),label=w.querySelector('label');if(!el||!label)return null;let name=[...label.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join(' ').trim()||el.id;let value=el.tagName==='SELECT'?(el.options[el.selectedIndex]?.text||el.value):el.value;return{name,value,advanced:w.classList.contains('advancedField')}}).filter(Boolean);if(!items.length){$('assumptionBox').classList.add('hidden');return}$('assumptionList').innerHTML=items.map(x=>`<div class="assumptionChip ${x.advanced?'advancedAssumption':''}"><small>${x.name}</small><b>${x.value}</b></div>`).join('');$('assumptionBox').classList.remove('hidden')}
-function setResult(primary,subtitle,metrics=[],insight='',be=null,sens=null,series=null,label=''){state.last={primary,subtitle,metrics,insight,be};renderAssumptions();renderDecisionDrivers();recordScenarioSnapshot();$('resultPrimary').textContent=primary;$('resultSubtitle').textContent=subtitle;$('resultMetrics').innerHTML=metrics.map(x=>metric(x[0],x[1])).join('');if(insight){$('resultInsight').classList.remove('hidden');$('insightText').innerHTML=insight}else $('resultInsight').classList.add('hidden');if(be){$('breakEvenBox').classList.remove('hidden');$('breakEven').innerHTML=be}else $('breakEvenBox').classList.add('hidden');if(sens?.length){$('sensitivityBox').classList.remove('hidden');$('sensitivity').innerHTML=sens.map(x=>`<div class="sens"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('')}else $('sensitivityBox').classList.add('hidden');if(series?.length){$('chartBox').classList.remove('hidden');$('chartLabel').textContent=label;drawChart(series)}else $('chartBox').classList.add('hidden');renderNext()}
+function setResult(primary,subtitle,metrics=[],insight='',be=null,sens=null,series=null,label=''){state.last={primary,subtitle,metrics,insight,be,sens:sens||[],series:series||[],label};renderAssumptions();renderDecisionDrivers();recordScenarioSnapshot();$('resultPrimary').textContent=primary;$('resultSubtitle').textContent=subtitle;$('resultMetrics').innerHTML=metrics.map(x=>metric(x[0],x[1])).join('');if(insight){$('resultInsight').classList.remove('hidden');$('insightText').innerHTML=insight}else $('resultInsight').classList.add('hidden');if(be){$('breakEvenBox').classList.remove('hidden');$('breakEven').innerHTML=be}else $('breakEvenBox').classList.add('hidden');if(sens?.length){$('sensitivityBox').classList.remove('hidden');$('sensitivity').innerHTML=sens.map(x=>`<div class="sens"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('')}else $('sensitivityBox').classList.add('hidden');if(series?.length){$('chartBox').classList.remove('hidden');$('chartLabel').textContent=label;drawChart(series)}else $('chartBox').classList.add('hidden');renderNext()}
 function drawChart(series){const w=720,h=220,pad=28,all=series.flatMap(s=>s.data.map(x=>x.y)),min=Math.min(0,...all),max=Math.max(...all,1),span=max-min||1,colors=['#f3c62e','#7ed3af','#8fb5ff','#ff9a82'],maxLen=Math.max(...series.map(s=>s.data.length)),sx=i=>pad+(w-2*pad)*(maxLen<=1?0:i/(maxLen-1)),sy=y=>h-pad-(h-2*pad)*((y-min)/span);let grid='';for(let k=0;k<5;k++){let y=pad+(h-2*pad)*k/4;grid+=`<line x1="${pad}" y1="${y}" x2="${w-pad}" y2="${y}" stroke="#303029" stroke-width="1"/>`}let paths=series.map((s,si)=>`<path d="${s.data.map((p,i)=>(i?'L':'M')+sx(i)+' '+sy(p.y)).join(' ')}" fill="none" stroke="${colors[si%colors.length]}" stroke-width="3" stroke-linecap="round"/>`).join('');$('chart').innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${grid}${paths}</svg>`;$('legend').innerHTML=series.map((s,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${s.name}</span>`).join('')}
-function renderNext(){let map={'financiamento-consorcio':['comprar-alugar','amortizar-investir'],'comprar-alugar':['financiamento-consorcio','amortizar-investir'],'amortizar-investir':['renda-fixa','portabilidade-divida'],'portabilidade-divida':['plano-dividas','amortizar-investir'],'trocar-carro':['custo-carro','avista-parcelado'],'renda-fixa':['gross-up','meta-financeira'],'gross-up':['renda-fixa'],'aposentadoria':['viver-renda','meta-financeira'],'reserva':['quanto-rende'],'salario-liquido':['reserva','quanto-guardar']};let ids=map[state.current.id]||[];$('nextTools').innerHTML=ids.length?'<h4>Próximas análises relacionadas</h4>'+ids.map(id=>{let t=tools.find(x=>x.id===id);return t?`<button onclick="openTool('${id}')">${t.title} →</button>`:''}).join(''):''}
+function renderNext(){let map={'financiamento-consorcio':['comparar-financiamentos','comprar-alugar'],'comparar-financiamentos':['financiamento-consorcio','amortizar-investir'],'comprar-alugar':['financiamento-consorcio','amortizar-investir'],'amortizar-investir':['renda-fixa','portabilidade-divida'],'portabilidade-divida':['plano-dividas','amortizar-investir'],'trocar-carro':['custo-carro','avista-parcelado'],'renda-fixa':['gross-up','meta-financeira'],'gross-up':['renda-fixa'],'aposentadoria':['viver-renda','meta-financeira'],'reserva':['quanto-rende'],'salario-liquido':['reserva','quanto-guardar']};let ids=map[state.current.id]||[];$('nextTools').innerHTML=ids.length?'<h4>Próximas análises relacionadas</h4>'+ids.map(id=>{let t=tools.find(x=>x.id===id);return t?`<button onclick="openTool('${id}')">${t.title} →</button>`:''}).join(''):''}
 function calculateTool(){if(state.scenario&&!state.scenarioBusy)persistActiveScenario();const e=state.current.engine;try{
  if(e==='compound'){let P=num('p'),pmt=num('pmt'),years=num('years'),r=num('rate')/100,inf=num('inflation')/100,tax=num('tax')/100,N=years*12,gross=fv(P,pmt,r,N),invested=P+pmt*N,gain=gross-invested,net=gross-gain*tax,real=net/Math.pow(1+inf,years);let sens=[Math.max(0,r-.02),r,r+.02].map(rr=>[PCT(rr*100)+' a.a.',BRL(fv(P,pmt,rr,N))]),series=[],b=P,mi=monthly(r);for(let m=1;m<=N;m++){b=b*(1+mi)+pmt;if(m%12===0)series.push({y:b})}setResult(BRL(net),'Patrimônio líquido nominal estimado.',[['Total aportado',BRL(invested)],['Ganho líquido',BRL(net-invested)],['Em dinheiro de hoje',BRL(real)]],`Tempo e aportes são os grandes motores. A inflação reduz o poder de compra do valor nominal.`,`Para preservar poder de compra, o retorno precisa superar <b>${PCT(inf*100)}</b> antes de custos e impostos.`,sens,[{name:'Patrimônio',data:series}],'saldo')}
  else if(e==='fixedIncome'){
-  let P=num('p'),pmt=num('pmt'),N=Math.max(1,Math.round(num('months'))),cdi=num('cdi')/100,cdbPct=num('cdb')/100,lciPct=num('lci')/100,third=num('third')/100,fee=num('fee')/100,cdb=taxLots(P,pmt,cdi*cdbPct,N),lciNet=fv(P,pmt,cdi*lciPct,N),thirdCalc=taxLots(P,pmt,Math.max(-.99,third-fee),N),thirdNet=thirdCalc.net,arr=[['CDB',cdb.net],['LCI/LCA',lciNet],['Alternativa 3',thirdNet]].sort((a,b)=>b[1]-a[1]),tax=irDays(N*30),eqConventional=lciPct/(1-tax),eqExact=solveRate(mult=>taxLots(P,pmt,cdi*mult,N).net,lciNet,0,4),invested=P+pmt*N,sc=[],sl=[],st=[];
-  for(let m=1;m<=N;m++){sc.push({y:taxLots(P,pmt,cdi*cdbPct,m).net});sl.push({y:fv(P,pmt,cdi*lciPct,m)});st.push({y:taxLots(P,pmt,Math.max(-.99,third-fee),m).net})}
-  let sens=[Math.max(0,cdi-.02),cdi,cdi+.02].map(rr=>{let a=taxLots(P,pmt,rr*cdbPct,N).net,b=fv(P,pmt,rr*lciPct,N),d=a-b;return[PCT(rr*100)+' CDI',(`${d>=0?'CDB +':'LCI/LCA +'} ${BRL(Math.abs(d))}`)]});
-  let second=arr[1],lead=arr[0][1]-second[1];
-  setResult(arr[0][0],`Maior valor líquido estimado por ${BRL(lead)} sobre a segunda alternativa.`,[['Total aportado',BRL(invested)],['CDB líquido',BRL(cdb.net)],['IR estimado CDB',BRL(cdb.tax)],['LCI/LCA líquida',BRL(lciNet)],['Alternativa 3 líquida',BRL(thirdNet)],['Gross-up exato LCI/LCA',PCT(eqExact*100)+' CDI']],`A maior taxa anunciada não necessariamente entrega o maior valor líquido. O motor considera o imposto regressivo por tempo de cada lote de aporte. Liquidez, risco de crédito, cobertura e carência continuam fora do ranking matemático e precisam ser avaliados separadamente.`,`O gross-up convencional da LCI/LCA é <b>${PCT(eqConventional*100)} do CDI</b>. Considerando os aportes e a capitalização desta simulação, o CDB precisa de aproximadamente <b>${PCT(eqExact*100)} do CDI</b> para empatar em dinheiro.`,sens,[{name:'CDB',data:sc},{name:'LCI/LCA',data:sl},{name:'Alternativa 3',data:st}],'valor líquido');
+  let P=Math.max(0,num('p')),pmt=Math.max(0,num('pmt')),N=Math.max(1,Math.round(num('months'))),cdi=Math.max(-.99,num('cdi')/100),infl=Math.max(-.99,num('fiInflation')/100);
+  function product(prefix,name,cdiOverride=cdi,rateOverride=null){
+    return fixedIncomeProduct(name,$(prefix+'Type').value,rateOverride===null?num(prefix+'Rate'):rateOverride,num(prefix+'Fee'),Math.max(0,num(prefix+'Lock')),P,pmt,N,cdiOverride,infl);
+  }
+  let products=[product('fiA','Produto A'),product('fiB','Produto B'),product('fiC','Produto C')],eligible=products.filter(x=>x.eligible),rank=(eligible.length?eligible:products).slice().sort((a,b)=>b.net-a.net),winner=rank[0],second=rank[1]||rank[0],lead=winner.net-second.net;
+  function netAt(prefix,name,rate){return product(prefix,name,cdi,rate).net}
+  let secondPrefix=second.name==='Produto A'?'fiA':second.name==='Produto B'?'fiB':'fiC',unit=second.cdiBased?'% do CDI':'% a.a.',lo=0,hi=second.cdiBased?400:100,breakRate=null,target=winner.net,flo=netAt(secondPrefix,second.name,lo)-target,fhi=netAt(secondPrefix,second.name,hi)-target;
+  if(flo*fhi<=0){for(let i=0;i<70;i++){let mid=(lo+hi)/2,fm=netAt(secondPrefix,second.name,mid)-target;if(flo*fm<=0){hi=mid;fhi=fm}else{lo=mid;flo=fm}}breakRate=(lo+hi)/2}
+  let invested=P+pmt*N;
+  let sens=[Math.max(0,cdi-.02),cdi,cdi+.02].map(rr=>{let ps=[fixedIncomeProduct('A',$('fiAType').value,num('fiARate'),num('fiAFee'),num('fiALock'),P,pmt,N,rr,infl),fixedIncomeProduct('B',$('fiBType').value,num('fiBRate'),num('fiBFee'),num('fiBLock'),P,pmt,N,rr,infl),fixedIncomeProduct('C',$('fiCType').value,num('fiCRate'),num('fiCFee'),num('fiCLock'),P,pmt,N,rr,infl)].filter(x=>x.eligible);let w=(ps.length?ps:products).sort((a,b)=>b.net-a.net)[0];return[PCT(rr*100)+' CDI',w.name+' · '+BRL(w.net)]});
+  function curve(prefix,name){let arr=[];for(let m=1;m<=N;m++){let pr=fixedIncomeProduct(name,$(prefix+'Type').value,num(prefix+'Rate'),num(prefix+'Fee'),num(prefix+'Lock'),P,pmt,m,cdi,infl);arr.push({y:pr.net})}return arr}
+  let ineligible=products.filter(x=>!x.eligible);
+  let insight=`O ranking principal usa <b>valor líquido em dinheiro</b> no prazo informado. Tipo de remuneração, imposto, custo anual e carência são tratados separadamente. ${ineligible.length?'Atenção: '+ineligible.map(x=>x.name).join(', ')+' não cumpre a carência no prazo informado e fica fora do ranking principal.':'Todos os produtos cumprem a carência informada.'}`;
+  let be=breakRate!==null?`${second.name} precisa de aproximadamente <b>${PCT(breakRate)} ${unit}</b> para alcançar o valor líquido de ${winner.name}, mantendo as demais premissas.`:'Não apareceu ponto de equilíbrio da segunda colocada dentro do intervalo de taxa testado.';
+  let metrics=[['Total aportado',BRL(invested)],...products.flatMap(x=>[[x.name+' · líquido',BRL(x.net)],[x.name+' · ganho',BRL(x.gain)],[x.name+' · real',BRL(x.real)],[x.name+' · imposto',BRL(x.tax)]]).slice(0,12)];
+  setResult(winner.name,`Maior valor líquido estimado${lead>0?' por '+BRL(lead):''} no horizonte informado.`,metrics,insight,be,sens,[{name:'Produto A',data:curve('fiA','A')},{name:'Produto B',data:curve('fiB','B')},{name:'Produto C',data:curve('fiC','C')}],'valor líquido');
  }
  else if(e==='grossup'){let P=num('p'),days=num('days'),cdi=num('cdi')/100,free=num('free')/100,actual=num('actualCdb')/100,du=num('du'),tax=irDays(days),simple=free/(1-tax),daily=Math.pow(1+cdi,1/252)-1,ff=Math.pow(1+daily*free,du),freeFV=P*ff,req=1+(ff-1)/(1-tax),exact=(Math.pow(req,1/du)-1)/daily,cg=P*Math.pow(1+daily*actual,du),cn=P+(cg-P)*(1-tax),diff=cn-freeFV,sens=[free-.05,free,free+.05].map(x=>[PCT(x*100)+' CDI isento',PCT(x/(1-tax)*100)+' CDI trib.']);setResult(PCT(simple*100)+' do CDI','Gross-up convencional da taxa.',[['Equivalente composto',PCT(exact*100)+' CDI'],['Isento líquido',BRL(freeFV)],['CDB informado',BRL(cn)]],diff>=0?`O CDB informado supera o isento em ${BRL(diff)} líquidos.`:`O isento supera o CDB informado em ${BRL(-diff)} líquidos.`,`Para empatar em dinheiro, o CDB precisa de aproximadamente <b>${PCT(exact*100)} do CDI</b>.`,sens)}
  else if(e==='realReturn'){let r=(1+num('nom')/100)/(1+num('inf')/100)-1;setResult(PCT(r*100),'Rentabilidade real.',[['Ganho real',BRL(num('p')*r)],['Inflação',PCT(num('inf'))]])}
@@ -1587,6 +1659,24 @@ function calculateTool(){if(state.scenario&&!state.scenarioBusy)persistActiveSce
  }
  else if(e==='cashInstallment'){let cash=num('cashPrice'),inst=num('install'),N=num('n'),r=num('returnM')/100,cb=num('cashback')/100,now=$('timing').value==='now',pv=0;for(let k=0;k<N;k++){let t=now?k:k+1;pv+=inst/Math.pow(1+r,t)}pv-=inst*N*cb;let nominal=inst*N*(1-cb),be=solveRate(rr=>{let x=0;for(let k=0;k<N;k++){let t=now?k:k+1;x+=inst/Math.pow(1+rr,t)}return x-inst*N*cb},cash,0,.2);setResult(pv>cash?'À vista':'Parcelado','Menor custo por valor presente.',[['À vista',BRL(cash)],['Parcelado nominal',BRL(nominal)],['Valor presente',BRL(pv)]],`A soma nominal não basta. O valor presente desconta cada parcela pelo retorno do dinheiro.`,`O empate acontece perto de <b>${PCT(be*100)} ao mês</b> de retorno líquido.`)}
  else if(e==='loan'){let pv=Math.max(0,num('price')-num('down')),i=num('rate')/100,N=num('n'),p=loanPay(pv,i,N),tot=p*N;setResult(BRL(p),'Parcela estimada.',[['Financiado',BRL(pv)],['Total parcelas',BRL(tot)],['Juros',BRL(tot-pv)]])}
+ else if(e==='loanCompare'){
+  let price=Math.max(0,num('cmpPrice')),down=Math.min(price,Math.max(0,num('cmpDown'))),credit=Math.max(0,price-down),H=Math.max(1,Math.round(num('cmpHorizon'))),disc=Math.max(-.99,num('cmpDiscount')/100);
+  function proposal(prefix,rateOverride=null){
+    let system=$(prefix+'System').value,rate=(rateOverride===null?num(prefix+'Rate'):rateOverride)/100,N=Math.max(1,Math.round(num(prefix+'N'))),upfront=Math.max(0,num(prefix+'Upfront')),monthlyExtra=Math.max(0,num(prefix+'Monthly')),base=loanFlow(credit,rate,N,system,0),flows=base.flows.map(x=>x+monthlyExtra),pv=upfront+pvFlows(flows,disc),total=upfront+flows.reduce((s,x)=>s+x,0),h=Math.min(H,N),balance=credit,cum=upfront,curve=[],balanceAtH=credit;
+    let amortSac=N?credit/N:0;
+    for(let m=1;m<=N;m++){
+      let contractual=base.flows[m-1]||0,j=balance*rate,a=system==='sac'?Math.min(amortSac,balance):Math.max(0,contractual-j);
+      balance=Math.max(0,balance-a);cum+=flows[m-1]||0;curve.push({y:cum});if(m===h)balanceAtH=balance;
+    }
+    return{system,rate,N,upfront,monthlyExtra,base,flows,pv,total,curve,balanceAtH,cashAtH:upfront+flows.slice(0,h).reduce((s,x)=>s+x,0)};
+  }
+  let A=proposal('cmpA'),B=proposal('cmpB'),winner=A.pv<=B.pv?'Proposta A':'Proposta B',diff=Math.abs(A.pv-B.pv),target=A.pv,lo=0,hi=5,breakB=null,flo=proposal('cmpB',lo).pv-target,fhi=proposal('cmpB',hi).pv-target;
+  if(flo*fhi<=0){for(let i=0;i<70;i++){let mid=(lo+hi)/2,fm=proposal('cmpB',mid).pv-target;if(flo*fm<=0){hi=mid;fhi=fm}else{lo=mid;flo=fm}}breakB=(lo+hi)/2}
+  let sens=[Math.max(0,num('cmpBRate')-.1),num('cmpBRate'),num('cmpBRate')+.1].map(r=>{let b=proposal('cmpB',r),d=b.pv-A.pv;return[PCT(r)+' a.m. proposta B',(d<=0?'B - ':'B + ')+BRL(Math.abs(d))+' VP']});
+  let insight=`Taxa menor não garante menor custo quando prazo, seguros e tarifas mudam. O comparador olha o fluxo completo e também mostra o saldo devedor que permanece no horizonte escolhido.`;
+  let be=breakB!==null?`Mantidas as demais condições da Proposta B, uma taxa perto de <b>${PCT(breakB)} a.m.</b> faria seu valor presente empatar com a Proposta A.`:'Não apareceu uma taxa de equilíbrio da Proposta B entre 0% e 5% a.m. com as condições atuais.';
+  setResult(winner,'Menor valor presente estimado dos desembolsos.',[['Valor financiado',BRL(credit)],['A · 1ª parcela',BRL(A.flows[0]||0)],['B · 1ª parcela',BRL(B.flows[0]||0)],['A · valor presente',BRL(A.pv)],['B · valor presente',BRL(B.pv)],['A · total nominal',BRL(A.total)],['B · total nominal',BRL(B.total)],['A · saldo no horizonte',BRL(A.balanceAtH)],['B · saldo no horizonte',BRL(B.balanceAtH)],['A · caixa pago no horizonte',BRL(A.cashAtH)],['B · caixa pago no horizonte',BRL(B.cashAtH)]],insight,be,sens,[{name:'Proposta A · desembolso',data:A.curve},{name:'Proposta B · desembolso',data:B.curve}],'desembolso acumulado');
+ }
  else if(e==='carCost'){let p=num('price'),y=num('years'),dep=p*num('dep')/100,rec=num('insurance')*y+num('tax')*y+num('fuel')*12*y+num('maint')*y,total=dep+rec;setResult(BRL(total),'Custo de uso + perda de valor.',[['Depreciação',BRL(dep)],['Custos recorrentes',BRL(rec)],['Média mensal',BRL(total/(12*y))]])}
  else if(e==='amortInvest'){
   let bal=num('balance'),da=num('debtA')/100,N=Math.max(1,Math.round(num('months'))),cash=Math.min(num('cash'),bal),ig=num('invGross')/100,tax=Math.max(0,Math.min(.999,num('tax')/100)),fee=num('fee')/100,system=$('loanSystem').value,mode=$('amortMode').value,m=monthly(da),newBal=Math.max(0,bal-cash);
@@ -1719,7 +1809,7 @@ function saveDecision(){
   let decisionName=currentDecisionName(),decisionKey=makeDecisionKey(state.current.id,decisionName);
   let previous=d.filter(x=>savedDecisionKey(x)===decisionKey),version=(previous.reduce((m,x)=>Math.max(m,x.version||1),0)||0)+1;
   let scenarioState=exportScenarioState(),scenarioId=scenarioState?.active||null,scenarioLabel=scenarioId?getScenarioLabel(scenarioId):null;
-  d.unshift({id:Date.now(),toolId:state.current.id,title:state.current.title,decisionName,decisionKey,version,scenarioLabel,primary:state.last.primary,subtitle:state.last.subtitle,metrics:state.last.metrics||[],assumptions:captureAssumptions(),scenarioState,mode:state.mode,date:new Date().toISOString()});
+  d.unshift({id:Date.now(),toolId:state.current.id,title:state.current.title,decisionName,decisionKey,version,scenarioLabel,primary:state.last.primary,subtitle:state.last.subtitle,metrics:state.last.metrics||[],sensitivity:state.last.sens||[],assumptions:captureAssumptions(),scenarioState,mode:state.mode,date:new Date().toISOString()});
   storage.set('amarelo_decisions',d.slice(0,100));
   toast((scenarioEnabled()?`Versão ${version} salva`:'Decisão salva')+' · '+decisionName);
   renderDashboard();
@@ -1760,6 +1850,13 @@ function openDecisionReport(){
   ensureScenarioSnapshotsForReport();
   const name=currentDecisionName(),scenarioLabel=state.scenario?getScenarioLabel(state.scenario.active):'Cenário atual';
   const metrics=(state.last.metrics||[]).map(m=>`<div class="reportMetric"><small>${escapeHtml(m[0])}</small><b>${escapeHtml(m[1])}</b></div>`).join('');
+  const sensitivity=(state.last.sens||[]).map(s=>`<div class="reportSensitivityItem"><small>${escapeHtml(s[0])}</small><b>${escapeHtml(s[1])}</b></div>`).join('');
+  const decisionKey=makeDecisionKey(state.current.id,name),savedVersions=saved().filter(x=>savedDecisionKey(x)===decisionKey).sort((a,b)=>new Date(b.date)-new Date(a.date)),previous=savedVersions[0]||null;
+  let evolutionSection='';
+  if(previous){
+    const currentMetrics=state.last.metrics||[],prevMetrics=previous.metrics||[],labels=[...new Set([...currentMetrics.map(m=>m[0]),...prevMetrics.map(m=>m[0])])].slice(0,6);
+    evolutionSection=`<section class="reportSection"><div class="reportSectionHead"><h3>Desde a última versão</h3><span>EVOLUÇÃO</span></div><div class="reportEvolution"><div class="reportEvolutionHero"><small>ÚLTIMA VERSÃO SALVA · ${escapeHtml(new Date(previous.date).toLocaleDateString('pt-BR'))}</small><b>${escapeHtml(previous.primary)}</b><p>${escapeHtml(previous.subtitle||'')}</p></div><div class="reportEvolutionTableWrap"><table class="reportScenarioTable"><thead><tr><th>Métrica</th><th>Agora</th><th>Última versão</th></tr></thead><tbody>${labels.map(label=>{let cur=currentMetrics.find(m=>m[0]===label),old=prevMetrics.find(m=>m[0]===label);return`<tr><td>${escapeHtml(label)}</td><td>${escapeHtml(cur?cur[1]:'—')}</td><td>${escapeHtml(old?old[1]:'—')}</td></tr>`}).join('')}</tbody></table></div></div></section>`;
+  }
   const drivers=decisionDrivers().map(d=>`<div class="reportDriver"><small>${escapeHtml(d[0])}</small><b>${escapeHtml(d[1])}</b><p>${escapeHtml(d[2])}</p></div>`).join('');
   const assumptions=reportAssumptionRows().map(a=>`<div class="reportAssumption"><span>${escapeHtml(a[0])}</span><b>${escapeHtml(a[1])}</b></div>`).join('');
   let scenarioSection='';
@@ -1772,19 +1869,31 @@ function openDecisionReport(){
   }
   const insight=state.last.insight?`<section class="reportSection"><div class="reportSectionHead"><h3>Leitura do resultado</h3><span>CONTEXTO</span></div><div class="reportText">${state.last.insight}</div></section>`:'';
   const breakEven=state.last.be?`<section class="reportSection"><div class="reportSectionHead"><h3>Ponto de equilíbrio</h3><span>BREAK-EVEN</span></div><div class="reportText">${state.last.be}</div></section>`:'';
-  $('reportContent').innerHTML=`<header class="reportHeader"><div class="reportBrand"><i></i>AMARELO</div><div class="reportMeta">Gerado em ${new Date().toLocaleString('pt-BR')}<br>Simulação educacional · premissas editáveis</div></header><div class="reportKicker">${escapeHtml(state.current.cat.toUpperCase())} / RELATÓRIO DE DECISÃO</div><h1 class="reportTitle">${escapeHtml(name)}</h1><p class="reportSubtitle">${escapeHtml(state.current.title)} · ${escapeHtml(state.current.desc)}</p><div class="reportScenario">${escapeHtml(scenarioLabel)}</div><section class="reportHero"><small>RESPOSTA DA SIMULAÇÃO</small><h2>${escapeHtml(state.last.primary)}</h2><p>${escapeHtml(state.last.subtitle||'')}</p></section><section class="reportSection"><div class="reportSectionHead"><h3>Métricas principais</h3><span>RESULTADO</span></div><div class="reportMetricGrid">${metrics}</div></section>${drivers?`<section class="reportSection"><div class="reportSectionHead"><h3>O que move a decisão</h3><span>DRIVERS</span></div><div class="reportDriverGrid">${drivers}</div></section>`:''}<section class="reportSection"><div class="reportSectionHead"><h3>Premissas</h3><span>TRANSPARÊNCIA</span></div><div class="reportAssumptions">${assumptions}</div></section>${insight}${breakEven}${scenarioSection}<div class="reportMethod"><b>Metodologia.</b> ${escapeHtml(method(state.current.engine))}</div><footer class="reportFooter"><span>AMARELO · Antes de decidir, coloque na conta.</span><span>Este relatório organiza uma simulação e não substitui análise individual de riscos, contratos, tributos ou condições específicas.</span></footer>`;
+  $('reportContent').innerHTML=`<header class="reportHeader"><div class="reportBrand"><i></i>AMARELO</div><div class="reportMeta">Gerado em ${new Date().toLocaleString('pt-BR')}<br>Simulação educacional · premissas editáveis</div></header><div class="reportKicker">${escapeHtml(state.current.cat.toUpperCase())} / RELATÓRIO DE DECISÃO</div><h1 class="reportTitle">${escapeHtml(name)}</h1><p class="reportSubtitle">${escapeHtml(state.current.title)} · ${escapeHtml(state.current.desc)}</p><div class="reportScenario">${escapeHtml(scenarioLabel)}</div><section class="reportHero"><small>RESPOSTA DA SIMULAÇÃO</small><h2>${escapeHtml(state.last.primary)}</h2><p>${escapeHtml(state.last.subtitle||'')}</p></section><section class="reportSection"><div class="reportSectionHead"><h3>Métricas principais</h3><span>RESULTADO</span></div><div class="reportMetricGrid">${metrics}</div></section>${drivers?`<section class="reportSection"><div class="reportSectionHead"><h3>O que move a decisão</h3><span>DRIVERS</span></div><div class="reportDriverGrid">${drivers}</div></section>`:''}<section class="reportSection"><div class="reportSectionHead"><h3>Premissas</h3><span>TRANSPARÊNCIA</span></div><div class="reportAssumptions">${assumptions}</div></section>${insight}${breakEven}${sensitivity?`<section class="reportSection"><div class="reportSectionHead"><h3>Sensibilidade</h3><span>E SE?</span></div><div class="reportSensitivity">${sensitivity}</div></section>`:''}${scenarioSection}${evolutionSection}<div class="reportMethod"><b>Metodologia.</b> ${escapeHtml(method(state.current.engine))}</div><footer class="reportFooter"><span>AMARELO · Antes de decidir, coloque na conta.</span><span>Este relatório organiza uma simulação e não substitui análise individual de riscos, contratos, tributos ou condições específicas.</span></footer>`;
   $('reportModal').classList.remove('hidden');
 }
 function renderDashboard(){
   let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0}),months=p.essentials?p.reserve/p.essentials:0;
   $('profileSummary').innerHTML=[['Renda líquida',BRL(p.income)],['Patrimônio financeiro',BRL(p.wealth)],['Reserva',months?months.toFixed(1)+' meses':'—'],['Investimento mensal',BRL(p.monthly)]].map(x=>`<div class="profileStat"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('');
-  let d=saved(),groups=groupSavedDecisions(d);
+  let d=saved(),groups=groupSavedDecisions(d),now=Date.now(),day=86400000,review=groups.filter(g=>(now-new Date(g.versions[0].date).getTime())/day>=45),multi=groups.filter(g=>g.versions.length>1),recent=groups.filter(g=>(now-new Date(g.versions[0].date).getTime())/day<30);
+  $('decisionPulse').innerHTML=[
+    ['Decisões acompanhadas',groups.length],
+    ['Versões salvas',d.length],
+    ['Com histórico',multi.length],
+    ['Atualizadas em 30 dias',recent.length]
+  ].map((x,i)=>`<div class="pulseStat"><span>0${i+1}</span><small>${x[0]}</small><b>${x[1]}</b></div>`).join('');
+  $('reviewQueue').innerHTML=review.length?review.slice(0,4).map(g=>{let x=g.versions[0],days=Math.floor((now-new Date(x.date).getTime())/day);return`<div class="reviewDecision"><div><span>${days} DIAS</span><h4>${escapeHtml(x.decisionName||x.title)}</h4><p>${escapeHtml(x.title)} · última versão V${x.version||g.versions.length}</p></div><button onclick="openSavedDecision(${x.id})">Revisar →</button></div>`}).join(''):`<div class="reviewEmpty"><i>✓</i><div><b>Nenhuma decisão está há 45 dias sem nova versão.</b><p>Quando uma decisão ficar antiga, ela aparece aqui para você reabrir as premissas.</p></div></div>`;
   $('savedDecisions').innerHTML=groups.length?groups.slice(0,8).map(g=>{let x=g.versions[0],count=g.versions.length;return`<div class="decisionRow groupedDecision"><div><div class="decisionTitleLine"><h4>${escapeHtml(x.decisionName||x.title)}</h4><span>V${x.version||count}</span></div><p>${escapeHtml(x.title)} · ${count} ${count===1?'versão':'versões'} · atualizado ${new Date(x.date).toLocaleDateString('pt-BR')}</p></div><div class="decisionValue"><strong>${escapeHtml(x.primary)}</strong><div class="decisionActions"><button onclick="openSavedDecision(${x.id})">Reabrir</button>${count>1?`<button data-history-key="${escapeHtml(g.key)}">Histórico</button>`:''}<button onclick="deleteDecision(${x.id})">Excluir última</button></div></div></div>`}).join(''):'<div class="dashEmpty"><span>01</span><h4>Seu histórico começa na primeira decisão.</h4><p>Faça uma simulação, dê um nome ao caso e salve a primeira versão.</p><button onclick="navigate(\'tools\')">Abrir biblioteca →</button></div>';
   $('savedDecisions').querySelectorAll('[data-history-key]').forEach(b=>b.addEventListener('click',()=>openVersionCompare(b.dataset.historyKey)));
   let f=favs().map(id=>tools.find(t=>t.id===id)).filter(Boolean);
   $('favoriteTools').innerHTML=f.length?f.slice(0,6).map(t=>`<div class="miniTool" onclick="openTool('${t.id}')"><i>${t.icon}</i><b>${t.title}</b></div>`).join(''):'<div class="dashEmpty compact"><span>☆</span><h4>Fixe o que você usa mais.</h4><p>Seus favoritos aparecem aqui.</p></div>';
-  let next=p.reserve<p.essentials*6&&p.essentials>0?['reserva','Sua reserva está abaixo de 6 meses.']:p.monthly>0?['meta-financeira','Transforme seu aporte mensal em uma meta.']:['diagnostico','Comece pelo diagnóstico financeiro.'];
-  $('nextDecision').innerHTML=`<div class="miniTool" onclick="openTool('${next[0]}')"><i>→</i><div><b>${tools.find(t=>t.id===next[0])?.title||'Próxima análise'}</b><p class="muted">${next[1]}</p></div></div>`;
+  if(review.length){
+    let x=review[0].versions[0];
+    $('nextDecision').innerHTML=`<div class="miniTool" onclick="openSavedDecision(${x.id})"><i>↻</i><div><b>${escapeHtml(x.decisionName||x.title)}</b><p class="muted">Reabra a última versão e atualize as premissas.</p></div></div>`;
+  }else{
+    let next=p.reserve<p.essentials*6&&p.essentials>0?['reserva','Sua reserva informada está abaixo de 6 meses.']:p.monthly>0?['meta-financeira','Transforme seu aporte mensal em uma meta.']:['diagnostico','Comece pelo diagnóstico financeiro.'];
+    $('nextDecision').innerHTML=`<div class="miniTool" onclick="openTool('${next[0]}')"><i>→</i><div><b>${tools.find(t=>t.id===next[0])?.title||'Próxima análise'}</b><p class="muted">${next[1]}</p></div></div>`;
+  }
 }
 function openProfile(){let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0});for(const k in p){let el=$('profile'+k[0].toUpperCase()+k.slice(1));if(el)el.value=p[k]}$('profileModal').classList.remove('hidden')}
 function closeProfile(){$('profileModal').classList.add('hidden')}
