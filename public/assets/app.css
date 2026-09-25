@@ -564,3 +564,33 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
   .reportMethod,.reportFooter{page-break-inside:avoid}
   .reportFooter{font-size:7pt!important}
 }
+
+/* AMARELO 1.0 — final responsive hardening */
+html{overflow-x:hidden}
+img,svg,canvas{max-width:100%}
+.reportScenarioTable,.reportEvolutionTableWrap{max-width:100%;overflow-x:auto}
+button,input,select,textarea{font:inherit}
+@media(max-width:760px){
+  body{padding-bottom:calc(82px + env(safe-area-inset-bottom))}
+  input,select,textarea{font-size:16px!important}
+  button,.btn,.navitem,.filters button,.quick button{min-height:44px}
+  .modal{padding:0;align-items:stretch}
+  .modalCard{width:100%;max-width:none;min-height:100dvh;border-radius:0;padding:26px 18px calc(30px + env(safe-area-inset-bottom));overflow:auto}
+  .reportModal{padding:0!important}
+  .reportShell{width:100%!important}
+  .reportToolbar{position:sticky;top:0;border-radius:0;margin:0;z-index:10}
+  .decisionReport{border-radius:0!important;box-shadow:none!important;padding:26px 18px!important;min-height:calc(100dvh - 58px)}
+  .reportHeader{display:grid;grid-template-columns:1fr;gap:12px}
+  .reportMeta{text-align:left}
+  .reportMetricGrid,.reportDriverGrid,.reportAssumptions,.reportSensitivity{grid-template-columns:1fr!important}
+  .reportFooter{display:grid;grid-template-columns:1fr;gap:12px}
+  .reportScenarioTable{display:block;overflow-x:auto;white-space:nowrap}
+  .page,.hero,.section{overflow-x:clip}
+  .toolActions,.dashActions{width:100%}
+  .toolActions .btn,.dashActions .btn{flex:1 1 145px}
+  .profileGrid{grid-template-columns:1fr!important}
+  .pricingTitle,.pageHead h1,.dashHead h1,.toolHeader h1{overflow-wrap:anywhere}
+}
+@media(min-width:761px){
+  .modalCard{max-height:calc(100vh - 48px);overflow:auto}
+}
