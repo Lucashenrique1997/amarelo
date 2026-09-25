@@ -68,6 +68,10 @@ export async function revokeSession(db, token) {
   await db.prepare("DELETE FROM sessions WHERE id = ?").bind(id).run();
 }
 
+export async function revokeAllSessions(db, userId) {
+  await db.prepare("DELETE FROM sessions WHERE user_id = ?").bind(userId).run();
+}
+
 export async function authenticatedUserId(request, env) {
   if (!env.DB) return null;
   const token = readCookie(request, SESSION_COOKIE);
