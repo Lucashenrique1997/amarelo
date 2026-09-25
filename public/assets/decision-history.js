@@ -14,8 +14,14 @@ function saveDecision(){
   let decisionName=currentDecisionName(),decisionKey=makeDecisionKey(state.current.id,decisionName);
   let previous=d.filter(x=>savedDecisionKey(x)===decisionKey),version=(previous.reduce((m,x)=>Math.max(m,x.version||1),0)||0)+1;
   let scenarioState=exportScenarioState(),scenarioId=scenarioState?.active||null,scenarioLabel=scenarioId?getScenarioLabel(scenarioId):null;
-  d.unshift({id:Date.now(),toolId:state.current.id,title:state.current.title,decisionName,decisionKey,version,scenarioLabel,primary:state.last.primary,subtitle:state.last.subtitle,metrics:state.last.metrics||[],sensitivity:state.last.sens||[],assumptions:captureAssumptions(),scenarioState,mode:state.mode,date:new Date().toISOString()});
+  const savedVersion={id:Date.now(),toolId:state.current.id,title:state.current.title,decisionName,decisionKey,version,scenarioLabel,primary:state.last.primary,subtitle:state.last.subtitle,metrics:state.last.metrics||[],sensitivity:state.last.sens||[],assumptions:captureAssumptions(),scenarioState,mode:state.mode,date:new Date().toISOString()};
+  d.unshift(savedVersion);
   storage.set('amarelo_decisions',d.slice(0,100));
+  syncDecisionVersionIfAvailable(savedVersion).then(remote=>{
+    if(!remote)return;
+    const items=saved(),item=items.find(x=>String(x.id)===String(savedVersion.id));
+    if(item){item.remoteDecisionId=remote.decisionId;item.remoteVersionId=remote.versionId;item.clientVersionId=String(savedVersion.id);storage.set('amarelo_decisions',items)}
+  });
   toast((scenarioEnabled()?`Versão ${version} salva`:'Decisão salva')+' · '+decisionName);
   renderDashboard();
 }
