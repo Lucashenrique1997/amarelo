@@ -22,3 +22,5 @@ jobs:
         run: npm run test:finance
       - name: Test 12 priority decision engines
         run: npm run test:engines
+      - name: Test Worker and API contracts
+        run: npm run test:worker
