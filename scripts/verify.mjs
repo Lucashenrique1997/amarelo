@@ -43,7 +43,16 @@ const required = [
   "function groupSavedDecisions",
   "function currentDecisionName",
   "reportContent",
-  "decisionIdentity"
+  "decisionIdentity",
+  "imovel-na-planta",
+  "bonus-decidir",
+  "independencia-financeira",
+  "offPlan",
+  "windfallDecision",
+  "financialIndependence",
+  "Correção anual estimada da obra",
+  "13º / Bônus: Dívida x Investir x Reserva",
+  "Mapa de Independência Financeira"
 ];
 
 for (const marker of required) {
@@ -65,7 +74,10 @@ for (const id of [
   "aposentadoria",
   "salario-liquido",
   "portabilidade-divida",
-  "trocar-carro"
+  "trocar-carro",
+  "imovel-na-planta",
+  "bonus-decidir",
+  "independencia-financeira"
 ]) {
   if (!ids.includes(id)) throw new Error(`Missing priority decision engine: ${id}`);
 }
@@ -83,4 +95,4 @@ for (const forbidden of ["azul-planejamento", "verde-market", "dourado"]) {
   if (productionSurface.includes(forbidden)) throw new Error(`Cross-project reference detected: ${forbidden}`);
 }
 
-console.log(`AMARELO verification passed: ${ids.length} tools, V14 reports and grouped decision histories, isolated Worker.`);
+console.log(`AMARELO verification passed: ${ids.length} tools, scenarios, reports, new decision engines and isolated Worker.`);
