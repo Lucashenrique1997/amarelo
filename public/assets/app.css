@@ -507,3 +507,7 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
 /* AMARELO 1.0 — dashboard utility actions */
 .dashActions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 @media(max-width:760px){.dashActions{justify-content:flex-start;width:100%;margin-top:14px}.dashActions .btn{flex:1 1 auto}}
+
+/* AMARELO 1.0 — keyboard accessibility */
+.skipLink{position:fixed;left:14px;top:-60px;z-index:999;background:#17160f;color:#fff;padding:10px 14px;border-radius:999px;font-size:10px;font-weight:850;text-decoration:none;transition:top .16s}
+.skipLink:focus{top:14px}
