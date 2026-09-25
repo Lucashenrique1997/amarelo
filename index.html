@@ -140,7 +140,7 @@
         <input id="backupInput" type="file" accept="application/json,.json" hidden onchange="importBackupFile(event)">
       </div>
     </div>
-    <div class="dashboardSignal"><span><i></i> Visão pessoal</span><p>Seu contexto muda. Suas decisões também. Volte, ajuste premissas e compare versões.</p></div>
+    <div class="dashboardSignal"><span><i></i> <b id="dataModeBadge">Somente neste navegador</b></span><p id="dataModeText">Seu contexto muda. Exporte um backup enquanto a sincronização online não está ativa.</p></div>
     <div id="profileSummary" class="profileSummary"></div>
     <div id="decisionPulse" class="decisionPulse"></div>
     <div class="dashGrid">
@@ -368,6 +368,7 @@
 <script src="/assets/scenario-system.js"></script>
 <script src="/assets/decision-engines.js"></script>
 <script src="/assets/data-store.js"></script>
+<script src="/assets/runtime-capabilities.js"></script>
 <script src="/assets/decision-history.js"></script>
 <script src="/assets/dashboard.js"></script>
 <script src="/assets/app.js"></script>
