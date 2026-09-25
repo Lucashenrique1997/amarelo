@@ -171,7 +171,6 @@ Quando aplicável:
 ### I. Lançamento
 - [ ] domínio `oamarelo.com.br`
 - [x] SEO/meta/social
-- [ ] analytics de produto com privacidade
 - [ ] mobile final
 - [ ] desktop final
 - [ ] smoke test de produção
@@ -211,3 +210,21 @@ Só interromper para:
 5. **aprovar termos/preço antes de cobrança real**.
 
 Todo o restante é responsabilidade de execução do projeto.
+
+
+---
+
+## Depois do lançamento
+
+Itens que não bloqueiam o AMARELO 1.0:
+- analytics de produto;
+- Família;
+- Professional;
+- Open Finance;
+- aplicativo nativo;
+- integrações bancárias/corretoras;
+- white label;
+- automações avançadas;
+- novos motores além do catálogo atual.
+
+Esses itens só entram depois que o 1.0 estiver publicado e sendo usado.
