@@ -845,6 +845,8 @@ function detectAskTool(text){
   const rules=[
     ['financiamento-consorcio',['consórc','consorc','financiar ou','financiamento ou investir','dar entrada']],
     ['comprar-alugar',['comprar ou alugar','alugar ou comprar','aluguel','continuar alugando']],
+    ['portabilidade-divida',['portabilidade','portar dívida','portar divida','refinanciar','trocar financiamento']],
+    ['trocar-carro',['trocar de carro','manter o carro','manter carro','comprar outro carro']],
     ['amortizar-investir',['amort','quitar financiamento','abater financiamento','reduzir saldo']],
     ['aposentadoria',['aposent','parar de trabalhar','previdência','previdencia']],
     ['viver-renda',['viver de renda','renda mensal com patrimônio','renda mensal com patrimonio']],
@@ -956,7 +958,7 @@ function askAmarelo(q){
 function planAllows(t){return t.tier==='free'||state.plan!=='free'}
 function setDemoPlan(p){state.plan=p;storage.set('amarelo_plan',p);toast('Plano de demonstração: '+p.toUpperCase());if(state.current)openCurrentTool();renderDashboard()}
 
-const scenarioDecisionIds=new Set(['financiamento-consorcio','comprar-alugar','amortizar-investir','aposentadoria']);
+const scenarioDecisionIds=new Set(['financiamento-consorcio','comprar-alugar','amortizar-investir','aposentadoria','portabilidade-divida','trocar-carro']);
 const scenarioNames={base:'Base',conservative:'Conservador',optimistic:'Otimista'};
 const scenarioNotes={
  base:'Suas premissas atuais. Este é o ponto de partida da comparação.',
@@ -1015,6 +1017,16 @@ function buildScenarioPreset(base,type){
    setScenarioNumber(a,'real',scenarioNumber(a,'real')+(stress?-1:1),-10,30);
    setScenarioNumber(a,'fee',scenarioNumber(a,'fee')+(stress?.25:-.25),0);
    setScenarioNumber(a,'inflation',scenarioNumber(a,'inflation')+(stress?1:-.5),0);
+ }else if(e==='debtPortability'){
+   setScenarioNumber(a,'portNewRate',scenarioNumber(a,'portNewRate')+(stress?.2:-.2),0);
+   setScenarioNumber(a,'portFee',scenarioNumber(a,'portFee')*(stress?1.25:.75),0);
+   setScenarioNumber(a,'portNewN',Math.max(1,Math.round(scenarioNumber(a,'portNewN')+(stress?6:-6))),1);
+ }else if(e==='carDecision'){
+   setScenarioNumber(a,'carNewPrice',scenarioNumber(a,'carNewPrice')*(stress?1.05:.95),0);
+   setScenarioNumber(a,'carNewDep',scenarioNumber(a,'carNewDep')+(stress?3:-3),0,90);
+   setScenarioNumber(a,'carRate',scenarioNumber(a,'carRate')+(stress?.15:-.15),0);
+   setScenarioNumber(a,'carCurrentMaint',scenarioNumber(a,'carCurrentMaint')*(stress?1.1:.9),0);
+   setScenarioNumber(a,'carInv',scenarioNumber(a,'carInv')+(stress?-2:2),0);
  }
  return a;
 }
@@ -1039,6 +1051,16 @@ function scenarioWhatIfConfig(){
    {id:'real',label:'Retorno real',step:.5,suffix:'% a.a.',min:-10},
    {id:'pmt',label:'Aporte mensal',step:250,prefix:'R$ ',min:0},
    {id:'ret',label:'Idade de aposentadoria',step:1,suffix:' anos',min:num('age')+1}
+ ];
+ if(e==='debtPortability')return[
+   {id:'portNewRate',label:'Nova taxa',step:.1,suffix:'% a.m.',min:0},
+   {id:'portFee',label:'Custos da troca',step:500,prefix:'R$ ',min:0},
+   {id:'portNewN',label:'Novo prazo',step:6,suffix:' meses',min:1}
+ ];
+ if(e==='carDecision')return[
+   {id:'carNewPrice',label:'Preço do novo carro',step:5000,prefix:'R$ ',min:0},
+   {id:'carCurrentMaint',label:'Manutenção atual',step:1000,prefix:'R$ ',min:0},
+   {id:'carRate',label:'Taxa do financiamento',step:.1,suffix:'% a.m.',min:0}
  ];
  return[];
 }
@@ -1184,6 +1206,18 @@ function decisionDrivers(){
    ['Tempo até aposentar',Math.max(0,num('ret')-num('age')).toFixed(1).replace('.',',')+' anos','mexe no tempo de capitalização'],
    ['Renda desejada',BRL(num('income'))+'/mês','mexe no capital necessário']
  ];
+ if(e==='debtPortability')return[
+   ['Taxa atual',PCT(num('portCurrentRate'))+' a.m.','define o fluxo que já existe'],
+   ['Nova taxa',PCT(num('portNewRate'))+' a.m.','mexe no custo da proposta'],
+   ['Custos iniciais',BRL(num('portFee')),'podem consumir a economia de juros'],
+   ['Prazo novo',Math.round(num('portNewN'))+' meses','mexe na parcela e no total pago']
+ ];
+ if(e==='carDecision')return[
+   ['Diferença de preço',BRL(Math.max(0,num('carNewPrice')-num('carCurrentValue'))),'define quanto capital precisa migrar'],
+   ['Taxa do financiamento',PCT(num('carRate'))+' a.m.','mexe no custo de trocar'],
+   ['Manutenção do atual',BRL(num('carCurrentMaint'))+'/ano','mexe no custo de manter'],
+   ['Retorno do capital',PCT(num('carInv'))+' a.a.','mexe no valor de esperar']
+ ];
  return[];
 }
 function renderDecisionDrivers(){
@@ -1272,7 +1306,7 @@ function metric(a,b){return `<div class="metric"><small>${a}</small><b>${b}</b><
 function renderAssumptions(){let items=[...document.querySelectorAll('#toolForm .field')].map(w=>{let el=w.querySelector('input,select'),label=w.querySelector('label');if(!el||!label)return null;let name=[...label.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join(' ').trim()||el.id;let value=el.tagName==='SELECT'?(el.options[el.selectedIndex]?.text||el.value):el.value;return{name,value,advanced:w.classList.contains('advancedField')}}).filter(Boolean);if(!items.length){$('assumptionBox').classList.add('hidden');return}$('assumptionList').innerHTML=items.map(x=>`<div class="assumptionChip ${x.advanced?'advancedAssumption':''}"><small>${x.name}</small><b>${x.value}</b></div>`).join('');$('assumptionBox').classList.remove('hidden')}
 function setResult(primary,subtitle,metrics=[],insight='',be=null,sens=null,series=null,label=''){state.last={primary,subtitle,metrics,insight,be};renderAssumptions();renderDecisionDrivers();recordScenarioSnapshot();$('resultPrimary').textContent=primary;$('resultSubtitle').textContent=subtitle;$('resultMetrics').innerHTML=metrics.map(x=>metric(x[0],x[1])).join('');if(insight){$('resultInsight').classList.remove('hidden');$('insightText').innerHTML=insight}else $('resultInsight').classList.add('hidden');if(be){$('breakEvenBox').classList.remove('hidden');$('breakEven').innerHTML=be}else $('breakEvenBox').classList.add('hidden');if(sens?.length){$('sensitivityBox').classList.remove('hidden');$('sensitivity').innerHTML=sens.map(x=>`<div class="sens"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('')}else $('sensitivityBox').classList.add('hidden');if(series?.length){$('chartBox').classList.remove('hidden');$('chartLabel').textContent=label;drawChart(series)}else $('chartBox').classList.add('hidden');renderNext()}
 function drawChart(series){const w=720,h=220,pad=28,all=series.flatMap(s=>s.data.map(x=>x.y)),min=Math.min(0,...all),max=Math.max(...all,1),span=max-min||1,colors=['#f3c62e','#7ed3af','#8fb5ff','#ff9a82'],maxLen=Math.max(...series.map(s=>s.data.length)),sx=i=>pad+(w-2*pad)*(maxLen<=1?0:i/(maxLen-1)),sy=y=>h-pad-(h-2*pad)*((y-min)/span);let grid='';for(let k=0;k<5;k++){let y=pad+(h-2*pad)*k/4;grid+=`<line x1="${pad}" y1="${y}" x2="${w-pad}" y2="${y}" stroke="#303029" stroke-width="1"/>`}let paths=series.map((s,si)=>`<path d="${s.data.map((p,i)=>(i?'L':'M')+sx(i)+' '+sy(p.y)).join(' ')}" fill="none" stroke="${colors[si%colors.length]}" stroke-width="3" stroke-linecap="round"/>`).join('');$('chart').innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${grid}${paths}</svg>`;$('legend').innerHTML=series.map((s,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${s.name}</span>`).join('')}
-function renderNext(){let map={'financiamento-consorcio':['comprar-alugar','amortizar-investir'],'comprar-alugar':['financiamento-consorcio','amortizar-investir'],'amortizar-investir':['renda-fixa','meta-financeira'],'renda-fixa':['gross-up','meta-financeira'],'gross-up':['renda-fixa'],'aposentadoria':['viver-renda','meta-financeira'],'reserva':['quanto-rende'],'salario-liquido':['reserva','quanto-guardar']};let ids=map[state.current.id]||[];$('nextTools').innerHTML=ids.length?'<h4>Próximas análises relacionadas</h4>'+ids.map(id=>{let t=tools.find(x=>x.id===id);return t?`<button onclick="openTool('${id}')">${t.title} →</button>`:''}).join(''):''}
+function renderNext(){let map={'financiamento-consorcio':['comprar-alugar','amortizar-investir'],'comprar-alugar':['financiamento-consorcio','amortizar-investir'],'amortizar-investir':['renda-fixa','portabilidade-divida'],'portabilidade-divida':['plano-dividas','amortizar-investir'],'trocar-carro':['custo-carro','avista-parcelado'],'renda-fixa':['gross-up','meta-financeira'],'gross-up':['renda-fixa'],'aposentadoria':['viver-renda','meta-financeira'],'reserva':['quanto-rende'],'salario-liquido':['reserva','quanto-guardar']};let ids=map[state.current.id]||[];$('nextTools').innerHTML=ids.length?'<h4>Próximas análises relacionadas</h4>'+ids.map(id=>{let t=tools.find(x=>x.id===id);return t?`<button onclick="openTool('${id}')">${t.title} →</button>`:''}).join(''):''}
 function calculateTool(){if(state.scenario&&!state.scenarioBusy)persistActiveScenario();const e=state.current.engine;try{
  if(e==='compound'){let P=num('p'),pmt=num('pmt'),years=num('years'),r=num('rate')/100,inf=num('inflation')/100,tax=num('tax')/100,N=years*12,gross=fv(P,pmt,r,N),invested=P+pmt*N,gain=gross-invested,net=gross-gain*tax,real=net/Math.pow(1+inf,years);let sens=[Math.max(0,r-.02),r,r+.02].map(rr=>[PCT(rr*100)+' a.a.',BRL(fv(P,pmt,rr,N))]),series=[],b=P,mi=monthly(r);for(let m=1;m<=N;m++){b=b*(1+mi)+pmt;if(m%12===0)series.push({y:b})}setResult(BRL(net),'Patrimônio líquido nominal estimado.',[['Total aportado',BRL(invested)],['Ganho líquido',BRL(net-invested)],['Em dinheiro de hoje',BRL(real)]],`Tempo e aportes são os grandes motores. A inflação reduz o poder de compra do valor nominal.`,`Para preservar poder de compra, o retorno precisa superar <b>${PCT(inf*100)}</b> antes de custos e impostos.`,sens,[{name:'Patrimônio',data:series}],'saldo')}
  else if(e==='fixedIncome'){
