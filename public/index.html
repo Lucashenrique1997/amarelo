@@ -1361,7 +1361,7 @@ function restoreScenarioState(savedState){
 }
 
 function openTool(id){state.current=tools.find(t=>t.id===id);navigate('tool');openCurrentTool()}
-function openCurrentTool(){const t=state.current;state.scenario=null;state.scenarioBusy=false;$('scenarioLab').classList.add('hidden');$('scenarioCompare').classList.add('hidden');$('toolTitle').textContent=t.title;$('toolDescription').textContent=t.desc;$('toolCategory').textContent=t.cat.toUpperCase();$('toolTier').textContent=t.tier==='decision'?'DECISÃO PRO':t.tier==='pro'?'PRO':'GRÁTIS';$('toolTier').className='tier '+t.tier;$('toolForm').innerHTML=buildForm(t.engine);$('methodology').textContent=method(t.engine);applyPendingAsk();state.mode='simple';setMode('simple');updateFav();state.last=null;clearResult();let allowed=planAllows(t);$('paywall').classList.toggle('hidden',allowed);$('calculator').classList.toggle('hidden',!allowed);if(allowed){calculateTool();initScenarioLab()}}
+function openCurrentTool(){const t=state.current;state.scenario=null;state.scenarioBusy=false;$('decisionNameInput').value='';$('decisionNameInput').placeholder='Ex.: '+t.title+' — meu caso';$('scenarioLab').classList.add('hidden');$('scenarioCompare').classList.add('hidden');$('toolTitle').textContent=t.title;$('toolDescription').textContent=t.desc;$('toolCategory').textContent=t.cat.toUpperCase();$('toolTier').textContent=t.tier==='decision'?'DECISÃO PRO':t.tier==='pro'?'PRO':'GRÁTIS';$('toolTier').className='tier '+t.tier;$('toolForm').innerHTML=buildForm(t.engine);$('methodology').textContent=method(t.engine);applyPendingAsk();state.mode='simple';setMode('simple');updateFav();state.last=null;clearResult();let allowed=planAllows(t);$('paywall').classList.toggle('hidden',allowed);$('calculator').classList.toggle('hidden',!allowed);if(allowed){calculateTool();initScenarioLab()}}
 function updateFav(){$('favoriteBtn').textContent=(isFav(state.current.id)?'★':'☆')+' Favoritar'}function toggleFavoriteCurrent(){toggleFav(state.current.id);updateFav()}
 function setMode(m){state.mode=m;$('simpleMode').classList.toggle('active',m==='simple');$('advancedMode').classList.toggle('active',m==='advanced');$('toolForm').classList.toggle('advanced',m==='advanced')}
 function clearResult(){$('resultPrimary').textContent='Calculando...';$('resultSubtitle').textContent='';$('resultMetrics').innerHTML='';['resultInsight','breakEvenBox','sensitivityBox','chartBox','assumptionBox','driverBox'].forEach(id=>$(id).classList.add('hidden'));$('nextTools').innerHTML=''}
@@ -1559,41 +1559,87 @@ function calculateTool(){if(state.scenario&&!state.scenarioBusy)persistActiveSce
  else if(e==='diagnostic'){let inc=num('income'),debt=inc?num('debt')/inc*100:0,save=inc?num('saving')/inc*100:0,months=num('ess')?num('reserve')/num('ess'):0;setResult('Diagnóstico pronto','Três sinais principais.',[['Dívidas/renda',PCT(debt)],['Taxa de poupança',PCT(save)],['Reserva',months.toFixed(1)+' meses']])}
 }catch(err){console.error(err);toast('Revise os dados da simulação.')}}
 function captureAssumptions(){return [...document.querySelectorAll('#toolForm input,#toolForm select')].reduce((a,el)=>{a[el.id]=el.value;return a},{})}
+function currentDecisionName(){let v=$('decisionNameInput')?.value?.trim();return v||state.current?.title||'Decisão'}
+function normalizeDecisionPart(v){return String(v||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')}
+function makeDecisionKey(toolId,name){return String(toolId||'')+'::'+normalizeDecisionPart(name)}
+function savedDecisionKey(item){return item.decisionKey||makeDecisionKey(item.toolId,item.decisionName||item.title||item.toolId)}
+function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]))}
+function reportAssumptionRows(){return [...document.querySelectorAll('#toolForm .field')].map(w=>{let el=w.querySelector('input,select'),label=w.querySelector('label');if(!el||!label)return null;let name=[...label.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join(' ').trim()||el.id;let value=el.tagName==='SELECT'?(el.options[el.selectedIndex]?.text||el.value):el.value;return[name,value]}).filter(Boolean)}
+function groupSavedDecisions(items){let map=new Map();for(const item of items){let key=savedDecisionKey(item);if(!map.has(key))map.set(key,[]);map.get(key).push(item)}return [...map.entries()].map(([key,versions])=>({key,versions:versions.sort((a,b)=>new Date(b.date)-new Date(a.date))})).sort((a,b)=>new Date(b.versions[0].date)-new Date(a.versions[0].date))}
 function saveDecision(){
- if(!state.last)return toast('Calcule primeiro.');
- let d=saved(),limit=state.plan==='free'?3:100;
- if(state.plan==='free'&&d.length>=limit)return toast('No Free você pode salvar até 3 decisões.');
- let previous=d.filter(x=>x.toolId===state.current.id),version=(previous.reduce((m,x)=>Math.max(m,x.version||1),0)||0)+1;
- let scenarioState=exportScenarioState(),scenarioId=scenarioState?.active||null,scenarioLabel=scenarioId?getScenarioLabel(scenarioId):null;
- d.unshift({
-   id:Date.now(),toolId:state.current.id,title:state.current.title,version,
-   scenarioLabel,primary:state.last.primary,subtitle:state.last.subtitle,metrics:state.last.metrics||[],
-   assumptions:captureAssumptions(),scenarioState,mode:state.mode,date:new Date().toISOString()
- });
- storage.set('amarelo_decisions',d.slice(0,100));
- toast(scenarioEnabled()?`Versão ${version} salva com cenários.`:'Decisão e premissas salvas.');
- renderDashboard();
+  if(!state.last)return toast('Calcule primeiro.');
+  let d=saved(),limit=state.plan==='free'?3:100;
+  if(state.plan==='free'&&d.length>=limit)return toast('No Free você pode salvar até 3 decisões.');
+  let decisionName=currentDecisionName(),decisionKey=makeDecisionKey(state.current.id,decisionName);
+  let previous=d.filter(x=>savedDecisionKey(x)===decisionKey),version=(previous.reduce((m,x)=>Math.max(m,x.version||1),0)||0)+1;
+  let scenarioState=exportScenarioState(),scenarioId=scenarioState?.active||null,scenarioLabel=scenarioId?getScenarioLabel(scenarioId):null;
+  d.unshift({id:Date.now(),toolId:state.current.id,title:state.current.title,decisionName,decisionKey,version,scenarioLabel,primary:state.last.primary,subtitle:state.last.subtitle,metrics:state.last.metrics||[],assumptions:captureAssumptions(),scenarioState,mode:state.mode,date:new Date().toISOString()});
+  storage.set('amarelo_decisions',d.slice(0,100));
+  toast((scenarioEnabled()?`Versão ${version} salva`:'Decisão salva')+' · '+decisionName);
+  renderDashboard();
 }
 function openSavedDecision(id){
- let d=saved().find(x=>x.id===id);if(!d)return toast('Decisão não encontrada.');
- openTool(d.toolId);
- let restored=false;
- if(d.scenarioState&&state.scenario)restored=restoreScenarioState(d.scenarioState);
- if(!restored&&d.assumptions){setAssumptions(d.assumptions);calculateTool()}
- if(d.mode==='advanced')setMode('advanced');
- toast(`Versão ${d.version||1} restaurada.`);
+  let d=saved().find(x=>x.id===id);if(!d)return toast('Decisão não encontrada.');
+  openTool(d.toolId);
+  $('decisionNameInput').value=d.decisionName||d.title||'';
+  let restored=false;
+  if(d.scenarioState&&state.scenario)restored=restoreScenarioState(d.scenarioState);
+  if(!restored&&d.assumptions){setAssumptions(d.assumptions);calculateTool()}
+  if(d.mode==='advanced')setMode('advanced');
+  toast(`Versão ${d.version||1} restaurada.`);
 }
 function deleteDecision(id){storage.set('amarelo_decisions',saved().filter(x=>x.id!==id));renderDashboard();toast('Versão removida deste navegador.')}
 function closeVersionCompare(){$('versionModal').classList.add('hidden')}
-function openVersionCompare(toolId){
- let versions=saved().filter(x=>x.toolId===toolId).sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,4);
- if(versions.length<2)return toast('Salve pelo menos duas versões desta decisão.');
- $('versionModalTitle').textContent=(versions[0]?.title||'Decisão')+' — versões';
- $('versionCompareGrid').innerHTML=versions.map((v,i)=>`<article class="versionCard ${i===0?'latest':''}"><div class="versionCardTop"><span>VERSÃO ${v.version||versions.length-i}</span><b>${new Date(v.date).toLocaleDateString('pt-BR')}</b></div><h3>${v.scenarioLabel||'Cenário salvo'}</h3><div class="versionPrimary">${v.primary}</div><p>${v.subtitle||''}</p><div class="versionMetrics">${(v.metrics||[]).slice(0,4).map(m=>`<div><span>${m[0]}</span><b>${m[1]}</b></div>`).join('')}</div><button onclick="closeVersionCompare();openSavedDecision(${v.id})">Reabrir esta versão →</button></article>`).join('');
- $('versionModal').classList.remove('hidden');
+function openVersionCompare(decisionKey){
+  let versions=saved().filter(x=>savedDecisionKey(x)===decisionKey).sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,6);
+  if(versions.length<2)return toast('Salve pelo menos duas versões desta decisão.');
+  $('versionModalTitle').textContent=(versions[0]?.decisionName||versions[0]?.title||'Decisão')+' — versões';
+  $('versionCompareGrid').innerHTML=versions.map((v,i)=>`<article class="versionCard ${i===0?'latest':''}"><div class="versionCardTop"><span>VERSÃO ${v.version||versions.length-i}</span><b>${new Date(v.date).toLocaleDateString('pt-BR')}</b></div><h3>${v.scenarioLabel||'Cenário salvo'}</h3><div class="versionPrimary">${escapeHtml(v.primary)}</div><p>${escapeHtml(v.subtitle||'')}</p><div class="versionMetrics">${(v.metrics||[]).slice(0,4).map(m=>`<div><span>${escapeHtml(m[0])}</span><b>${escapeHtml(m[1])}</b></div>`).join('')}</div><button onclick="closeVersionCompare();openSavedDecision(${v.id})">Reabrir esta versão →</button></article>`).join('');
+  $('versionModal').classList.remove('hidden');
 }
-function copyResult(){if(!state.last)return;navigator.clipboard?.writeText(`${state.current.title}\n${state.scenario?getScenarioLabel(state.scenario.active)+'\n':''}${state.last.primary}\n${state.last.subtitle}\n${state.last.metrics.map(x=>x[0]+': '+x[1]).join('\n')}`);toast('Resumo copiado.')}
-function renderDashboard(){let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0}),months=p.essentials?p.reserve/p.essentials:0;$('profileSummary').innerHTML=[['Renda líquida',BRL(p.income)],['Patrimônio financeiro',BRL(p.wealth)],['Reserva',months?months.toFixed(1)+' meses':'—'],['Investimento mensal',BRL(p.monthly)]].map(x=>`<div class="profileStat"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('');let d=saved();$('savedDecisions').innerHTML=d.length?d.slice(0,8).map(x=>{let count=d.filter(y=>y.toolId===x.toolId).length;return`<div class="decisionRow"><div><div class="decisionTitleLine"><h4>${x.title}</h4><span>V${x.version||1}</span></div><p>${new Date(x.date).toLocaleString('pt-BR')}${x.scenarioLabel?' · '+x.scenarioLabel:''}</p></div><div class="decisionValue"><strong>${x.primary}</strong><div class="decisionActions"><button onclick="openSavedDecision(${x.id})">Reabrir</button>${count>1?`<button onclick="openVersionCompare('${x.toolId}')">Comparar versões</button>`:''}<button onclick="deleteDecision(${x.id})">Excluir</button></div></div></div>`}).join(''):'<div class="dashEmpty"><span>01</span><h4>Seu histórico começa na primeira decisão.</h4><p>Faça uma simulação e salve as premissas para voltar depois.</p><button onclick="navigate(\'tools\')">Abrir biblioteca →</button></div>';let f=favs().map(id=>tools.find(t=>t.id===id)).filter(Boolean);$('favoriteTools').innerHTML=f.length?f.slice(0,6).map(t=>`<div class="miniTool" onclick="openTool('${t.id}')"><i>${t.icon}</i><b>${t.title}</b></div>`).join(''):'<div class="dashEmpty compact"><span>☆</span><h4>Fixe o que você usa mais.</h4><p>Seus favoritos aparecem aqui.</p></div>';let next=p.reserve<p.essentials*6&&p.essentials>0?['reserva','Sua reserva está abaixo de 6 meses.']:p.monthly>0?['meta-financeira','Transforme seu aporte mensal em uma meta.']:['diagnostico','Comece pelo diagnóstico financeiro.'];$('nextDecision').innerHTML=`<div class="miniTool" onclick="openTool('${next[0]}')"><i>→</i><div><b>${tools.find(t=>t.id===next[0])?.title||'Próxima análise'}</b><p class="muted">${next[1]}</p></div></div>`}
+function copyResult(){
+  if(!state.last)return;
+  navigator.clipboard?.writeText(`${currentDecisionName()}\n${state.current.title}\n${state.scenario?getScenarioLabel(state.scenario.active)+'\n':''}${state.last.primary}\n${state.last.subtitle}\n${state.last.metrics.map(x=>x[0]+': '+x[1]).join('\n')}`);
+  toast('Resumo copiado.');
+}
+function ensureScenarioSnapshotsForReport(){
+  if(!state.scenario)return;
+  let missing=Object.keys(state.scenario.sets).some(id=>!state.scenario.snapshots[id]);
+  if(missing){compareScenarios();$('scenarioCompare').classList.add('hidden')}
+}
+function closeDecisionReport(){$('reportModal').classList.add('hidden')}
+function openDecisionReport(){
+  if(!state.last)return toast('Calcule primeiro.');
+  if(state.plan==='free')return toast('O relatório completo faz parte da experiência PRO.');
+  ensureScenarioSnapshotsForReport();
+  const name=currentDecisionName(),scenarioLabel=state.scenario?getScenarioLabel(state.scenario.active):'Cenário atual';
+  const metrics=(state.last.metrics||[]).map(m=>`<div class="reportMetric"><small>${escapeHtml(m[0])}</small><b>${escapeHtml(m[1])}</b></div>`).join('');
+  const drivers=decisionDrivers().map(d=>`<div class="reportDriver"><small>${escapeHtml(d[0])}</small><b>${escapeHtml(d[1])}</b><p>${escapeHtml(d[2])}</p></div>`).join('');
+  const assumptions=reportAssumptionRows().map(a=>`<div class="reportAssumption"><span>${escapeHtml(a[0])}</span><b>${escapeHtml(a[1])}</b></div>`).join('');
+  let scenarioSection='';
+  if(state.scenario){
+    const ids=Object.keys(state.scenario.sets).slice(0,5),snaps=ids.map(id=>({id,s:state.scenario.snapshots[id]})).filter(x=>x.s);
+    const labels=[...new Set(snaps.flatMap(x=>(x.s.metrics||[]).slice(0,5).map(m=>m[0])))].slice(0,6);
+    if(snaps.length){
+      scenarioSection=`<section class="reportSection"><div class="reportSectionHead"><h3>Cenários</h3><span>COMPARAÇÃO</span></div><table class="reportScenarioTable"><thead><tr><th>Métrica</th>${snaps.map(x=>`<th>${escapeHtml(getScenarioLabel(x.id))}</th>`).join('')}</tr></thead><tbody>${labels.map(label=>`<tr><td>${escapeHtml(label)}</td>${snaps.map(x=>{let m=(x.s.metrics||[]).find(v=>v[0]===label);return`<td>${escapeHtml(m?m[1]:'—')}</td>`}).join('')}</tr>`).join('')}</tbody></table></section>`;
+    }
+  }
+  const insight=state.last.insight?`<section class="reportSection"><div class="reportSectionHead"><h3>Leitura do resultado</h3><span>CONTEXTO</span></div><div class="reportText">${state.last.insight}</div></section>`:'';
+  const breakEven=state.last.be?`<section class="reportSection"><div class="reportSectionHead"><h3>Ponto de equilíbrio</h3><span>BREAK-EVEN</span></div><div class="reportText">${state.last.be}</div></section>`:'';
+  $('reportContent').innerHTML=`<header class="reportHeader"><div class="reportBrand"><i></i>AMARELO</div><div class="reportMeta">Gerado em ${new Date().toLocaleString('pt-BR')}<br>Simulação educacional · premissas editáveis</div></header><div class="reportKicker">${escapeHtml(state.current.cat.toUpperCase())} / RELATÓRIO DE DECISÃO</div><h1 class="reportTitle">${escapeHtml(name)}</h1><p class="reportSubtitle">${escapeHtml(state.current.title)} · ${escapeHtml(state.current.desc)}</p><div class="reportScenario">${escapeHtml(scenarioLabel)}</div><section class="reportHero"><small>RESPOSTA DA SIMULAÇÃO</small><h2>${escapeHtml(state.last.primary)}</h2><p>${escapeHtml(state.last.subtitle||'')}</p></section><section class="reportSection"><div class="reportSectionHead"><h3>Métricas principais</h3><span>RESULTADO</span></div><div class="reportMetricGrid">${metrics}</div></section>${drivers?`<section class="reportSection"><div class="reportSectionHead"><h3>O que move a decisão</h3><span>DRIVERS</span></div><div class="reportDriverGrid">${drivers}</div></section>`:''}<section class="reportSection"><div class="reportSectionHead"><h3>Premissas</h3><span>TRANSPARÊNCIA</span></div><div class="reportAssumptions">${assumptions}</div></section>${insight}${breakEven}${scenarioSection}<div class="reportMethod"><b>Metodologia.</b> ${escapeHtml(method(state.current.engine))}</div><footer class="reportFooter"><span>AMARELO · Antes de decidir, coloque na conta.</span><span>Este relatório organiza uma simulação e não substitui análise individual de riscos, contratos, tributos ou condições específicas.</span></footer>`;
+  $('reportModal').classList.remove('hidden');
+}
+function renderDashboard(){
+  let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0}),months=p.essentials?p.reserve/p.essentials:0;
+  $('profileSummary').innerHTML=[['Renda líquida',BRL(p.income)],['Patrimônio financeiro',BRL(p.wealth)],['Reserva',months?months.toFixed(1)+' meses':'—'],['Investimento mensal',BRL(p.monthly)]].map(x=>`<div class="profileStat"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('');
+  let d=saved(),groups=groupSavedDecisions(d);
+  $('savedDecisions').innerHTML=groups.length?groups.slice(0,8).map(g=>{let x=g.versions[0],count=g.versions.length;return`<div class="decisionRow groupedDecision"><div><div class="decisionTitleLine"><h4>${escapeHtml(x.decisionName||x.title)}</h4><span>V${x.version||count}</span></div><p>${escapeHtml(x.title)} · ${count} ${count===1?'versão':'versões'} · atualizado ${new Date(x.date).toLocaleDateString('pt-BR')}</p></div><div class="decisionValue"><strong>${escapeHtml(x.primary)}</strong><div class="decisionActions"><button onclick="openSavedDecision(${x.id})">Reabrir</button>${count>1?`<button data-history-key="${escapeHtml(g.key)}">Histórico</button>`:''}<button onclick="deleteDecision(${x.id})">Excluir última</button></div></div></div>`}).join(''):'<div class="dashEmpty"><span>01</span><h4>Seu histórico começa na primeira decisão.</h4><p>Faça uma simulação, dê um nome ao caso e salve a primeira versão.</p><button onclick="navigate(\'tools\')">Abrir biblioteca →</button></div>';
+  $('savedDecisions').querySelectorAll('[data-history-key]').forEach(b=>b.addEventListener('click',()=>openVersionCompare(b.dataset.historyKey)));
+  let f=favs().map(id=>tools.find(t=>t.id===id)).filter(Boolean);
+  $('favoriteTools').innerHTML=f.length?f.slice(0,6).map(t=>`<div class="miniTool" onclick="openTool('${t.id}')"><i>${t.icon}</i><b>${t.title}</b></div>`).join(''):'<div class="dashEmpty compact"><span>☆</span><h4>Fixe o que você usa mais.</h4><p>Seus favoritos aparecem aqui.</p></div>';
+  let next=p.reserve<p.essentials*6&&p.essentials>0?['reserva','Sua reserva está abaixo de 6 meses.']:p.monthly>0?['meta-financeira','Transforme seu aporte mensal em uma meta.']:['diagnostico','Comece pelo diagnóstico financeiro.'];
+  $('nextDecision').innerHTML=`<div class="miniTool" onclick="openTool('${next[0]}')"><i>→</i><div><b>${tools.find(t=>t.id===next[0])?.title||'Próxima análise'}</b><p class="muted">${next[1]}</p></div></div>`;
+}
 function openProfile(){let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0});for(const k in p){let el=$('profile'+k[0].toUpperCase()+k.slice(1));if(el)el.value=p[k]}$('profileModal').classList.remove('hidden')}
 function closeProfile(){$('profileModal').classList.add('hidden')}
 function saveProfile(){let p={income:num('profileIncome'),wealth:num('profileWealth'),essentials:num('profileEssentials'),reserve:num('profileReserve'),monthly:num('profileMonthly'),age:num('profileAge')};storage.set('amarelo_profile',p);closeProfile();renderDashboard();toast('Perfil salvo neste navegador.')}
