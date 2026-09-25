@@ -52,7 +52,10 @@ const required = [
   "financialIndependence",
   "Correção anual estimada da obra",
   "13º / Bônus: Dívida x Investir x Reserva",
-  "Mapa de Independência Financeira"
+  "Mapa de Independência Financeira",
+  "windDebtSystem",
+  "não sustenta preservação",
+  "useExtra?lump:0"
 ];
 
 for (const marker of required) {
