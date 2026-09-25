@@ -3,10 +3,6 @@
  * Financial calculations remain deterministic.
  */
 const $=id=>document.getElementById(id), num=id=>parseFloat($(id)?.value)||0;
-const storage={
- get(k,f){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}},
- set(k,v){localStorage.setItem(k,JSON.stringify(v))}
-};
 let state={route:'home',category:'Todas',current:null,mode:'simple',last:null,plan:storage.get('amarelo_plan','free'),scenario:null,scenarioBusy:false,pendingAsk:null,askContext:null};
 if(!['free','pro'].includes(state.plan)){state.plan='pro';storage.set('amarelo_plan','pro')}
 
