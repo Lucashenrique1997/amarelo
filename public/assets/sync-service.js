@@ -151,6 +151,53 @@ async function hydrateEntitlements(){
   storage.set('amarelo_plan',plan);
   return response.entitlements;
 }
+
+function localGoalPayload(goal){
+  return {
+    ...(goal.remoteGoalId?{id:goal.remoteGoalId}:{}),
+    clientGoalId:String(goal.clientGoalId||goal.id),
+    name:goal.name,
+    targetAmount:Number(goal.targetAmount||0),
+    currentAmount:Number(goal.currentAmount||0),
+    targetDate:goal.targetDate||null,
+    metadata:{source:'amarelo-web'}
+  };
+}
+function remoteGoalToLocal(goal){
+  return {
+    id:stableLocalNumericId(goal.client_goal_id||goal.id),
+    remoteGoalId:goal.id,
+    clientGoalId:goal.client_goal_id||null,
+    name:goal.name,
+    targetAmount:Number(goal.target_amount||0),
+    currentAmount:Number(goal.current_amount||0),
+    targetDate:goal.target_date||null,
+    updatedAt:goal.updated_at||new Date().toISOString()
+  };
+}
+async function pushLocalGoals(){
+  const local=storage.get('amarelo_goals',[]);
+  for(const goal of local){
+    const response=await amareloApi.saveGoal(localGoalPayload(goal));
+    goal.remoteGoalId=response.id;
+    goal.clientGoalId=String(goal.clientGoalId||goal.id);
+  }
+  if(local.length)storage.set('amarelo_goals',local);
+}
+async function hydrateRemoteGoals(){
+  const response=await amareloApi.goals();
+  const remote=(response.goals||[]).map(remoteGoalToLocal);
+  const local=storage.get('amarelo_goals',[]);
+  const merged=new Map();
+  for(const goal of local)merged.set('client:'+String(goal.clientGoalId||goal.id),goal);
+  for(const goal of remote)merged.set(goal.clientGoalId?'client:'+String(goal.clientGoalId):'remote:'+String(goal.remoteGoalId),goal);
+  storage.set('amarelo_goals',[...merged.values()]);
+}
+async function syncGoalIfAvailable(goal){
+  if(!(runtimeCapabilities.persistence&&runtimeCapabilities.authentication))return null;
+  try{return await amareloApi.saveGoal(localGoalPayload(goal))}
+  catch(error){console.warn('AMARELO goal sync failed',String(error?.message||error));return null}
+}
 async function syncAccountIfAvailable(){
   if(!(runtimeCapabilities.persistence&&runtimeCapabilities.authentication))return {active:false};
 
@@ -159,9 +206,10 @@ async function syncAccountIfAvailable(){
     if(!migrated){
       await pushLocalProfile();
       await pushLocalDecisions();
+      await pushLocalGoals();
       storage.set('amarelo_cloud_migration_v1',true);
     }
-    await Promise.all([hydrateRemoteProfile(),hydrateRemoteDecisions(),hydrateEntitlements()]);
+    await Promise.all([hydrateRemoteProfile(),hydrateRemoteDecisions(),hydrateRemoteGoals(),hydrateEntitlements()]);
     window.dispatchEvent(new CustomEvent('amarelo:sync-complete'));
     return {active:true,ok:true};
   }catch(error){
