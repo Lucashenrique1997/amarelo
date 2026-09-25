@@ -35,9 +35,11 @@ function renderGoals(){
       <div class="goalTop"><div><span>${months===null?'SEM PRAZO':months===0?'PRAZO ATUAL':months+' MESES'}</span><h4>${escapeHtml(goal.name)}</h4></div><b>${PCT(progress)}</b></div>
       <div class="goalBar"><i style="width:${progress}%"></i></div>
       <div class="goalNumbers"><span><small>Atual</small><b>${BRL(Number(goal.currentAmount||0))}</b></span><span><small>Falta</small><b>${BRL(remaining)}</b></span><span><small>Meta</small><b>${BRL(Number(goal.targetAmount||0))}</b></span></div>
-      <div class="goalActions"><button onclick="openGoalModal(${JSON.stringify(String(goal.id))})">Editar</button><button onclick="deleteGoal(${JSON.stringify(String(goal.id))})">Excluir</button></div>
+      <div class="goalActions"><button data-goal-edit="${escapeHtml(String(goal.id))}">Editar</button><button data-goal-delete="${escapeHtml(String(goal.id))}">Excluir</button></div>
     </article>`;
   }).join(''):`<div class="dashEmpty"><span>◎</span><h4>Transforme uma decisão em algo para acompanhar.</h4><p>Cadastre uma meta de patrimônio, entrada, reserva ou qualquer objetivo com valor e prazo.</p><button onclick="openGoalModal()">Criar primeira meta →</button></div>`;
+  container.querySelectorAll('[data-goal-edit]').forEach(button=>button.addEventListener('click',()=>openGoalModal(button.dataset.goalEdit)));
+  container.querySelectorAll('[data-goal-delete]').forEach(button=>button.addEventListener('click',()=>deleteGoal(button.dataset.goalDelete)));
 }
 function openGoalModal(id=null){
   const existing=id?goals().find(g=>String(g.id)===String(id)):null;
