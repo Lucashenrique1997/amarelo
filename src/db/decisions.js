@@ -39,6 +39,7 @@ export async function upsertDecisionWithVersion(db, userId, input) {
     existing = await db.prepare(
       "SELECT id FROM decisions WHERE id = ? AND user_id = ?"
     ).bind(decisionId, userId).first();
+    if (!existing) decisionId = null;
   }
 
   if (!existing && decisionKey) {
