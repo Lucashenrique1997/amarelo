@@ -1056,126 +1056,91 @@ function setAssumptions(values){Object.entries(values||{}).forEach(([id,v])=>{le
 function scenarioNumber(obj,id){let v=parseFloat(obj[id]);return Number.isFinite(v)?v:0}
 function setScenarioNumber(obj,id,value,min=-Infinity,max=Infinity){obj[id]=String(Math.min(max,Math.max(min,value)))}
 function buildScenarioPreset(base,type){
- let a=cloneData(base),stress=type==='conservative',opti=type==='optimistic';
- if(!stress&&!opti)return a;
- const e=state.current.engine;
- if(e==='buyPaths'){
-   setScenarioNumber(a,'finM',scenarioNumber(a,'finM')+(stress?.15:-.15),0);
-   setScenarioNumber(a,'cont',Math.round(scenarioNumber(a,'cont')*(stress?1.45:.75)),1,scenarioNumber(a,'consN')||1200);
-   setScenarioNumber(a,'reaj',scenarioNumber(a,'reaj')+(stress?1.5:-1),0);
-   setScenarioNumber(a,'inv',scenarioNumber(a,'inv')+(stress?-2:2),0);
-   setScenarioNumber(a,'rent',scenarioNumber(a,'rent')*(stress?1.1:.95),0);
- }else if(e==='buyRent'){
-   setScenarioNumber(a,'app',scenarioNumber(a,'app')+(stress?-2:2),-20,30);
-   setScenarioNumber(a,'inv',scenarioNumber(a,'inv')+(stress?-2:2),0);
-   setScenarioNumber(a,'rentGrow',scenarioNumber(a,'rentGrow')+(stress?1:-1),0);
-   setScenarioNumber(a,'finM',scenarioNumber(a,'finM')+(stress?.1:-.1),0);
-   setScenarioNumber(a,'maintenance',scenarioNumber(a,'maintenance')+(stress?.25:-.2),0);
- }else if(e==='carDecision'){
-  let currentValue=Math.max(0,num('carCurrentValue')),currentDep=Math.min(.99,Math.max(0,num('carCurrentDep')/100)),currentMaint=Math.max(0,num('carCurrentMaint')),currentIns=Math.max(0,num('carCurrentInsurance')),currentTax=Math.max(0,num('carCurrentTax')),currentFuel=Math.max(0,num('carCurrentFuel')),newPrice=Math.max(0,num('carNewPrice')),cash=Math.max(0,num('carCash')),feePct=Math.max(0,num('carBuyFee')/100),system=$('carSystem').value,rate=Math.max(0,num('carRate')/100),N=Math.max(1,Math.round(num('carN'))),newDep=Math.min(.99,Math.max(0,num('carNewDep')/100)),newMaint=Math.max(0,num('carNewMaint')),newIns=Math.max(0,num('carNewInsurance')),newTax=Math.max(0,num('carNewTax')),newFuel=Math.max(0,num('carNewFuel')),years=Math.max(1,num('carYears')),H=Math.max(1,Math.round(years*12)),inv=Math.max(-.99,num('carInv')/100),mi=monthly(inv),totalPurchase=newPrice*(1+feePct),credit=Math.max(0,totalPurchase-currentValue-cash),buyInv=Math.max(0,currentValue+cash-totalPurchase),keepInv=cash,loan=loanFlow(credit,rate,N,system,0);
-  function simulate(maintOverride=currentMaint){
-    let cv=currentValue,nv=newPrice,debt=credit,ki=keepInv,bi=buyInv,keepCurve=[],buyCurve=[],buyCostCum=0,keepCostCum=0;
-    let cm=Math.pow(1-currentDep,1/12),nm=Math.pow(1-newDep,1/12);
-    for(let month=1;month<=H;month++){
-      ki*=1+mi;bi*=1+mi;cv*=cm;nv*=nm;
-      let pay=month<=N?(loan.flows[month-1]||0):0;
-      if(month<=N&&debt>0){let j=debt*rate,a=Math.max(0,pay-j);debt=Math.max(0,debt-a)}
-      let buyCost=pay+newMaint/12+newIns/12+newTax/12+newFuel,keepCost=maintOverride/12+currentIns/12+currentTax/12+currentFuel;
-      buyCostCum+=buyCost;keepCostCum+=keepCost;
-      if(buyCost>keepCost)ki+=buyCost-keepCost;else bi+=keepCost-buyCost;
-      buyCurve.push({y:nv-debt+bi});keepCurve.push({y:cv+ki});
-    }
-    return{buy:nv-debt+bi,keep:cv+ki,buyCurve,keepCurve,debt,buyCar:nv,keepCar:cv,buyCostCum,keepCostCum};
+  let a=cloneData(base),stress=type==='conservative',opti=type==='optimistic';
+  if(!stress&&!opti)return a;
+  const e=state.current.engine;
+  if(e==='buyPaths'){
+    setScenarioNumber(a,'finM',scenarioNumber(a,'finM')+(stress?.15:-.15),0);
+    setScenarioNumber(a,'cont',Math.round(scenarioNumber(a,'cont')*(stress?1.45:.75)),1,scenarioNumber(a,'consN')||1200);
+    setScenarioNumber(a,'reaj',scenarioNumber(a,'reaj')+(stress?1.5:-1),0);
+    setScenarioNumber(a,'inv',scenarioNumber(a,'inv')+(stress?-2:2),0);
+    setScenarioNumber(a,'rent',scenarioNumber(a,'rent')*(stress?1.1:.95),0);
+  }else if(e==='buyRent'){
+    setScenarioNumber(a,'app',scenarioNumber(a,'app')+(stress?-2:2),-20,30);
+    setScenarioNumber(a,'inv',scenarioNumber(a,'inv')+(stress?-2:2),0);
+    setScenarioNumber(a,'rentGrow',scenarioNumber(a,'rentGrow')+(stress?1:-1),0);
+    setScenarioNumber(a,'finM',scenarioNumber(a,'finM')+(stress?.1:-.1),0);
+    setScenarioNumber(a,'maintenance',scenarioNumber(a,'maintenance')+(stress?.25:-.2),0);
+  }else if(e==='amortInvest'){
+    setScenarioNumber(a,'invGross',scenarioNumber(a,'invGross')+(stress?-2:2),0);
+    setScenarioNumber(a,'fee',scenarioNumber(a,'fee')+(stress?.25:-.25),0);
+    setScenarioNumber(a,'months',Math.round(scenarioNumber(a,'months')+(stress?12:-12)),1);
+  }else if(e==='retirement'){
+    setScenarioNumber(a,'real',scenarioNumber(a,'real')+(stress?-1:1),-10,30);
+    setScenarioNumber(a,'fee',scenarioNumber(a,'fee')+(stress?.25:-.25),0);
+    setScenarioNumber(a,'inflation',scenarioNumber(a,'inflation')+(stress?1:-.5),0);
+  }else if(e==='fixedIncome'){
+    setScenarioNumber(a,'cdi',scenarioNumber(a,'cdi')+(stress?-2:2),0);
+    setScenarioNumber(a,'fee',scenarioNumber(a,'fee')+(stress?.15:-.15),0);
+  }else if(e==='goal'){
+    setScenarioNumber(a,'rate',scenarioNumber(a,'rate')+(stress?-2:2),0);
+    setScenarioNumber(a,'years',Math.max(1,scenarioNumber(a,'years')+(stress?-1:1)),1);
+  }else if(e==='debtPortability'){
+    setScenarioNumber(a,'portNewRate',scenarioNumber(a,'portNewRate')+(stress?.2:-.2),0);
+    setScenarioNumber(a,'portFee',scenarioNumber(a,'portFee')*(stress?1.25:.75),0);
+    setScenarioNumber(a,'portNewN',Math.max(1,Math.round(scenarioNumber(a,'portNewN')+(stress?6:-6))),1);
+  }else if(e==='carDecision'){
+    setScenarioNumber(a,'carNewPrice',scenarioNumber(a,'carNewPrice')*(stress?1.05:.95),0);
+    setScenarioNumber(a,'carNewDep',scenarioNumber(a,'carNewDep')+(stress?3:-3),0,90);
+    setScenarioNumber(a,'carRate',scenarioNumber(a,'carRate')+(stress?.15:-.15),0);
+    setScenarioNumber(a,'carCurrentMaint',scenarioNumber(a,'carCurrentMaint')*(stress?1.1:.9),0);
+    setScenarioNumber(a,'carInv',scenarioNumber(a,'carInv')+(stress?-2:2),0);
   }
-  let base=simulate(),diff=base.buy-base.keep,lo=0,hi=Math.max(100000,currentMaint*8+1000),fLo=simulate(lo).buy-simulate(lo).keep,fHi=simulate(hi).buy-simulate(hi).keep,maintBreak=null;
-  if(fLo===0)maintBreak=lo;else if(fLo*fHi<=0){for(let i=0;i<70;i++){let mid=(lo+hi)/2,f=simulate(mid).buy-simulate(mid).keep;if(fLo*f<=0){hi=mid;fHi=f}else{lo=mid;fLo=f}}maintBreak=(lo+hi)/2}
-  let sens=[Math.max(0,currentMaint-2000),currentMaint,currentMaint+2000].map(m=>{let s=simulate(m),d=s.buy-s.keep;return[BRL(m)+'/ano manutenção atual',(d>=0?'trocar + ':'manter + ')+BRL(Math.abs(d))]});
-  let insight=diff>=0?`Ao fim de ${years.toFixed(1).replace('.',',')} anos, o caminho de trocar o carro acumula <b>${BRL(diff)}</b> a mais de patrimônio líquido no modelo.`:`Ao fim de ${years.toFixed(1).replace('.',',')} anos, manter o carro atual acumula <b>${BRL(-diff)}</b> a mais de patrimônio líquido no modelo.`;
-  let be=maintBreak!==null?`Mantidas as demais premissas, a manutenção anual do carro atual precisaria ficar perto de <b>${BRL(maintBreak)}</b> para os dois caminhos terminarem com patrimônio semelhante.`:'Não apareceu ponto de equilíbrio de manutenção dentro do intervalo testado.';
-  setResult(BRL(Math.abs(diff)),'Diferença de patrimônio líquido no horizonte.',[['Trocar · patrimônio final',BRL(base.buy)],['Manter · patrimônio final',BRL(base.keep)],['Financiamento',BRL(credit)],['1ª parcela',BRL(loan.first)],['Novo carro ao fim',BRL(base.buyCar)],['Carro atual ao fim',BRL(base.keepCar)]],insight,be,sens,[{name:'Trocar',data:base.buyCurve},{name:'Manter atual',data:base.keepCurve}],'patrimônio líquido');
- }
- else if(e==='amortInvest'){
-   setScenarioNumber(a,'invGross',scenarioNumber(a,'invGross')+(stress?-2:2),0);
-   setScenarioNumber(a,'fee',scenarioNumber(a,'fee')+(stress?.25:-.25),0);
-   setScenarioNumber(a,'months',Math.round(scenarioNumber(a,'months')+(stress?12:-12)),1);
- }else if(e==='retirement'){
-   setScenarioNumber(a,'real',scenarioNumber(a,'real')+(stress?-1:1),-10,30);
-   setScenarioNumber(a,'fee',scenarioNumber(a,'fee')+(stress?.25:-.25),0);
-   setScenarioNumber(a,'inflation',scenarioNumber(a,'inflation')+(stress?1:-.5),0);
- }else if(e==='fixedIncome'){
-   setScenarioNumber(a,'cdi',scenarioNumber(a,'cdi')+(stress?-2:2),0);
-   setScenarioNumber(a,'fee',scenarioNumber(a,'fee')+(stress?.15:-.15),0);
- }else if(e==='goal'){
-   setScenarioNumber(a,'rate',scenarioNumber(a,'rate')+(stress?-2:2),0);
-   setScenarioNumber(a,'years',Math.max(1,scenarioNumber(a,'years')+(stress?-1:1)),1);
- }else if(e==='debtPortability'){
-   setScenarioNumber(a,'portNewRate',scenarioNumber(a,'portNewRate')+(stress?.2:-.2),0);
-   setScenarioNumber(a,'portFee',scenarioNumber(a,'portFee')*(stress?1.25:.75),0);
-   setScenarioNumber(a,'portNewN',Math.max(1,Math.round(scenarioNumber(a,'portNewN')+(stress?6:-6))),1);
- }else if(e==='carDecision'){
-   setScenarioNumber(a,'carNewPrice',scenarioNumber(a,'carNewPrice')*(stress?1.05:.95),0);
-   setScenarioNumber(a,'carNewDep',scenarioNumber(a,'carNewDep')+(stress?3:-3),0,90);
-   setScenarioNumber(a,'carRate',scenarioNumber(a,'carRate')+(stress?.15:-.15),0);
-   setScenarioNumber(a,'carCurrentMaint',scenarioNumber(a,'carCurrentMaint')*(stress?1.1:.9),0);
-   setScenarioNumber(a,'carInv',scenarioNumber(a,'carInv')+(stress?-2:2),0);
- }
- return a;
+  return a;
 }
 function scenarioWhatIfConfig(){
- const e=state.current?.engine;
- if(e==='buyPaths')return[
-   {id:'finM',label:'Taxa do crédito',step:.1,suffix:'% a.m.',min:0},
-   {id:'cont',label:'Contemplação',step:6,suffix:' meses',min:1},
-   {id:'inv',label:'Retorno alternativo',step:1,suffix:'% a.a.',min:0}
- ];
- if(e==='buyRent')return[
-   {id:'app',label:'Valorização do imóvel',step:1,suffix:'% a.a.',min:-20},
-   {id:'inv',label:'Retorno investido',step:1,suffix:'% a.a.',min:0},
-   {id:'rent',label:'Aluguel mensal',step:250,prefix:'R$ ',min:0}
- ];
- if(e==='amortInvest')return[
-   {id:'invGross',label:'Retorno do investimento',step:1,suffix:'% a.a.',min:0},
-   {id:'cash',label:'Capital disponível',step:10000,prefix:'R$ ',min:0},
-   {id:'months',label:'Prazo restante',step:12,suffix:' meses',min:1}
- ];
- if(e==='retirement')return[
-   {id:'real',label:'Retorno real',step:.5,suffix:'% a.a.',min:-10},
-   {id:'pmt',label:'Aporte mensal',step:250,prefix:'R$ ',min:0},
-   {id:'ret',label:'Idade de aposentadoria',step:1,suffix:' anos',min:num('age')+1}
- ];
- if(e==='fixedIncome')return[
-   {id:'cdi',label:'CDI anual',step:1,suffix:'% a.a.',min:0},
-   {id:'cdb',label:'CDB',step:2,suffix:'% do CDI',min:0},
-   {id:'lci',label:'LCI/LCA',step:2,suffix:'% do CDI',min:0}
- ];
- if(e==='goal')return[
-   {id:'rate',label:'Retorno anual',step:1,suffix:'% a.a.',min:0},
-   {id:'pmt',label:'Aporte mensal',step:250,prefix:'R$ ',min:0},
-   {id:'years',label:'Prazo',step:1,suffix:' anos',min:1}
- ];
- if(e==='fixedIncome')return[
-   ['CDI informado',PCT(num('cdi'))+' a.a.','mexe no retorno dos produtos pós-fixados'],
-   ['CDB',PCT(num('cdb'))+' do CDI','mexe no retorno tributado'],
-   ['LCI/LCA',PCT(num('lci'))+' do CDI','mexe no retorno isento informado'],
-   ['Prazo',Math.round(num('months'))+' meses','mexe na tributação e na capitalização']
- ];
- if(e==='goal')return[
-   ['Meta',BRL(num('target')),'define o patrimônio desejado'],
-   ['Aporte mensal',BRL(num('pmt')),'mexe na velocidade de formação'],
-   ['Retorno',PCT(num('rate'))+' a.a.','mexe na capitalização'],
-   ['Prazo',num('years').toFixed(1).replace('.',',')+' anos','mexe no tempo disponível']
- ];
- if(e==='debtPortability')return[
-   {id:'portNewRate',label:'Nova taxa',step:.1,suffix:'% a.m.',min:0},
-   {id:'portFee',label:'Custos da troca',step:500,prefix:'R$ ',min:0},
-   {id:'portNewN',label:'Novo prazo',step:6,suffix:' meses',min:1}
- ];
- if(e==='carDecision')return[
-   {id:'carNewPrice',label:'Preço do novo carro',step:5000,prefix:'R$ ',min:0},
-   {id:'carCurrentMaint',label:'Manutenção atual',step:1000,prefix:'R$ ',min:0},
-   {id:'carRate',label:'Taxa do financiamento',step:.1,suffix:'% a.m.',min:0}
- ];
- return[];
+  const e=state.current?.engine;
+  if(e==='buyPaths')return[
+    {id:'finM',label:'Taxa do crédito',step:.1,suffix:'% a.m.',min:0},
+    {id:'cont',label:'Contemplação',step:6,suffix:' meses',min:1},
+    {id:'inv',label:'Retorno alternativo',step:1,suffix:'% a.a.',min:0}
+  ];
+  if(e==='buyRent')return[
+    {id:'app',label:'Valorização do imóvel',step:1,suffix:'% a.a.',min:-20},
+    {id:'inv',label:'Retorno investido',step:1,suffix:'% a.a.',min:0},
+    {id:'rent',label:'Aluguel mensal',step:250,prefix:'R$ ',min:0}
+  ];
+  if(e==='amortInvest')return[
+    {id:'invGross',label:'Retorno do investimento',step:1,suffix:'% a.a.',min:0},
+    {id:'cash',label:'Capital disponível',step:10000,prefix:'R$ ',min:0},
+    {id:'months',label:'Prazo restante',step:12,suffix:' meses',min:1}
+  ];
+  if(e==='retirement')return[
+    {id:'real',label:'Retorno real',step:.5,suffix:'% a.a.',min:-10},
+    {id:'pmt',label:'Aporte mensal',step:250,prefix:'R$ ',min:0},
+    {id:'ret',label:'Idade de aposentadoria',step:1,suffix:' anos',min:num('age')+1}
+  ];
+  if(e==='fixedIncome')return[
+    {id:'cdi',label:'CDI anual',step:1,suffix:'% a.a.',min:0},
+    {id:'cdb',label:'CDB',step:2,suffix:'% do CDI',min:0},
+    {id:'lci',label:'LCI/LCA',step:2,suffix:'% do CDI',min:0}
+  ];
+  if(e==='goal')return[
+    {id:'rate',label:'Retorno anual',step:1,suffix:'% a.a.',min:0},
+    {id:'pmt',label:'Aporte mensal',step:250,prefix:'R$ ',min:0},
+    {id:'years',label:'Prazo',step:1,suffix:' anos',min:1}
+  ];
+  if(e==='debtPortability')return[
+    {id:'portNewRate',label:'Nova taxa',step:.1,suffix:'% a.m.',min:0},
+    {id:'portFee',label:'Custos da troca',step:500,prefix:'R$ ',min:0},
+    {id:'portNewN',label:'Novo prazo',step:6,suffix:' meses',min:1}
+  ];
+  if(e==='carDecision')return[
+    {id:'carNewPrice',label:'Preço do novo carro',step:5000,prefix:'R$ ',min:0},
+    {id:'carCurrentMaint',label:'Manutenção atual',step:1000,prefix:'R$ ',min:0},
+    {id:'carRate',label:'Taxa do financiamento',step:.1,suffix:'% a.m.',min:0}
+  ];
+  return[];
 }
 function formatScenarioValue(cfg,value){
  let n=parseFloat(value)||0;
@@ -1293,45 +1258,57 @@ function compareScenarios(){
  renderScenarioCompare();
 }
 function decisionDrivers(){
- if(!scenarioEnabled())return[];
- const e=state.current.engine;
- if(e==='buyPaths')return[
-   ['Taxa do financiamento',PCT(num('finM'))+' a.m.','mexe no custo do crédito'],
-   ['Contemplação simulada',Math.round(num('cont'))+' meses','mexe no tempo de espera'],
-   ['Retorno alternativo',PCT(num('inv'))+' a.a.','mexe no custo de oportunidade'],
-   ['Reajuste da carta',PCT(num('reaj'))+' a.a.','mexe no fluxo do consórcio']
- ];
- if(e==='buyRent')return[
-   ['Valorização do imóvel',PCT(num('app'))+' a.a.','mexe no patrimônio do proprietário'],
-   ['Retorno investido',PCT(num('inv'))+' a.a.','mexe no patrimônio do inquilino'],
-   ['Aluguel inicial',BRL(num('rent')),'mexe no caixa mensal'],
-   ['Taxa do financiamento',PCT(num('finM'))+' a.m.','mexe no custo de comprar']
- ];
- if(e==='amortInvest')return[
-   ['Custo da dívida',PCT(num('debtA'))+' a.a.','define a economia potencial'],
-   ['Retorno do investimento',PCT(num('invGross'))+' a.a.','define o ganho alternativo'],
-   ['Capital disponível',BRL(num('cash')),'define o tamanho da decisão'],
-   ['Prazo restante',Math.round(num('months'))+' meses','define por quanto tempo o efeito se acumula']
- ];
- if(e==='retirement')return[
-   ['Retorno real líquido',PCT(num('real')-num('fee'))+' a.a.','mexe na acumulação e na fase de renda'],
-   ['Aporte mensal',BRL(num('pmt')),'mexe na velocidade de formação'],
-   ['Tempo até aposentar',Math.max(0,num('ret')-num('age')).toFixed(1).replace('.',',')+' anos','mexe no tempo de capitalização'],
-   ['Renda desejada',BRL(num('income'))+'/mês','mexe no capital necessário']
- ];
- if(e==='debtPortability')return[
-   ['Taxa atual',PCT(num('portCurrentRate'))+' a.m.','define o fluxo que já existe'],
-   ['Nova taxa',PCT(num('portNewRate'))+' a.m.','mexe no custo da proposta'],
-   ['Custos iniciais',BRL(num('portFee')),'podem consumir a economia de juros'],
-   ['Prazo novo',Math.round(num('portNewN'))+' meses','mexe na parcela e no total pago']
- ];
- if(e==='carDecision')return[
-   ['Diferença de preço',BRL(Math.max(0,num('carNewPrice')-num('carCurrentValue'))),'define quanto capital precisa migrar'],
-   ['Taxa do financiamento',PCT(num('carRate'))+' a.m.','mexe no custo de trocar'],
-   ['Manutenção do atual',BRL(num('carCurrentMaint'))+'/ano','mexe no custo de manter'],
-   ['Retorno do capital',PCT(num('carInv'))+' a.a.','mexe no valor de esperar']
- ];
- return[];
+  if(!scenarioEnabled())return[];
+  const e=state.current.engine;
+  if(e==='buyPaths')return[
+    ['Taxa do financiamento',PCT(num('finM'))+' a.m.','mexe no custo do crédito'],
+    ['Contemplação simulada',Math.round(num('cont'))+' meses','mexe no tempo de espera'],
+    ['Retorno alternativo',PCT(num('inv'))+' a.a.','mexe no custo de oportunidade'],
+    ['Reajuste da carta',PCT(num('reaj'))+' a.a.','mexe no fluxo do consórcio']
+  ];
+  if(e==='buyRent')return[
+    ['Valorização do imóvel',PCT(num('app'))+' a.a.','mexe no patrimônio do proprietário'],
+    ['Retorno investido',PCT(num('inv'))+' a.a.','mexe no patrimônio do inquilino'],
+    ['Aluguel inicial',BRL(num('rent')),'mexe no caixa mensal'],
+    ['Taxa do financiamento',PCT(num('finM'))+' a.m.','mexe no custo de comprar']
+  ];
+  if(e==='amortInvest')return[
+    ['Custo da dívida',PCT(num('debtA'))+' a.a.','define a economia potencial'],
+    ['Retorno do investimento',PCT(num('invGross'))+' a.a.','define o ganho alternativo'],
+    ['Capital disponível',BRL(num('cash')),'define o tamanho da decisão'],
+    ['Prazo restante',Math.round(num('months'))+' meses','define por quanto tempo o efeito se acumula']
+  ];
+  if(e==='retirement')return[
+    ['Retorno real líquido',PCT(num('real')-num('fee'))+' a.a.','mexe na acumulação e na fase de renda'],
+    ['Aporte mensal',BRL(num('pmt')),'mexe na velocidade de formação'],
+    ['Tempo até aposentar',Math.max(0,num('ret')-num('age')).toFixed(1).replace('.',',')+' anos','mexe no tempo de capitalização'],
+    ['Renda desejada',BRL(num('income'))+'/mês','mexe no capital necessário']
+  ];
+  if(e==='fixedIncome')return[
+    ['CDI informado',PCT(num('cdi'))+' a.a.','mexe no retorno dos produtos pós-fixados'],
+    ['CDB',PCT(num('cdb'))+' do CDI','mexe no retorno tributado'],
+    ['LCI/LCA',PCT(num('lci'))+' do CDI','mexe no retorno isento informado'],
+    ['Prazo',Math.round(num('months'))+' meses','mexe na tributação e na capitalização']
+  ];
+  if(e==='goal')return[
+    ['Meta',BRL(num('target')),'define o patrimônio desejado'],
+    ['Aporte mensal',BRL(num('pmt')),'mexe na velocidade de formação'],
+    ['Retorno',PCT(num('rate'))+' a.a.','mexe na capitalização'],
+    ['Prazo',num('years').toFixed(1).replace('.',',')+' anos','mexe no tempo disponível']
+  ];
+  if(e==='debtPortability')return[
+    ['Taxa atual',PCT(num('portCurrentRate'))+' a.m.','define o fluxo que já existe'],
+    ['Nova taxa',PCT(num('portNewRate'))+' a.m.','mexe no custo da proposta'],
+    ['Custos iniciais',BRL(num('portFee')),'podem consumir a economia de juros'],
+    ['Prazo novo',Math.round(num('portNewN'))+' meses','mexe na parcela e no total pago']
+  ];
+  if(e==='carDecision')return[
+    ['Diferença de preço',BRL(Math.max(0,num('carNewPrice')-num('carCurrentValue'))),'define quanto capital precisa migrar'],
+    ['Taxa do financiamento',PCT(num('carRate'))+' a.m.','mexe no custo de trocar'],
+    ['Manutenção do atual',BRL(num('carCurrentMaint'))+'/ano','mexe no custo de manter'],
+    ['Retorno do capital',PCT(num('carInv'))+' a.a.','mexe no valor de esperar']
+  ];
+  return[];
 }
 function renderDecisionDrivers(){
  const drivers=decisionDrivers();
@@ -1420,6 +1397,29 @@ function renderAssumptions(){let items=[...document.querySelectorAll('#toolForm 
 function setResult(primary,subtitle,metrics=[],insight='',be=null,sens=null,series=null,label=''){state.last={primary,subtitle,metrics,insight,be};renderAssumptions();renderDecisionDrivers();recordScenarioSnapshot();$('resultPrimary').textContent=primary;$('resultSubtitle').textContent=subtitle;$('resultMetrics').innerHTML=metrics.map(x=>metric(x[0],x[1])).join('');if(insight){$('resultInsight').classList.remove('hidden');$('insightText').innerHTML=insight}else $('resultInsight').classList.add('hidden');if(be){$('breakEvenBox').classList.remove('hidden');$('breakEven').innerHTML=be}else $('breakEvenBox').classList.add('hidden');if(sens?.length){$('sensitivityBox').classList.remove('hidden');$('sensitivity').innerHTML=sens.map(x=>`<div class="sens"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('')}else $('sensitivityBox').classList.add('hidden');if(series?.length){$('chartBox').classList.remove('hidden');$('chartLabel').textContent=label;drawChart(series)}else $('chartBox').classList.add('hidden');renderNext()}
 function drawChart(series){const w=720,h=220,pad=28,all=series.flatMap(s=>s.data.map(x=>x.y)),min=Math.min(0,...all),max=Math.max(...all,1),span=max-min||1,colors=['#f3c62e','#7ed3af','#8fb5ff','#ff9a82'],maxLen=Math.max(...series.map(s=>s.data.length)),sx=i=>pad+(w-2*pad)*(maxLen<=1?0:i/(maxLen-1)),sy=y=>h-pad-(h-2*pad)*((y-min)/span);let grid='';for(let k=0;k<5;k++){let y=pad+(h-2*pad)*k/4;grid+=`<line x1="${pad}" y1="${y}" x2="${w-pad}" y2="${y}" stroke="#303029" stroke-width="1"/>`}let paths=series.map((s,si)=>`<path d="${s.data.map((p,i)=>(i?'L':'M')+sx(i)+' '+sy(p.y)).join(' ')}" fill="none" stroke="${colors[si%colors.length]}" stroke-width="3" stroke-linecap="round"/>`).join('');$('chart').innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${grid}${paths}</svg>`;$('legend').innerHTML=series.map((s,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${s.name}</span>`).join('')}
 function renderNext(){let map={'financiamento-consorcio':['comprar-alugar','amortizar-investir'],'comprar-alugar':['financiamento-consorcio','amortizar-investir'],'amortizar-investir':['renda-fixa','portabilidade-divida'],'portabilidade-divida':['plano-dividas','amortizar-investir'],'trocar-carro':['custo-carro','avista-parcelado'],'renda-fixa':['gross-up','meta-financeira'],'gross-up':['renda-fixa'],'aposentadoria':['viver-renda','meta-financeira'],'reserva':['quanto-rende'],'salario-liquido':['reserva','quanto-guardar']};let ids=map[state.current.id]||[];$('nextTools').innerHTML=ids.length?'<h4>Próximas análises relacionadas</h4>'+ids.map(id=>{let t=tools.find(x=>x.id===id);return t?`<button onclick="openTool('${id}')">${t.title} →</button>`:''}).join(''):''}
+function calculateCarDecision(){
+  let currentValue=Math.max(0,num('carCurrentValue')),currentDep=Math.min(.99,Math.max(0,num('carCurrentDep')/100)),currentMaint=Math.max(0,num('carCurrentMaint')),currentIns=Math.max(0,num('carCurrentInsurance')),currentTax=Math.max(0,num('carCurrentTax')),currentFuel=Math.max(0,num('carCurrentFuel')),newPrice=Math.max(0,num('carNewPrice')),cash=Math.max(0,num('carCash')),feePct=Math.max(0,num('carBuyFee')/100),system=$('carSystem').value,rate=Math.max(0,num('carRate')/100),N=Math.max(1,Math.round(num('carN'))),newDep=Math.min(.99,Math.max(0,num('carNewDep')/100)),newMaint=Math.max(0,num('carNewMaint')),newIns=Math.max(0,num('carNewInsurance')),newTax=Math.max(0,num('carNewTax')),newFuel=Math.max(0,num('carNewFuel')),years=Math.max(1,num('carYears')),H=Math.max(1,Math.round(years*12)),inv=Math.max(-.99,num('carInv')/100),mi=monthly(inv),totalPurchase=newPrice*(1+feePct),credit=Math.max(0,totalPurchase-currentValue-cash),buyInv=Math.max(0,currentValue+cash-totalPurchase),keepInv=cash,loan=loanFlow(credit,rate,N,system,0);
+  function simulate(maintOverride=currentMaint){
+    let cv=currentValue,nv=newPrice,debt=credit,ki=keepInv,bi=buyInv,keepCurve=[],buyCurve=[],buyCostCum=0,keepCostCum=0;
+    let cm=Math.pow(1-currentDep,1/12),nm=Math.pow(1-newDep,1/12);
+    for(let month=1;month<=H;month++){
+      ki*=1+mi;bi*=1+mi;cv*=cm;nv*=nm;
+      let pay=month<=N?(loan.flows[month-1]||0):0;
+      if(month<=N&&debt>0){let j=debt*rate,a=Math.max(0,pay-j);debt=Math.max(0,debt-a)}
+      let buyCost=pay+newMaint/12+newIns/12+newTax/12+newFuel,keepCost=maintOverride/12+currentIns/12+currentTax/12+currentFuel;
+      buyCostCum+=buyCost;keepCostCum+=keepCost;
+      if(buyCost>keepCost)ki+=buyCost-keepCost;else bi+=keepCost-buyCost;
+      buyCurve.push({y:nv-debt+bi});keepCurve.push({y:cv+ki});
+    }
+    return{buy:nv-debt+bi,keep:cv+ki,buyCurve,keepCurve,debt,buyCar:nv,keepCar:cv,buyCostCum,keepCostCum};
+  }
+  let base=simulate(),diff=base.buy-base.keep,lo=0,hi=Math.max(100000,currentMaint*8+1000),fLo=simulate(lo).buy-simulate(lo).keep,fHi=simulate(hi).buy-simulate(hi).keep,maintBreak=null;
+  if(fLo===0)maintBreak=lo;else if(fLo*fHi<=0){for(let i=0;i<70;i++){let mid=(lo+hi)/2,f=simulate(mid).buy-simulate(mid).keep;if(fLo*f<=0){hi=mid;fHi=f}else{lo=mid;fLo=f}}maintBreak=(lo+hi)/2}
+  let sens=[Math.max(0,currentMaint-2000),currentMaint,currentMaint+2000].map(m=>{let s=simulate(m),d=s.buy-s.keep;return[BRL(m)+'/ano manutenção atual',(d>=0?'trocar + ':'manter + ')+BRL(Math.abs(d))]});
+  let insight=diff>=0?`Ao fim de ${years.toFixed(1).replace('.',',')} anos, o caminho de trocar o carro acumula <b>${BRL(diff)}</b> a mais de patrimônio líquido no modelo.`:`Ao fim de ${years.toFixed(1).replace('.',',')} anos, manter o carro atual acumula <b>${BRL(-diff)}</b> a mais de patrimônio líquido no modelo.`;
+  let be=maintBreak!==null?`Mantidas as demais premissas, a manutenção anual do carro atual precisaria ficar perto de <b>${BRL(maintBreak)}</b> para os dois caminhos terminarem com patrimônio semelhante.`:'Não apareceu ponto de equilíbrio de manutenção dentro do intervalo testado.';
+  setResult(BRL(Math.abs(diff)),'Diferença de patrimônio líquido no horizonte.',[['Trocar · patrimônio final',BRL(base.buy)],['Manter · patrimônio final',BRL(base.keep)],['Financiamento',BRL(credit)],['1ª parcela',BRL(loan.first)],['Novo carro ao fim',BRL(base.buyCar)],['Carro atual ao fim',BRL(base.keepCar)]],insight,be,sens,[{name:'Trocar',data:base.buyCurve},{name:'Manter atual',data:base.keepCurve}],'patrimônio líquido');
+}
 function calculateTool(){if(state.scenario&&!state.scenarioBusy)persistActiveScenario();const e=state.current.engine;try{
  if(e==='compound'){let P=num('p'),pmt=num('pmt'),years=num('years'),r=num('rate')/100,inf=num('inflation')/100,tax=num('tax')/100,N=years*12,gross=fv(P,pmt,r,N),invested=P+pmt*N,gain=gross-invested,net=gross-gain*tax,real=net/Math.pow(1+inf,years);let sens=[Math.max(0,r-.02),r,r+.02].map(rr=>[PCT(rr*100)+' a.a.',BRL(fv(P,pmt,rr,N))]),series=[],b=P,mi=monthly(r);for(let m=1;m<=N;m++){b=b*(1+mi)+pmt;if(m%12===0)series.push({y:b})}setResult(BRL(net),'Patrimônio líquido nominal estimado.',[['Total aportado',BRL(invested)],['Ganho líquido',BRL(net-invested)],['Em dinheiro de hoje',BRL(real)]],`Tempo e aportes são os grandes motores. A inflação reduz o poder de compra do valor nominal.`,`Para preservar poder de compra, o retorno precisa superar <b>${PCT(inf*100)}</b> antes de custos e impostos.`,sens,[{name:'Patrimônio',data:series}],'saldo')}
  else if(e==='fixedIncome'){
@@ -1484,6 +1484,7 @@ function calculateTool(){if(state.scenario&&!state.scenarioBusy)persistActiveSce
  else if(e==='cashInstallment'){let cash=num('cashPrice'),inst=num('install'),N=num('n'),r=num('returnM')/100,cb=num('cashback')/100,now=$('timing').value==='now',pv=0;for(let k=0;k<N;k++){let t=now?k:k+1;pv+=inst/Math.pow(1+r,t)}pv-=inst*N*cb;let nominal=inst*N*(1-cb),be=solveRate(rr=>{let x=0;for(let k=0;k<N;k++){let t=now?k:k+1;x+=inst/Math.pow(1+rr,t)}return x-inst*N*cb},cash,0,.2);setResult(pv>cash?'À vista':'Parcelado','Menor custo por valor presente.',[['À vista',BRL(cash)],['Parcelado nominal',BRL(nominal)],['Valor presente',BRL(pv)]],`A soma nominal não basta. O valor presente desconta cada parcela pelo retorno do dinheiro.`,`O empate acontece perto de <b>${PCT(be*100)} ao mês</b> de retorno líquido.`)}
  else if(e==='loan'){let pv=Math.max(0,num('price')-num('down')),i=num('rate')/100,N=num('n'),p=loanPay(pv,i,N),tot=p*N;setResult(BRL(p),'Parcela estimada.',[['Financiado',BRL(pv)],['Total parcelas',BRL(tot)],['Juros',BRL(tot-pv)]])}
  else if(e==='carCost'){let p=num('price'),y=num('years'),dep=p*num('dep')/100,rec=num('insurance')*y+num('tax')*y+num('fuel')*12*y+num('maint')*y,total=dep+rec;setResult(BRL(total),'Custo de uso + perda de valor.',[['Depreciação',BRL(dep)],['Custos recorrentes',BRL(rec)],['Média mensal',BRL(total/(12*y))]])}
+ else if(e==='carDecision'){calculateCarDecision()}
  else if(e==='amortInvest'){
   let bal=num('balance'),da=num('debtA')/100,N=Math.max(1,Math.round(num('months'))),cash=Math.min(num('cash'),bal),ig=num('invGross')/100,tax=Math.max(0,Math.min(.999,num('tax')/100)),fee=num('fee')/100,system=$('loanSystem').value,mode=$('amortMode').value,m=monthly(da),newBal=Math.max(0,bal-cash);
   let base=loanFlow(bal,m,N,system,0),after;
