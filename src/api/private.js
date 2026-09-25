@@ -1,4 +1,4 @@
-import { authenticatedUserId } from "../auth/session.js";
+import { authenticatedUserId, readCookie, sessionCookieName, revokeSession, revokeAllSessions, clearSessionCookie } from "../auth/session.js";
 import { readJson, jsonError, mutationOriginAllowed } from "./json.js";
 import { getProfile, upsertProfile } from "../db/profiles.js";
 import { listDecisions, listDecisionVersions, upsertDecisionWithVersion, deleteDecisionVersion } from "../db/decisions.js";
@@ -43,6 +43,25 @@ export async function handlePrivateApi(request, env, url) {
 
   if (!mutationOriginAllowed(request)) {
     return jsonError("origin_not_allowed", 403);
+  }
+
+  if (url.pathname === "/api/v1/session") {
+    if (request.method !== "DELETE") return jsonError("method_not_allowed", 405);
+    const token = readCookie(request, sessionCookieName());
+    await revokeSession(env.DB, token);
+    return Response.json(
+      { ok: true },
+      { headers: { "Set-Cookie": clearSessionCookie() } }
+    );
+  }
+
+  if (url.pathname === "/api/v1/sessions") {
+    if (request.method !== "DELETE") return jsonError("method_not_allowed", 405);
+    await revokeAllSessions(env.DB, userId);
+    return Response.json(
+      { ok: true },
+      { headers: { "Set-Cookie": clearSessionCookie() } }
+    );
   }
 
   if (url.pathname === "/api/v1/profile") {
