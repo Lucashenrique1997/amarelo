@@ -30,12 +30,36 @@ function openSavedDecision(id){
   toast(`Versão ${d.version||1} restaurada.`);
 }
 function deleteDecision(id){storage.set('amarelo_decisions',saved().filter(x=>x.id!==id));renderDashboard();toast('Versão removida deste navegador.')}
+
+function decisionDocumentId(decisionKey){
+  let hash=2166136261;
+  for(const ch of String(decisionKey||'')){
+    hash^=ch.charCodeAt(0);
+    hash=Math.imul(hash,16777619);
+  }
+  return 'AM-'+(hash>>>0).toString(36).toUpperCase().padStart(7,'0').slice(0,7);
+}
+function assumptionChangeCount(previous,current){
+  const keys=new Set([...Object.keys(previous||{}),...Object.keys(current||{})]);
+  let count=0;
+  for(const key of keys)if(String(previous?.[key]??'')!==String(current?.[key]??''))count++;
+  return count;
+}
 function closeVersionCompare(){$('versionModal').classList.add('hidden')}
 function openVersionCompare(decisionKey){
-  let versions=saved().filter(x=>savedDecisionKey(x)===decisionKey).sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,6);
+  let versions=saved().filter(x=>savedDecisionKey(x)===decisionKey).sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,12);
   if(versions.length<2)return toast('Salve pelo menos duas versões desta decisão.');
-  $('versionModalTitle').textContent=(versions[0]?.decisionName||versions[0]?.title||'Decisão')+' — versões';
-  $('versionCompareGrid').innerHTML=versions.map((v,i)=>`<article class="versionCard ${i===0?'latest':''}"><div class="versionCardTop"><span>VERSÃO ${v.version||versions.length-i}</span><b>${new Date(v.date).toLocaleDateString('pt-BR')}</b></div><h3>${v.scenarioLabel||'Cenário salvo'}</h3><div class="versionPrimary">${escapeHtml(v.primary)}</div><p>${escapeHtml(v.subtitle||'')}</p><div class="versionMetrics">${(v.metrics||[]).slice(0,4).map(m=>`<div><span>${escapeHtml(m[0])}</span><b>${escapeHtml(m[1])}</b></div>`).join('')}</div><button onclick="closeVersionCompare();openSavedDecision(${v.id})">Reabrir esta versão →</button></article>`).join('');
+  $('versionModalTitle').textContent=(versions[0]?.decisionName||versions[0]?.title||'Decisão')+' — linha do tempo';
+  const chronological=[...versions].reverse();
+  const timeline=chronological.map((v,i)=>{
+    const prev=chronological[i-1],changes=prev?assumptionChangeCount(prev.assumptions,v.assumptions):0;
+    return `<button class="timelineNode ${i===chronological.length-1?'current':''}" onclick="closeVersionCompare();openSavedDecision(${v.id})"><i></i><span>V${v.version||i+1}</span><b>${new Date(v.date).toLocaleDateString('pt-BR')}</b><small>${i===0?'Ponto inicial':changes+' premissa'+(changes===1?'':'s')+' alterada'+(changes===1?'':'s')}</small></button>`;
+  }).join('');
+  const cards=versions.map((v,i)=>{
+    const older=versions[i+1],changes=older?assumptionChangeCount(older.assumptions,v.assumptions):0;
+    return `<article class="versionCard ${i===0?'latest':''}"><div class="versionCardTop"><span>VERSÃO ${v.version||versions.length-i}</span><b>${new Date(v.date).toLocaleDateString('pt-BR')}</b></div><h3>${escapeHtml(v.scenarioLabel||'Cenário salvo')}</h3><div class="versionPrimary">${escapeHtml(v.primary)}</div><p>${escapeHtml(v.subtitle||'')}</p>${older?`<div class="versionDelta"><span>DESDE V${older.version||''}</span><b>${changes} premissa${changes===1?'':'s'} alterada${changes===1?'':'s'}</b></div>`:''}<div class="versionMetrics">${(v.metrics||[]).slice(0,4).map(m=>`<div><span>${escapeHtml(m[0])}</span><b>${escapeHtml(m[1])}</b></div>`).join('')}</div><button onclick="closeVersionCompare();openSavedDecision(${v.id})">Reabrir esta versão →</button></article>`;
+  }).join('');
+  $('versionCompareGrid').innerHTML=`<div class="versionTimeline"><div class="timelineTrack"></div>${timeline}</div><div class="versionCardsGrid">${cards}</div>`;
   $('versionModal').classList.remove('hidden');
 }
 function copyResult(){
@@ -54,9 +78,12 @@ function openDecisionReport(){
   if(state.plan==='free')return toast('O relatório completo está liberado no PRO Beta.');
   ensureScenarioSnapshotsForReport();
   const name=currentDecisionName(),scenarioLabel=state.scenario?getScenarioLabel(state.scenario.active):'Cenário atual';
+  const decisionKey=makeDecisionKey(state.current.id,name),documentId=decisionDocumentId(decisionKey);
+  const allVersions=saved().filter(x=>savedDecisionKey(x)===decisionKey).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const reportVersion=allVersions.length?Math.max(...allVersions.map(x=>Number(x.version)||1)):null;
   const metrics=(state.last.metrics||[]).map(m=>`<div class="reportMetric"><small>${escapeHtml(m[0])}</small><b>${escapeHtml(m[1])}</b></div>`).join('');
   const sensitivity=(state.last.sens||[]).map(s=>`<div class="reportSensitivityItem"><small>${escapeHtml(s[0])}</small><b>${escapeHtml(s[1])}</b></div>`).join('');
-  const decisionKey=makeDecisionKey(state.current.id,name),savedVersions=saved().filter(x=>savedDecisionKey(x)===decisionKey).sort((a,b)=>new Date(b.date)-new Date(a.date)),previous=savedVersions[0]||null;
+  const savedVersions=allVersions,previous=savedVersions[0]||null;
   let evolutionSection='';
   if(previous){
     const currentMetrics=state.last.metrics||[],prevMetrics=previous.metrics||[],labels=[...new Set([...currentMetrics.map(m=>m[0]),...prevMetrics.map(m=>m[0])])].slice(0,6);
@@ -74,6 +101,6 @@ function openDecisionReport(){
   }
   const insight=state.last.insight?`<section class="reportSection"><div class="reportSectionHead"><h3>Leitura do resultado</h3><span>CONTEXTO</span></div><div class="reportText">${state.last.insight}</div></section>`:'';
   const breakEven=state.last.be?`<section class="reportSection"><div class="reportSectionHead"><h3>Ponto de equilíbrio</h3><span>BREAK-EVEN</span></div><div class="reportText">${state.last.be}</div></section>`:'';
-  $('reportContent').innerHTML=`<header class="reportHeader"><div class="reportBrand"><i></i>AMARELO</div><div class="reportMeta">Gerado em ${new Date().toLocaleString('pt-BR')}<br>Simulação educacional · premissas editáveis</div></header><div class="reportKicker">${escapeHtml(state.current.cat.toUpperCase())} / RELATÓRIO DE DECISÃO</div><h1 class="reportTitle">${escapeHtml(name)}</h1><p class="reportSubtitle">${escapeHtml(state.current.title)} · ${escapeHtml(state.current.desc)}</p><div class="reportScenario">${escapeHtml(scenarioLabel)}</div><section class="reportHero"><small>RESPOSTA DA SIMULAÇÃO</small><h2>${escapeHtml(state.last.primary)}</h2><p>${escapeHtml(state.last.subtitle||'')}</p></section><section class="reportSection"><div class="reportSectionHead"><h3>Métricas principais</h3><span>RESULTADO</span></div><div class="reportMetricGrid">${metrics}</div></section>${drivers?`<section class="reportSection"><div class="reportSectionHead"><h3>O que move a decisão</h3><span>DRIVERS</span></div><div class="reportDriverGrid">${drivers}</div></section>`:''}<section class="reportSection"><div class="reportSectionHead"><h3>Premissas</h3><span>TRANSPARÊNCIA</span></div><div class="reportAssumptions">${assumptions}</div></section>${insight}${breakEven}${sensitivity?`<section class="reportSection"><div class="reportSectionHead"><h3>Sensibilidade</h3><span>E SE?</span></div><div class="reportSensitivity">${sensitivity}</div></section>`:''}${scenarioSection}${evolutionSection}<div class="reportMethod"><b>Metodologia.</b> ${escapeHtml(method(state.current.engine))}</div><footer class="reportFooter"><span>AMARELO · Antes de decidir, coloque na conta.</span><span>Este relatório organiza uma simulação e não substitui análise individual de riscos, contratos, tributos ou condições específicas.</span></footer>`;
+  $('reportContent').innerHTML=`<header class="reportHeader"><div><div class="reportBrand"><i></i>AMARELO</div><div class="reportDocId">${escapeHtml(documentId)}${reportVersion?' · V'+reportVersion:''}</div></div><div class="reportMeta">Gerado em ${new Date().toLocaleString('pt-BR')}<br>Simulação educacional · premissas editáveis</div></header><div class="reportKicker">${escapeHtml(state.current.cat.toUpperCase())} / RELATÓRIO DE DECISÃO</div><h1 class="reportTitle">${escapeHtml(name)}</h1><p class="reportSubtitle">${escapeHtml(state.current.title)} · ${escapeHtml(state.current.desc)}</p><div class="reportScenario">${escapeHtml(scenarioLabel)}</div><section class="reportHero"><small>RESPOSTA DA SIMULAÇÃO</small><h2>${escapeHtml(state.last.primary)}</h2><p>${escapeHtml(state.last.subtitle||'')}</p></section><section class="reportSection"><div class="reportSectionHead"><h3>Métricas principais</h3><span>RESULTADO</span></div><div class="reportMetricGrid">${metrics}</div></section>${drivers?`<section class="reportSection"><div class="reportSectionHead"><h3>O que move a decisão</h3><span>DRIVERS</span></div><div class="reportDriverGrid">${drivers}</div></section>`:''}<section class="reportSection"><div class="reportSectionHead"><h3>Premissas</h3><span>TRANSPARÊNCIA</span></div><div class="reportAssumptions">${assumptions}</div></section>${insight}${breakEven}${sensitivity?`<section class="reportSection"><div class="reportSectionHead"><h3>Sensibilidade</h3><span>E SE?</span></div><div class="reportSensitivity">${sensitivity}</div></section>`:''}${scenarioSection}${evolutionSection}<div class="reportMethod"><b>Metodologia.</b> ${escapeHtml(method(state.current.engine))}</div><footer class="reportFooter"><span><b>AMARELO</b> · Antes de decidir, coloque na conta.<br>${escapeHtml(documentId)} · ${escapeHtml(state.current.title)}</span><span>Simulação educacional baseada nas premissas apresentadas. Não constitui promessa de resultado nem substitui análise individual de riscos, contratos, tributos ou condições específicas.</span></footer>`;
   $('reportModal').classList.remove('hidden');
 }
