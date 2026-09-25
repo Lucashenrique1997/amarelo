@@ -432,6 +432,15 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
 .versionCard>button{border:0;background:transparent;text-align:left;padding:10px 0 0;font-size:8px;font-weight:900;color:#6f5d16;cursor:pointer}
 @media(max-width:900px){.versionCompareGrid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.versionCompareGrid{grid-template-columns:1fr}}
 
+
+/* V12 scenario matrix */
+.decisionRibbon .versionBadge{font-style:normal;vertical-align:middle}
+.scenarioCompareHead>div>span{display:block;font-size:6px;letter-spacing:.13em;font-weight:950;color:#9a8120;margin-bottom:4px}
+.scenarioMatrixWrap{margin-top:12px;overflow:auto;border:1px solid rgba(19,19,14,.08);border-radius:16px;background:#fff}
+.scenarioMatrix{width:100%;border-collapse:collapse;min-width:620px}.scenarioMatrix th,.scenarioMatrix td{padding:10px 12px;border-bottom:1px solid #eee9dd;text-align:right;font-size:8px;white-space:nowrap}
+.scenarioMatrix th:first-child,.scenarioMatrix td:first-child{text-align:left}.scenarioMatrix th{font-size:6px;letter-spacing:.1em;text-transform:uppercase;color:#958d7f;background:#faf8f1}.scenarioMatrix td:first-child{font-weight:850;color:#6d665b}
+.scenarioMatrix tr:last-child td{border-bottom:0}
+
 </style>
 </head>
 <body>
@@ -643,7 +652,7 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
         <div id="methodology" class="methodology"></div>
       </aside>
       <section class="resultPanel">
-        <div class="decisionRibbon"><span>SIMULAÇÃO EDUCACIONAL · PREMISSAS EDITÁVEIS</span><b>AMARELO / DECISÃO</b></div>
+        <div class="decisionRibbon"><span>SIMULAÇÃO EDUCACIONAL · PREMISSAS EDITÁVEIS <i id="scenarioActiveBadge" class="versionBadge hidden"></i></span><b>AMARELO / DECISÃO</b></div>
         <div class="resultGuide"><div>RESPOSTA</div><div>DIRECIONADORES</div><div>BREAK-EVEN</div><div>E SE?</div></div>
         <div class="resultHero"><span>RESPOSTA DIRETA</span><h2 id="resultPrimary">Preencha os dados</h2><p id="resultSubtitle"></p></div>
         <div id="resultMetrics" class="metrics"></div>
@@ -855,7 +864,7 @@ function getScenarioLabel(id){
 function initScenarioLab(){
  state.scenario=null;
  const lab=$('scenarioLab');
- if(!scenarioEnabled()){lab.classList.add('hidden');$('saveDecisionBtn').textContent='Salvar decisão';return}
+ if(!scenarioEnabled()){lab.classList.add('hidden');$('saveDecisionBtn').textContent='Salvar decisão';$('scenarioActiveBadge').classList.add('hidden');return}
  const base=captureAssumptions();
  state.scenario={
    active:'base',
@@ -884,6 +893,8 @@ function persistActiveScenario(){
 function renderScenarioLab(){
  if(!state.scenario)return;
  const ids=Object.keys(state.scenario.sets);
+ $('scenarioActiveBadge').textContent=getScenarioLabel(state.scenario.active);
+ $('scenarioActiveBadge').classList.remove('hidden');
  $('scenarioTabs').innerHTML=ids.map(id=>`<button class="scenarioTab ${state.scenario.active===id?'active':''}" onclick="switchScenario('${id}')"><small>${id.startsWith('custom')?'CENÁRIO LIVRE':'CENÁRIO'}</small><b>${getScenarioLabel(id)}</b><span>${id==='base'?'premissas atuais':id==='conservative'?'mais prudente':id==='optimistic'?'mais favorável':'editável'}</span></button>`).join('');
  $('scenarioDescription').textContent=scenarioNotes[state.scenario.active]||'Cópia independente para testar outra hipótese.';
  renderWhatIfQuick();
@@ -932,8 +943,10 @@ function recordScenarioSnapshot(){
 }
 function renderScenarioCompare(){
  if(!state.scenario)return;
- const ids=Object.keys(state.scenario.sets);
- $('scenarioCompare').innerHTML=`<div class="scenarioCompareHead"><h4>Comparação de cenários</h4><button onclick="document.getElementById('scenarioCompare').classList.add('hidden')">Fechar ×</button></div><div class="scenarioCompareGrid">${ids.map(id=>{let s=state.scenario.snapshots[id];if(!s)return'';let metrics=(s.metrics||[]).slice(0,3);return`<article class="scenarioSnapshot ${state.scenario.active===id?'active':''}"><span>${getScenarioLabel(id)}</span><h5>${state.current.title}</h5><div class="snapshotPrimary">${s.primary}</div><div class="snapshotSubtitle">${s.subtitle||''}</div><div class="snapshotMetrics">${metrics.map(m=>`<div><span>${m[0]}</span><b>${m[1]}</b></div>`).join('')}</div></article>`}).join('')}</div>`;
+ const ids=Object.keys(state.scenario.sets),snaps=ids.map(id=>({id,s:state.scenario.snapshots[id]})).filter(x=>x.s);
+ const metricLabels=[...new Set(snaps.flatMap(x=>(x.s.metrics||[]).slice(0,5).map(m=>m[0])))].slice(0,6);
+ const matrix=`<div class="scenarioMatrixWrap"><table class="scenarioMatrix"><thead><tr><th>Métrica</th>${snaps.map(x=>`<th>${getScenarioLabel(x.id)}</th>`).join('')}</tr></thead><tbody>${metricLabels.map(label=>`<tr><td>${label}</td>${snaps.map(x=>{let m=(x.s.metrics||[]).find(v=>v[0]===label);return`<td>${m?m[1]:'—'}</td>`}).join('')}</tr>`).join('')}</tbody></table></div>`;
+ $('scenarioCompare').innerHTML=`<div class="scenarioCompareHead"><div><span>LEITURA LADO A LADO</span><h4>Comparação de cenários</h4></div><button onclick="document.getElementById('scenarioCompare').classList.add('hidden')">Fechar ×</button></div><div class="scenarioCompareGrid">${snaps.map(({id,s})=>{let metrics=(s.metrics||[]).slice(0,3);return`<article class="scenarioSnapshot ${state.scenario.active===id?'active':''}"><span>${getScenarioLabel(id)}</span><h5>${state.current.title}</h5><div class="snapshotPrimary">${s.primary}</div><div class="snapshotSubtitle">${s.subtitle||''}</div><div class="snapshotMetrics">${metrics.map(m=>`<div><span>${m[0]}</span><b>${m[1]}</b></div>`).join('')}</div></article>`}).join('')}</div>${matrix}`;
  $('scenarioCompare').classList.remove('hidden');
 }
 function compareScenarios(){
