@@ -152,6 +152,11 @@
         <div class="cardHead"><h3>Minhas Decisões</h3><button class="link" onclick="navigate('tools')">Nova análise →</button></div>
         <div id="savedDecisions"></div>
       </div>
+      <div class="dashCard span2 goalsCard">
+        <div class="cardHead"><div><span class="kicker">OBJETIVOS</span><h3>Minhas Metas</h3></div><button class="link" onclick="openGoalModal()">Nova meta →</button></div>
+        <div id="goalSummary" class="goalSummary"></div>
+        <div id="goalList" class="goalList"></div>
+      </div>
       <div class="dashCard">
         <div class="cardHead"><h3>Ferramentas favoritas</h3></div>
         <div id="favoriteTools"></div>
@@ -339,6 +344,24 @@
   </div>
 </div>
 
+<div id="goalModal" class="modal hidden">
+  <div class="modalCard goalModalCard">
+    <button class="modalClose naked" onclick="closeGoalModal()">×</button>
+    <span class="kicker">META FINANCEIRA</span>
+    <h2 id="goalModalTitle">Nova meta.</h2>
+    <p class="muted">Acompanhe o objetivo pelo valor atual, valor-alvo e prazo.</p>
+    <input id="goalId" type="hidden">
+    <div class="profileGrid">
+      <label>Nome da meta<input id="goalName" maxlength="80" placeholder="Ex.: Entrada do apartamento"></label>
+      <label>Valor-alvo<input id="goalTarget" type="number" min="0" step="any" value="100000"></label>
+      <label>Valor atual<input id="goalCurrent" type="number" min="0" step="any" value="0"></label>
+      <label>Data-alvo<input id="goalDate" type="date"></label>
+    </div>
+    <button class="btn yellow wide" onclick="saveGoal()">Salvar meta</button>
+    <p class="privacy" id="goalPrivacy">Na beta, a meta fica neste navegador.</p>
+  </div>
+</div>
+
 <div id="versionModal" class="modal hidden">
   <div class="modalCard versionModalCard">
     <button class="modalClose naked" onclick="closeVersionCompare()">×</button>
@@ -372,6 +395,7 @@
 <script src="/assets/api-client.js"></script>
 <script src="/assets/sync-service.js"></script>
 <script src="/assets/decision-history.js"></script>
+<script src="/assets/goals.js"></script>
 <script src="/assets/dashboard.js"></script>
 <script src="/assets/app.js"></script>
 
