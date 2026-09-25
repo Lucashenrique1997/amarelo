@@ -812,8 +812,10 @@ const tools=[
 {id:'financiamento-carro',cat:'Comprar',tier:'free',icon:'◈',title:'Financiamento de Veículo',desc:'Entrada, parcela e juros totais.',engine:'loan'},
 {id:'custo-carro',cat:'Comprar',tier:'pro',icon:'◈',title:'Custo Real de um Carro',desc:'Depreciação, seguro, impostos, combustível e manutenção.',engine:'carCost'},
 {id:'trocar-carro',cat:'Comprar',tier:'decision',icon:'↔',title:'Trocar de Carro x Manter o Atual',desc:'Financiamento, depreciação, custos de uso e patrimônio final.',engine:'carDecision',new:true},
+{id:'imovel-na-planta',cat:'Comprar',tier:'decision',icon:'▥',title:'Imóvel na Planta x Esperar',desc:'Obra, correção, aluguel, financiamento na entrega e capital alternativo.',engine:'offPlan',new:true},
 
 {id:'amortizar-investir',cat:'Decidir',tier:'decision',icon:'⇄',title:'Amortizar x Investir',desc:'Descubra o retorno necessário para não amortizar.',engine:'amortInvest',featured:true},
+{id:'bonus-decidir',cat:'Decidir',tier:'decision',icon:'+',title:'13º / Bônus: Dívida x Investir x Reserva',desc:'Coloque um dinheiro extra em três destinos e compare o impacto.',engine:'windfallDecision',new:true},
 {id:'custo-oportunidade',cat:'Decidir',tier:'free',icon:'Δ',title:'Custo de Oportunidade',desc:'Compare dois cenários de retorno.',engine:'opportunity'},
 {id:'valor-presente',cat:'Decidir',tier:'free',icon:'←',title:'Valor Presente',desc:'Traga um valor futuro para hoje.',engine:'presentValue'},
 {id:'valor-futuro',cat:'Decidir',tier:'free',icon:'→',title:'Valor Futuro',desc:'Projete um valor atual para o futuro.',engine:'futureValue'},
@@ -825,7 +827,8 @@ const tools=[
 
 {id:'reserva',cat:'Planejar',tier:'free',icon:'✓',title:'Reserva de Emergência',desc:'Meta de segurança e tempo para formar.',engine:'reserve',featured:true},
 {id:'meta-financeira',cat:'Planejar',tier:'pro',icon:'◎',title:'Meta Financeira Pro',desc:'Aporte, prazo, taxa necessária e sensibilidade.',engine:'goal',featured:true},
-{id:'viver-renda',cat:'Planejar',tier:'pro',icon:'R$',title:'Viver de Renda',desc:'Patrimônio necessário e renda sustentável.',engine:'liveIncome'},
+{id:'viver-renda',cat:'Planejar',tier:'pro',icon:'R$',title:'Viver de Renda',desc:'Patrimônio necessário, renda sustentável, duração e legado.',engine:'liveIncome'},
+{id:'independencia-financeira',cat:'Planejar',tier:'decision',icon:'◉',title:'Mapa de Independência Financeira',desc:'Cobertura do custo de vida, capital-alvo, marcos e tempo até a meta.',engine:'financialIndependence',new:true},
 {id:'aposentadoria',cat:'Previdência',tier:'decision',icon:'∞',title:'Previdência / Aposentadoria',desc:'Patrimônio, renda, gap, idade e cenários.',engine:'retirement',featured:true},
 {id:'pgbl-vgbl',cat:'Previdência',tier:'pro',icon:'P',title:'PGBL x VGBL',desc:'Compare bases tributáveis em uma simulação educacional.',engine:'pgblVgbl'},
 
