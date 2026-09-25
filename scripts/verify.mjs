@@ -8,8 +8,11 @@ const css = read("public/assets/app.css");
 const catalog = read("public/assets/catalog.js");
 const financeCore = read("public/assets/finance-core.js");
 const decisionConfig = read("public/assets/decision-config.js");
+const scenarioSystem = read("public/assets/scenario-system.js");
 const decisionEngines = read("public/assets/decision-engines.js");
 const dataStore = read("public/assets/data-store.js");
+const decisionHistory = read("public/assets/decision-history.js");
+const dashboard = read("public/assets/dashboard.js");
 const app = read("public/assets/app.js");
 const wrangler = read("wrangler.toml");
 const worker = read("src/worker.js");
@@ -22,7 +25,7 @@ const workspacesRepo = read("src/db/workspaces.js");
 const migration1 = read("migrations/0001_initial.sql");
 const migration2 = read("migrations/0002_commercial_readiness.sql");
 
-const frontend = [html, css, catalog, financeCore, decisionConfig, decisionEngines, dataStore, app].join("\n");
+const frontend = [html, css, catalog, financeCore, decisionConfig, scenarioSystem, decisionEngines, dataStore, decisionHistory, dashboard, app].join("\n");
 const backend = [worker, apiRouter, apiHealth, productConfig, decisionsRepo, profilesRepo, workspacesRepo, wrangler, migration1, migration2].join("\n");
 const productionSurface = (frontend + "\n" + backend).toLowerCase();
 
@@ -35,8 +38,11 @@ const requiredAssets = [
   "/assets/catalog.js",
   "/assets/finance-core.js",
   "/assets/decision-config.js",
+  "/assets/scenario-system.js",
   "/assets/decision-engines.js",
   "/assets/data-store.js",
+  "/assets/decision-history.js",
+  "/assets/dashboard.js",
   "/assets/app.js"
 ];
 let previous = -1;
@@ -51,8 +57,11 @@ for (const [name, code] of [
   ["catalog.js", catalog],
   ["finance-core.js", financeCore],
   ["decision-config.js", decisionConfig],
+  ["scenario-system.js", scenarioSystem],
   ["decision-engines.js", decisionEngines],
   ["data-store.js", dataStore],
+  ["decision-history.js", decisionHistory],
+  ["dashboard.js", dashboard],
   ["app.js", app]
 ]) {
   try {
@@ -62,14 +71,20 @@ for (const [name, code] of [
   }
 }
 
-if (app.length > 90000) throw new Error(`app.js grew too large (${app.length} bytes). Split responsibilities before merging.`);
+if (app.length > 40000) throw new Error(`app.js grew too large (${app.length} bytes). Split responsibilities before merging.`);
 if (html.length > 40000) throw new Error(`index.html grew too large (${html.length} bytes). Keep it as an application shell.`);
 if (app.includes("const tools=[")) throw new Error("Tools catalog leaked back into app.js.");
 if (app.includes("function loanFlow(")) throw new Error("Financial core leaked back into app.js.");
 if (app.includes("function buildForm(")) throw new Error("Decision config leaked back into app.js.");
 if (app.includes("function calculateTool(")) throw new Error("Decision engine execution leaked back into app.js.");
 if (app.includes("const storage={")) throw new Error("Data adapter leaked back into app.js.");
+if (app.includes("const scenarioDecisionIds=")) throw new Error("Scenario system leaked back into app.js.");
+if (app.includes("function saveDecision(")) throw new Error("Decision history leaked back into app.js.");
+if (app.includes("function renderDashboard(")) throw new Error("Dashboard leaked back into app.js.");
 if (!dataStore.includes("const storage=")) throw new Error("Client data adapter contract is missing.");
+if (!scenarioSystem.includes("function compareScenarios(")) throw new Error("Scenario system is missing.");
+if (!decisionHistory.includes("function openDecisionReport(")) throw new Error("Decision history/report layer is missing.");
+if (!dashboard.includes("function renderDashboard(")) throw new Error("Dashboard layer is missing.");
 
 const requiredProductMarkers = [
   "<title>AMARELO",
