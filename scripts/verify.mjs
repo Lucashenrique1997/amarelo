@@ -41,11 +41,9 @@ const migration3 = read("migrations/0003_sync_safety.sql");
 const migration4 = read("migrations/0004_goals_sync.sql");
 const migration5 = read("migrations/0005_api_rate_limits.sql");
 const migration6 = read("migrations/0006_identity_billing_foundation.sql");
-const migration3 = read("migrations/0003_sync_safety.sql");
-const migration4 = read("migrations/0004_goals_sync.sql");
 
 const frontend = [html, css, catalog, financeCore, decisionConfig, scenarioSystem, decisionEngines, dataStore, runtimeCapabilities, apiClient, syncService, decisionHistory, goals, dashboard, app].join("\n");
-const backend = [worker, apiRouter, apiHealth, privateApi, productConfig, decisionsRepo, profilesRepo, workspacesRepo, goalsRepo, subscriptionsRepo, authSession, security, wrangler, migration1, migration2, migration3, migration4].join("\n");
+const backend = [worker, apiRouter, apiHealth, privateApi, productConfig, decisionsRepo, profilesRepo, workspacesRepo, goalsRepo, subscriptionsRepo, authSession, security, rateLimit, requestSecurity, identitiesRepo, billingEventsRepo, wrangler, migration1, migration2, migration3, migration4, migration5, migration6].join("\n");
 const runtimeSurface = [frontend, worker, apiRouter, apiHealth, productConfig, decisionsRepo, profilesRepo, workspacesRepo, wrangler].join("\n").toLowerCase();
 
 if (html !== rootHtml) throw new Error("Root preview and public application shell are out of sync.");
@@ -183,6 +181,10 @@ if (!decisionsRepo.includes("deleteDecisionVersion")) throw new Error("Decision 
 if (!decisionsRepo.includes("if (!existing) decisionId = null")) throw new Error("Decision upsert must reject foreign client IDs.");
 if (!profilesRepo.includes("upsertProfile")) throw new Error("Profile repository is missing.");
 if (!workspacesRepo.includes("createPersonalWorkspace")) throw new Error("Workspace repository is missing.");
+if (!identitiesRepo.includes("upsertIdentity")) throw new Error("Identity repository is missing.");
+if (!billingEventsRepo.includes("beginBillingEvent")) throw new Error("Billing event repository is missing.");
+if (!rateLimit.includes("consumeRateLimit")) throw new Error("Rate-limit primitive is missing.");
+if (!requestSecurity.includes("sameOriginAllowed")) throw new Error("Same-origin request protection is missing.");
 if (!goalsRepo.includes("upsertGoal")) throw new Error("Goals repository is missing.");
 if (!goalsRepo.includes("if (!owned) id = null")) throw new Error("Goal upsert must reject foreign client IDs.");
 if (!subscriptionsRepo.includes("getEntitlements") || !subscriptionsRepo.includes("proBeta")) throw new Error("Entitlement repository is missing beta/commercial gating.");
@@ -195,6 +197,10 @@ for (const marker of ["users", "sessions", "decisions", "subscriptions"]) {
 }
 for (const marker of ["decision_versions", "workspaces", "workspace_members", "financial_profiles", "clients"]) {
   if (!migration2.includes(marker)) throw new Error(`Commercial D1 schema missing: ${marker}`);
+}
+if (!migration5.includes("api_rate_limits")) throw new Error("Rate-limit migration is missing.");
+for (const marker of ["auth_identities", "billing_events"]) {
+  if (!migration6.includes(marker)) throw new Error(`Identity/billing foundation missing: ${marker}`);
 }
 if (!migration3.includes("client_version_id")) throw new Error("Sync safety migration is missing client_version_id.");
 if (!migration4.includes("client_goal_id")) throw new Error("Goal sync migration is missing client_goal_id.");
