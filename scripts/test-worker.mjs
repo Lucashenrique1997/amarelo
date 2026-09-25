@@ -1,3 +1,4 @@
+import { mutationOriginAllowed } from "../src/api/json.js";
 import assert from "node:assert/strict";
 import worker from "../src/worker.js";
 
@@ -26,6 +27,7 @@ assert.equal(cap.persistence, false);
 assert.equal(cap.authentication, false);
 assert.equal(capabilities.headers.get("X-Content-Type-Options"), "nosniff");
 assert.equal(capabilities.headers.get("Cache-Control"), "no-store");
+assert.ok(capabilities.headers.get("Content-Security-Policy")?.includes("default-src 'self'"));
 assert.ok(capabilities.headers.get("X-Request-ID"));
 
 const health = await call("/api/health");
@@ -60,3 +62,20 @@ const failureBody = await safeFailure.json();
 assert.equal(failureBody.error, "internal_error");
 assert.ok(failureBody.requestId);
 assert.equal(safeFailure.headers.get("X-Request-ID"), failureBody.requestId);
+
+assert.equal(
+  mutationOriginAllowed(new Request("https://amarelo.test/api/v1/profile",{method:"PUT",headers:{Origin:"https://amarelo.test"}})),
+  true
+);
+assert.equal(
+  mutationOriginAllowed(new Request("https://amarelo.test/api/v1/profile",{method:"PUT",headers:{Origin:"https://evil.example"}})),
+  false
+);
+assert.equal(
+  mutationOriginAllowed(new Request("https://amarelo.test/api/v1/profile",{method:"PUT"})),
+  false
+);
+assert.equal(
+  mutationOriginAllowed(new Request("https://amarelo.test/api/v1/profile",{method:"GET"})),
+  true
+);
