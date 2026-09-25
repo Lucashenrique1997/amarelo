@@ -3,6 +3,8 @@ import { readJson, jsonError } from "./json.js";
 import { getProfile, upsertProfile } from "../db/profiles.js";
 import { listDecisions, listDecisionVersions, upsertDecisionWithVersion } from "../db/decisions.js";
 import { listWorkspaces } from "../db/workspaces.js";
+import { listGoals, upsertGoal, deleteGoal } from "../db/goals.js";
+import { getEntitlements } from "../db/subscriptions.js";
 
 function databaseRequired(env) {
   return env.DB ? null : jsonError("database_not_configured", 503);
@@ -61,6 +63,32 @@ export async function handlePrivateApi(request, env, url) {
     if (request.method !== "GET") return jsonError("method_not_allowed", 405);
     const result = await listWorkspaces(env.DB, userId);
     return Response.json({ ok: true, workspaces: result.results || [] });
+  }
+
+  if (url.pathname === "/api/v1/goals") {
+    if (request.method === "GET") {
+      const result = await listGoals(env.DB, userId);
+      return Response.json({ ok: true, goals: result.results || [] });
+    }
+    if (request.method === "POST" || request.method === "PUT") {
+      const body = await readJson(request);
+      if (!body.ok) return body.response;
+      if (!body.value?.name) return jsonError("missing_required_fields", 422);
+      return Response.json({ ok: true, ...(await upsertGoal(env.DB, userId, body.value)) }, { status: request.method === "POST" ? 201 : 200 });
+    }
+    return jsonError("method_not_allowed", 405);
+  }
+
+  const goalMatch = url.pathname.match(/^\/api\/v1\/goals\/([^/]+)$/);
+  if (goalMatch) {
+    if (request.method !== "DELETE") return jsonError("method_not_allowed", 405);
+    await deleteGoal(env.DB, userId, decodeURIComponent(goalMatch[1]));
+    return Response.json({ ok: true });
+  }
+
+  if (url.pathname === "/api/v1/entitlements") {
+    if (request.method !== "GET") return jsonError("method_not_allowed", 405);
+    return Response.json({ ok: true, entitlements: await getEntitlements(env.DB, userId) });
   }
 
   return jsonError("not_found", 404);
