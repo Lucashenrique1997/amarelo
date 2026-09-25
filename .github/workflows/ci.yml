@@ -26,6 +26,8 @@ jobs:
         run: npm run test:worker
       - name: Test security contracts
         run: npm run test:security
+      - name: Test UI contracts
+        run: npm run test:ui
       - name: Test synchronization contracts
         run: npm run test:sync
       - name: Test D1 migrations
