@@ -78,7 +78,7 @@ assert.equal(remote.remoteDecisionId,"decision-1");
 assert.equal(remote.remoteVersionId,"version-1");
 assert.equal(remote.version,2);
 assert.equal(remote.mode,"advanced");
-assert.deepEqual(remote.metrics,[["Comprar","R$ 10"]]);
+assert.equal(JSON.stringify(remote.metrics),JSON.stringify([["Comprar","R$ 10"]]));
 
 const profile=s.localProfileToApi({income:10000,wealth:250000,essentials:5000,reserve:30000,monthly:2000});
 assert.equal(profile.monthlyIncome,10000);
