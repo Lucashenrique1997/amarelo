@@ -328,7 +328,7 @@
   </div>
 </section>
 
-<div id="profileModal" class="modal hidden">
+<div id="profileModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="profileModalTitle">
   <div class="modalCard">
     <button class="modalClose naked" onclick="closeProfile()">×</button>
     <span class="kicker">MEU PERFIL</span><h2>Dados que ajudam o AMARELO a contextualizar suas contas.</h2>
@@ -345,7 +345,7 @@
   </div>
 </div>
 
-<div id="goalModal" class="modal hidden">
+<div id="goalModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="goalModalTitle">
   <div class="modalCard goalModalCard">
     <button class="modalClose naked" onclick="closeGoalModal()">×</button>
     <span class="kicker">META FINANCEIRA</span>
@@ -363,7 +363,7 @@
   </div>
 </div>
 
-<div id="versionModal" class="modal hidden">
+<div id="versionModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="versionModalTitle">
   <div class="modalCard versionModalCard">
     <button class="modalClose naked" onclick="closeVersionCompare()">×</button>
     <span class="kicker">HISTÓRICO DA DECISÃO</span>
@@ -373,7 +373,7 @@
   </div>
 </div>
 
-<div id="reportModal" class="modal hidden reportModal">
+<div id="reportModal" class="modal hidden reportModal" role="dialog" aria-modal="true" aria-label="Relatório AMARELO">
   <div class="reportShell">
     <div class="reportToolbar">
       <button class="reportClose" onclick="closeDecisionReport()">Fechar</button>
