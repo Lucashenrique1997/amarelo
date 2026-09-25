@@ -494,14 +494,15 @@ function calculateTool(){const e=state.current.engine;try{
  else if(e==='cdiConvert'){setResult(PCT(num('cdi')*num('pctcdi')/100),'Aproximação anual sobre o CDI informado.')}
  else if(e==='exposure'){let a=num('amount'),l=num('limit');setResult(BRL(a),'Exposição total.',[['Dentro do limite',BRL(Math.min(a,l))],['Acima do limite',BRL(Math.max(0,a-l))]])}
  else if(e==='buyPaths'){
-  let asset=num('asset'),cash=Math.min(num('cash'),num('asset')),fm=num('finM')/100,N=Math.max(1,Math.round(num('finN'))),system=$('finSystem').value,cet=num('cetAdd')/100,finExtra=num('finExtra'),adm=num('adm')/100,consN=Math.max(1,Math.round(num('consN'))),cont=Math.max(1,Math.min(consN,Math.round(num('cont')))),bid=Math.max(0,num('bid')),reserve=num('reserveFee')/100,reaj=num('reaj')/100,rent=num('rent'),inv=num('inv')/100,app=num('assetApp')/100,pmtSave=num('monthlySave');
+  let asset=num('asset'),cash=Math.min(num('cash'),num('asset')),fm=num('finM')/100,N=Math.max(1,Math.round(num('finN'))),system=$('finSystem').value,cet=num('cetAdd')/100,finExtra=num('finExtra'),adm=num('adm')/100,consN=Math.max(1,Math.round(num('consN'))),cont=Math.max(1,Math.min(consN,Math.round(num('cont')))),bid=Math.min(cash,Math.max(0,num('bid'))),reserve=num('reserveFee')/100,reaj=num('reaj')/100,rent=num('rent'),inv=num('inv')/100,app=num('assetApp')/100,pmtSave=num('monthlySave');
   let credit=Math.max(0,asset-cash),upfront=credit*cet,lf=loanFlow(credit,fm,N,system,finExtra),finNominal=cash+upfront+lf.total,finEconomic=cash+upfront+pvFlows(lf.flows,inv);
   function consortium(cm){
     let baseContract=asset*(1+adm+reserve),basePmt=baseContract/consN,offset=0,total=0,pv=0,flows=[],cum=0,dm=monthly(inv);
     for(let m=1;m<=consN;m++){
       let idx=Math.pow(1+reaj,Math.floor((m-1)/12)),scheduled=basePmt*idx,extra=0;
-      if(m===cm){extra=Math.min(bid,Math.max(0,baseContract));offset+=extra}
-      let reduction=Math.min(offset,scheduled),paid=Math.max(0,scheduled-reduction);offset-=reduction;
+      if(m===cm)extra=Math.min(bid,Math.max(0,baseContract));
+      let reduction=m>cm?Math.min(offset,scheduled):0,paid=Math.max(0,scheduled-reduction);offset-=reduction;
+      if(m===cm)offset+=extra;
       let waitCost=m<cm?rent:0;
       let cashOut=paid+extra+waitCost;
       total+=cashOut;pv+=cashOut/Math.pow(1+dm,m);cum+=cashOut;flows.push({y:cum});
