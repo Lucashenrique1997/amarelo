@@ -13,9 +13,12 @@ public/
     catalog.js              # metadados das ferramentas
     finance-core.js         # matemática determinística reutilizável
     decision-config.js      # campos e metodologias dos motores
+    scenario-system.js      # cenários, what-if, drivers
     decision-engines.js     # execução dos motores
     data-store.js           # adaptador de dados/cache local
-    app.js                  # navegação, estado, dashboard, cenários, relatórios
+    decision-history.js     # decisões, versões e relatórios
+    dashboard.js            # Meu AMARELO, perfil e backup
+    app.js                  # navegação, interação e composição
 ```
 
 ### Fronteiras
@@ -24,9 +27,12 @@ public/
 - `catalog.js`: catálogo e metadados; nenhuma conta.
 - `finance-core.js`: funções puras; sem DOM, localStorage ou estado.
 - `decision-config.js`: formulários e metodologia; sem persistência.
+- `scenario-system.js`: cenários, sensibilidade, drivers e “E se?”.
 - `decision-engines.js`: orquestra cálculos; usa finance-core.
 - `data-store.js`: contrato de armazenamento local; será camada de cache quando D1 estiver ativo.
-- `app.js`: interface, navegação e composição.
+- `decision-history.js`: persistência local, versões e relatório.
+- `dashboard.js`: Meu AMARELO, perfil e backup.
+- `app.js`: navegação, interação e composição.
 
 ## Worker
 
