@@ -1,7 +1,7 @@
 import { authenticatedUserId } from "../auth/session.js";
 import { readJson, jsonError } from "./json.js";
 import { getProfile, upsertProfile } from "../db/profiles.js";
-import { listDecisions, listDecisionVersions, upsertDecisionWithVersion } from "../db/decisions.js";
+import { listDecisions, listDecisionVersions, upsertDecisionWithVersion, deleteDecisionVersion } from "../db/decisions.js";
 import { listWorkspaces } from "../db/workspaces.js";
 import { listGoals, upsertGoal, deleteGoal } from "../db/goals.js";
 import { getEntitlements } from "../db/subscriptions.js";
@@ -57,6 +57,19 @@ export async function handlePrivateApi(request, env, url) {
     if (request.method !== "GET") return jsonError("method_not_allowed", 405);
     const result = await listDecisionVersions(env.DB, userId, decodeURIComponent(versionsMatch[1]));
     return Response.json({ ok: true, versions: result.results || [] });
+  }
+
+  const versionDeleteMatch = url.pathname.match(/^\/api\/v1\/decisions\/([^/]+)\/versions\/([^/]+)$/);
+  if (versionDeleteMatch) {
+    if (request.method !== "DELETE") return jsonError("method_not_allowed", 405);
+    const result = await deleteDecisionVersion(
+      env.DB,
+      userId,
+      decodeURIComponent(versionDeleteMatch[1]),
+      decodeURIComponent(versionDeleteMatch[2])
+    );
+    if (!result.deleted) return jsonError("not_found", 404);
+    return Response.json({ ok: true, ...result });
   }
 
   if (url.pathname === "/api/v1/workspaces") {
