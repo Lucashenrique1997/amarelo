@@ -897,6 +897,9 @@ function firstInt(text,patterns){
 }
 function detectAskTool(text){
   const rules=[
+    ['imovel-na-planta',['na planta','imóvel na planta','imovel na planta','incc','entrega do imóvel','entrega do imovel']],
+    ['bonus-decidir',['13º','décimo terceiro','decimo terceiro','bônus','bonus','plr','dinheiro extra']],
+    ['independencia-financeira',['independência financeira','independencia financeira','liberdade financeira','cobrir meu custo de vida','cobrir meus gastos']],
     ['financiamento-consorcio',['consórc','consorc','financiar ou','financiamento ou investir','dar entrada']],
     ['comprar-alugar',['comprar ou alugar','alugar ou comprar','aluguel','continuar alugando']],
     ['portabilidade-divida',['portabilidade','portar dívida','portar divida','refinanciar','trocar financiamento']],
@@ -1021,6 +1024,34 @@ function interpretAsk(raw){
     if(newPrice===null)missing.push('preço do carro desejado');
     if(rate===null)missing.push('taxa do financiamento');
     if(years===null)missing.push('horizonte da comparação');
+  }else if(toolId==='imovel-na-planta'){
+    let price=firstMoney(text,['(?:imóvel|imovel|apartamento)(?:\s+na planta)?(?:\s+(?:de|custa|valor))?\s+MONEY']);
+    let entry=firstMoney(text,['entrada(?:\s+de)?\s+MONEY']);
+    let months=firstInt(text,[/(?:entrega|obra).*?(\d+)\s+meses/,/(\d+)\s+meses.*?(?:entrega|obra)/]);
+    let rent=firstMoney(text,['aluguel(?:\s+de)?\s+MONEY']);
+    add('offPrice',price,'Preço contratado',price?BRL(price):null);
+    add('offEntry',entry,'Entrada',entry?BRL(entry):null);
+    add('offMonths',months,'Prazo até entrega',months?months+' meses':null);
+    add('offRent',rent,'Aluguel durante a obra',rent?BRL(rent)+'/mês':null);
+    if(price===null)missing.push('preço contratado');
+    if(months===null)missing.push('prazo até a entrega');
+  }else if(toolId==='bonus-decidir'){
+    let amount=firstMoney(text,['(?:13º|décimo terceiro|decimo terceiro|bônus|bonus|plr|dinheiro extra)(?:\s+de|\s+no valor de)?\s+MONEY','MONEY\s+(?:de bônus|de bonus|de plr|de 13º)']);
+    let debt=firstMoney(text,['(?:dívida|divida|saldo devedor)(?:\s+de)?\s+MONEY']);
+    let expense=firstMoney(text,['(?:gasto essencial|custo de vida)(?:\s+de)?\s+MONEY']);
+    add('windAmount',amount,'Valor recebido',amount?BRL(amount):null);
+    add('windDebt',debt,'Saldo devedor',debt?BRL(debt):null);
+    add('windExpense',expense,'Gasto essencial',expense?BRL(expense)+'/mês':null);
+    if(amount===null)missing.push('valor recebido');
+  }else if(toolId==='independencia-financeira'){
+    let expense=firstMoney(text,['(?:custo de vida|gasto mensal|gastos mensais)(?:\s+de)?\s+MONEY']);
+    let current=firstMoney(text,['(?:patrimônio|patrimonio|tenho investido)(?:\s+de)?\s+MONEY']);
+    let pmt=firstMoney(text,['(?:aporto|invisto|guardo)(?:\s+por mês|\s+por mes|\s+mensalmente)?\s+MONEY']);
+    add('fiExpenses',expense,'Custo de vida',expense?BRL(expense)+'/mês':null);
+    add('fiCurrent',current,'Patrimônio atual',current?BRL(current):null);
+    add('fiPmt',pmt,'Aporte mensal',pmt?BRL(pmt)+'/mês':null);
+    if(expense===null)missing.push('custo de vida mensal');
+    if(current===null)missing.push('patrimônio atual');
   }
   return{raw:String(raw||''),toolId,values,understood,missing};
 }
@@ -1306,43 +1337,81 @@ function compareScenarios(){
 function decisionDrivers(){
  if(!scenarioEnabled())return[];
  const e=state.current.engine;
- if(e==='buyPaths')return[
+ const map={
+  buyPaths:()=>[
    ['Taxa do financiamento',PCT(num('finM'))+' a.m.','mexe no custo do crédito'],
    ['Contemplação simulada',Math.round(num('cont'))+' meses','mexe no tempo de espera'],
    ['Retorno alternativo',PCT(num('inv'))+' a.a.','mexe no custo de oportunidade'],
    ['Reajuste da carta',PCT(num('reaj'))+' a.a.','mexe no fluxo do consórcio']
- ];
- if(e==='buyRent')return[
+  ],
+  buyRent:()=>[
    ['Valorização do imóvel',PCT(num('app'))+' a.a.','mexe no patrimônio do proprietário'],
    ['Retorno investido',PCT(num('inv'))+' a.a.','mexe no patrimônio do inquilino'],
    ['Aluguel inicial',BRL(num('rent')),'mexe no caixa mensal'],
    ['Taxa do financiamento',PCT(num('finM'))+' a.m.','mexe no custo de comprar']
- ];
- if(e==='amortInvest')return[
+  ],
+  offPlan:()=>[
+   ['Correção da obra',PCT(num('offIndex'))+' a.a.','mexe no saldo que chega à entrega'],
+   ['Prazo até entrega',Math.round(num('offMonths'))+' meses','mexe no tempo de correção e aluguel'],
+   ['Taxa na entrega',PCT(num('offFinanceRate'))+' a.m.','mexe no custo do saldo financiado'],
+   ['Valorização de mercado',PCT(num('offApp'))+' a.a.','mexe no preço de esperar']
+  ],
+  amortInvest:()=>[
    ['Custo da dívida',PCT(num('debtA'))+' a.a.','define a economia potencial'],
    ['Retorno do investimento',PCT(num('invGross'))+' a.a.','define o ganho alternativo'],
    ['Capital disponível',BRL(num('cash')),'define o tamanho da decisão'],
    ['Prazo restante',Math.round(num('months'))+' meses','define por quanto tempo o efeito se acumula']
- ];
- if(e==='retirement')return[
-   ['Retorno real líquido',PCT(num('real')-num('fee'))+' a.a.','mexe na acumulação e na fase de renda'],
+  ],
+  windfallDecision:()=>[
+   ['Valor recebido',BRL(num('windAmount')),'define o tamanho da decisão'],
+   ['Custo da dívida',PCT(num('windDebtRate'))+' a.a.','define o custo evitável'],
+   ['Retorno do investimento',PCT(num('windInv'))+' a.a.','define o ganho alternativo'],
+   ['Gap de reserva',BRL(Math.max(0,num('windExpense')*num('windReserveMonths')-num('windReserve'))),'define o contexto de liquidez']
+  ],
+  retirement:()=>[
+   ['Retorno real líquido',PCT(num('real')-num('fee'))+' a.a.','mexe na acumulação e renda'],
    ['Aporte mensal',BRL(num('pmt')),'mexe na velocidade de formação'],
    ['Tempo até aposentar',Math.max(0,num('ret')-num('age')).toFixed(1).replace('.',',')+' anos','mexe no tempo de capitalização'],
    ['Renda desejada',BRL(num('income'))+'/mês','mexe no capital necessário']
- ];
- if(e==='debtPortability')return[
-   ['Taxa atual',PCT(num('portCurrentRate'))+' a.m.','define o fluxo que já existe'],
+  ],
+  liveIncome:()=>[
+   ['Retorno real líquido',PCT(num('real')-num('liveFee'))+' a.a.','mexe na renda sustentável'],
+   ['Renda desejada',BRL(num('income'))+'/mês','mexe na velocidade de consumo'],
+   ['Horizonte',Math.round(num('years'))+' anos','mexe na duração necessária'],
+   ['Legado final',PCT(num('legacy')),'mexe no capital que precisa permanecer']
+  ],
+  financialIndependence:()=>[
+   ['Custo de vida',BRL(num('fiExpenses'))+'/mês','define a renda a cobrir'],
+   ['Cobertura desejada',PCT(num('fiCoverage')),'define o objetivo'],
+   ['Retorno real',PCT(num('fiReal'))+' a.a.','mexe no capital-alvo'],
+   ['Aporte mensal',BRL(num('fiPmt')),'mexe no tempo até a meta']
+  ],
+  debtPortability:()=>[
+   ['Taxa atual',PCT(num('portCurrentRate'))+' a.m.','define o fluxo existente'],
    ['Nova taxa',PCT(num('portNewRate'))+' a.m.','mexe no custo da proposta'],
-   ['Custos iniciais',BRL(num('portFee')),'podem consumir a economia de juros'],
-   ['Prazo novo',Math.round(num('portNewN'))+' meses','mexe na parcela e no total pago']
- ];
- if(e==='carDecision')return[
+   ['Custos iniciais',BRL(num('portFee')),'podem consumir a economia'],
+   ['Prazo novo',Math.round(num('portNewN'))+' meses','mexe na parcela e total']
+  ],
+  carDecision:()=>[
    ['Diferença de preço',BRL(Math.max(0,num('carNewPrice')-num('carCurrentValue'))),'define quanto capital precisa migrar'],
    ['Taxa do financiamento',PCT(num('carRate'))+' a.m.','mexe no custo de trocar'],
    ['Manutenção do atual',BRL(num('carCurrentMaint'))+'/ano','mexe no custo de manter'],
    ['Retorno do capital',PCT(num('carInv'))+' a.a.','mexe no valor de esperar']
- ];
- return[];
+  ],
+  fixedIncome:()=>[
+   ['CDI informado',PCT(num('cdi'))+' a.a.','mexe no retorno pós-fixado'],
+   ['CDB',PCT(num('cdb'))+' do CDI','mexe no retorno tributado'],
+   ['LCI/LCA',PCT(num('lci'))+' do CDI','mexe no retorno isento informado'],
+   ['Prazo',Math.round(num('months'))+' meses','mexe na tributação e capitalização']
+  ],
+  goal:()=>[
+   ['Meta',BRL(num('target')),'define o patrimônio desejado'],
+   ['Aporte mensal',BRL(num('pmt')),'mexe na velocidade de formação'],
+   ['Retorno',PCT(num('rate'))+' a.a.','mexe na capitalização'],
+   ['Prazo',num('years').toFixed(1).replace('.',',')+' anos','mexe no tempo disponível']
+  ]
+ };
+ return map[e]?map[e]():[];
 }
 function renderDecisionDrivers(){
  const drivers=decisionDrivers();
