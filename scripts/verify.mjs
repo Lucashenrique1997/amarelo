@@ -15,6 +15,7 @@ const runtimeCapabilities = read("public/assets/runtime-capabilities.js");
 const apiClient = read("public/assets/api-client.js");
 const syncService = read("public/assets/sync-service.js");
 const decisionHistory = read("public/assets/decision-history.js");
+const goals = read("public/assets/goals.js");
 const dashboard = read("public/assets/dashboard.js");
 const app = read("public/assets/app.js");
 const wrangler = read("wrangler.toml");
@@ -33,9 +34,10 @@ const security = read("src/http/security.js");
 const migration1 = read("migrations/0001_initial.sql");
 const migration2 = read("migrations/0002_commercial_readiness.sql");
 const migration3 = read("migrations/0003_sync_safety.sql");
+const migration4 = read("migrations/0004_goals_sync.sql");
 
-const frontend = [html, css, catalog, financeCore, decisionConfig, scenarioSystem, decisionEngines, dataStore, runtimeCapabilities, apiClient, syncService, decisionHistory, dashboard, app].join("\n");
-const backend = [worker, apiRouter, apiHealth, privateApi, productConfig, decisionsRepo, profilesRepo, workspacesRepo, goalsRepo, subscriptionsRepo, authSession, security, wrangler, migration1, migration2, migration3].join("\n");
+const frontend = [html, css, catalog, financeCore, decisionConfig, scenarioSystem, decisionEngines, dataStore, runtimeCapabilities, apiClient, syncService, decisionHistory, goals, dashboard, app].join("\n");
+const backend = [worker, apiRouter, apiHealth, privateApi, productConfig, decisionsRepo, profilesRepo, workspacesRepo, goalsRepo, subscriptionsRepo, authSession, security, wrangler, migration1, migration2, migration3, migration4].join("\n");
 const runtimeSurface = [frontend, worker, apiRouter, apiHealth, productConfig, decisionsRepo, profilesRepo, workspacesRepo, wrangler].join("\n").toLowerCase();
 
 if (html !== rootHtml) throw new Error("Root preview and public application shell are out of sync.");
@@ -54,6 +56,7 @@ const requiredAssets = [
   "/assets/api-client.js",
   "/assets/sync-service.js",
   "/assets/decision-history.js",
+  "/assets/goals.js",
   "/assets/dashboard.js",
   "/assets/app.js"
 ];
@@ -76,6 +79,7 @@ for (const [name, code] of [
   ["api-client.js", apiClient],
   ["sync-service.js", syncService],
   ["decision-history.js", decisionHistory],
+  ["goals.js", goals],
   ["dashboard.js", dashboard],
   ["app.js", app]
 ]) {
@@ -102,6 +106,7 @@ if (!apiClient.includes("const amareloApi=")) throw new Error("Authenticated API
 if (!syncService.includes("syncAccountIfAvailable") || !syncService.includes("clientVersionId")) throw new Error("Account synchronization layer is incomplete.");
 if (!scenarioSystem.includes("function compareScenarios(")) throw new Error("Scenario system is missing.");
 if (!decisionHistory.includes("function openDecisionReport(")) throw new Error("Decision history/report layer is missing.");
+if (!goals.includes("function renderGoals(") || !goals.includes("function saveGoal(")) throw new Error("Tracked goals module is incomplete.");
 if (!dashboard.includes("function renderDashboard(")) throw new Error("Dashboard layer is missing.");
 
 const requiredProductMarkers = [
@@ -181,6 +186,7 @@ for (const marker of ["decision_versions", "workspaces", "workspace_members", "f
   if (!migration2.includes(marker)) throw new Error(`Commercial D1 schema missing: ${marker}`);
 }
 if (!migration3.includes("client_version_id")) throw new Error("Sync safety migration is missing client_version_id.");
+if (!migration4.includes("client_goal_id")) throw new Error("Goal sync migration is missing client_goal_id.");
 
 if (frontend.includes("setDemoPlan('family')") || frontend.includes("setDemoPlan('professional')")) {
   throw new Error("Unbuilt paid tiers must not be activatable.");
