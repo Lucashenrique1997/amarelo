@@ -1,0 +1,19 @@
+name = "amarelo"
+main = "src/worker.js"
+compatibility_date = "2026-09-24"
+workers_dev = true
+preview_urls = true
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*"]
+
+# Depois de criar o D1 exclusivo do AMARELO no Cloudflare:
+#
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "amarelo"
+# database_id = "<DATABASE_ID>"
+# migrations_dir = "migrations"
