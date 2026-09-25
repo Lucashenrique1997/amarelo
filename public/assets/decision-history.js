@@ -10,8 +10,9 @@ function groupSavedDecisions(items){let map=new Map();for(const item of items){l
 function saveDecision(){
   if(!state.last)return toast('Calcule primeiro.');
   let d=saved(),limit=state.plan==='free'?3:100;
-  if(state.plan==='free'&&d.length>=limit)return toast('No Free você pode salvar até 3 decisões.');
   let decisionName=currentDecisionName(),decisionKey=makeDecisionKey(state.current.id,decisionName);
+  const existingKeys=new Set(d.map(savedDecisionKey));
+  if(state.plan==='free'&&!existingKeys.has(decisionKey)&&existingKeys.size>=limit)return toast('No Free você pode acompanhar até 3 decisões.');
   let previous=d.filter(x=>savedDecisionKey(x)===decisionKey),version=(previous.reduce((m,x)=>Math.max(m,x.version||1),0)||0)+1;
   let scenarioState=exportScenarioState(),scenarioId=scenarioState?.active||null,scenarioLabel=scenarioId?getScenarioLabel(scenarioId):null;
   const savedVersion={id:Date.now(),toolId:state.current.id,title:state.current.title,decisionName,decisionKey,version,scenarioLabel,primary:state.last.primary,subtitle:state.last.subtitle,metrics:state.last.metrics||[],sensitivity:state.last.sens||[],assumptions:captureAssumptions(),scenarioState,mode:state.mode,date:new Date().toISOString()};
@@ -99,7 +100,9 @@ function openDecisionReport(){
   const reportVersion=allVersions.length?Math.max(...allVersions.map(x=>Number(x.version)||1)):null;
   const metrics=(state.last.metrics||[]).map(m=>`<div class="reportMetric"><small>${escapeHtml(m[0])}</small><b>${escapeHtml(m[1])}</b></div>`).join('');
   const sensitivity=(state.last.sens||[]).map(s=>`<div class="reportSensitivityItem"><small>${escapeHtml(s[0])}</small><b>${escapeHtml(s[1])}</b></div>`).join('');
-  const savedVersions=allVersions,previous=savedVersions[0]||null;
+  const savedVersions=allVersions,currentAssumptions=captureAssumptions();
+  const latestMatchesCurrent=savedVersions[0]&&JSON.stringify(savedVersions[0].assumptions||{})===JSON.stringify(currentAssumptions||{});
+  const previous=latestMatchesCurrent?(savedVersions[1]||null):(savedVersions[0]||null);
   let evolutionSection='';
   if(previous){
     const currentMetrics=state.last.metrics||[],prevMetrics=previous.metrics||[],labels=[...new Set([...currentMetrics.map(m=>m[0]),...prevMetrics.map(m=>m[0])])].slice(0,6);
