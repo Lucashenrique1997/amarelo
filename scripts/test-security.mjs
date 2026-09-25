@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { sameOriginAllowed } from "../src/security/request.js";
 import { consumeRateLimit } from "../src/security/rate-limit.js";
-import { readCookie, sessionCookieName } from "../src/auth/session.js";
+import { readCookie, sessionCookieName, createOpaqueSessionToken, sessionTokenHash, sessionCookie, clearSessionCookie } from "../src/auth/session.js";
 
 assert.equal(
   sameOriginAllowed(new Request("https://amarelo.test/api/v1/profile", {
@@ -59,3 +59,21 @@ assert.equal(third.remaining, 0);
 assert.ok(third.resetAt > Date.now());
 
 console.log("AMARELO security contract tests passed.");
+
+const opaque = createOpaqueSessionToken();
+assert.equal(opaque.length, 64);
+assert.match(opaque, /^[a-f0-9]{64}$/);
+const hashed = await sessionTokenHash(opaque);
+assert.equal(hashed.length, 64);
+assert.notEqual(hashed, opaque);
+
+const cookie = sessionCookie(opaque, 3600);
+assert.match(cookie, /HttpOnly/);
+assert.match(cookie, /Secure/);
+assert.match(cookie, /SameSite=Lax/);
+assert.match(cookie, /Max-Age=3600/);
+
+const cleared = clearSessionCookie();
+assert.match(cleared, /Max-Age=0/);
+
+console.log("AMARELO session hardening tests passed.");
