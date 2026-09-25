@@ -114,3 +114,45 @@ export async function upsertDecisionWithVersion(db, userId, input) {
   await db.batch([decisionStatement, versionStatement]);
   return { decisionId, versionId, versionNumber, decisionKey, deduplicated: false };
 }
+
+export async function deleteDecisionVersion(db, userId, decisionId, versionId) {
+  const owned = await db.prepare(
+    `SELECT v.id
+       FROM decision_versions v
+       JOIN decisions d ON d.id = v.decision_id
+      WHERE v.id = ? AND v.decision_id = ? AND d.user_id = ?`
+  ).bind(versionId, decisionId, userId).first();
+
+  if (!owned) return { deleted: false, decisionDeleted: false };
+
+  await db.prepare(
+    "DELETE FROM decision_versions WHERE id = ? AND decision_id = ?"
+  ).bind(versionId, decisionId).run();
+
+  const latest = await db.prepare(
+    `SELECT inputs_json, outputs_json, assumptions_json, primary_result, summary
+       FROM decision_versions
+      WHERE decision_id = ?
+      ORDER BY version_number DESC
+      LIMIT 1`
+  ).bind(decisionId).first();
+
+  if (!latest) {
+    await db.prepare(
+      "DELETE FROM decisions WHERE id = ? AND user_id = ?"
+    ).bind(decisionId, userId).run();
+    return { deleted: true, decisionDeleted: true };
+  }
+
+  await db.prepare(
+    `UPDATE decisions
+        SET inputs_json = ?, outputs_json = ?, assumptions_json = ?,
+            primary_result = ?, summary = ?, updated_at = CURRENT_TIMESTAMP
+      WHERE id = ? AND user_id = ?`
+  ).bind(
+    latest.inputs_json, latest.outputs_json, latest.assumptions_json,
+    latest.primary_result, latest.summary, decisionId, userId
+  ).run();
+
+  return { deleted: true, decisionDeleted: false };
+}
