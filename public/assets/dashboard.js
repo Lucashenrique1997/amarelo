@@ -27,6 +27,7 @@ function renderDashboard(){
     let next=p.reserve<p.essentials*6&&p.essentials>0?['reserva','Sua reserva informada está abaixo de 6 meses.']:p.monthly>0?['meta-financeira','Transforme seu aporte mensal em uma meta.']:['diagnostico','Comece pelo diagnóstico financeiro.'];
     $('nextDecision').innerHTML=`<div class="miniTool" onclick="openTool('${next[0]}')"><i>→</i><div><b>${tools.find(t=>t.id===next[0])?.title||'Próxima análise'}</b><p class="muted">${next[1]}</p></div></div>`;
   }
+  renderGoals();
 }
 function exportBackup(){
   const payload={app:'amarelo',format:1,exportedAt:new Date().toISOString(),data:storage.snapshot()};
