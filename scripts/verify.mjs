@@ -30,7 +30,13 @@ const required = [
   "function decisionDrivers",
   "function interpretAsk",
   "function openVersionCompare",
-  "LABORATÓRIO DE CENÁRIOS"
+  "LABORATÓRIO DE CENÁRIOS",
+  "portabilidade-divida",
+  "trocar-carro",
+  "debtPortability",
+  "carDecision",
+  "Portabilidade de Dívida",
+  "Trocar de Carro x Manter o Atual"
 ];
 
 for (const marker of required) {
@@ -50,7 +56,9 @@ for (const id of [
   "renda-fixa",
   "gross-up",
   "aposentadoria",
-  "salario-liquido"
+  "salario-liquido",
+  "portabilidade-divida",
+  "trocar-carro"
 ]) {
   if (!ids.includes(id)) throw new Error(`Missing priority decision engine: ${id}`);
 }
@@ -68,4 +76,4 @@ for (const forbidden of ["azul-planejamento", "verde-market", "dourado"]) {
   if (productionSurface.includes(forbidden)) throw new Error(`Cross-project reference detected: ${forbidden}`);
 }
 
-console.log(`AMARELO verification passed: ${ids.length} tools, V12 decision system, isolated Worker.`);
+console.log(`AMARELO verification passed: ${ids.length} tools, V13 product expansion, isolated Worker.`);
