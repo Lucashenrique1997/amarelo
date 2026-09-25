@@ -4,97 +4,110 @@
 
 > Antes de decidir, coloque na conta.
 
-O AMARELO transforma dúvidas financeiras reais em cenários comparáveis, com premissas visíveis, ponto de equilíbrio, sensibilidade, versões e acompanhamento.
+## Estado do projeto
+O desenvolvimento agora está concentrado em uma única entrega: **AMARELO 1.0**.
 
-## Arquitetura
-- GitHub: código, branches, pull requests e histórico
-- Cloudflare Workers + Static Assets: frontend e APIs
-- Cloudflare D1: banco planejado e schema versionado
-- Worker de produção: `amarelo` no ambiente Cloudflare LUCAS DEV
-- Domínio definitivo planejado: `oamarelo.com.br`
+Não existe mais ciclo de V18/V19/V20. A branch `release/amarelo-1.0` permanece aberta até cumprir o Definition of Done.
 
-## Regra de isolamento
-O AMARELO é isolado de Azul, Verde e Dourado. Nenhum banco, deploy, variável, domínio, segredo ou recurso deve ser compartilhado entre os projetos.
+## Produto 1.0
+Lançamento consumidor:
+- **Free**
+- **PRO**
 
-## Fluxo de desenvolvimento
-`branch -> commits -> pull request -> CI -> merge em main -> publicação Cloudflare -> verificação`
+Fora do 1.0:
+- Família
+- Professional
+- Open Finance
+- app nativo
+- white label
+- integrações com bancos/corretoras
 
-Nunca considerar um deploy concluído apenas porque houve merge. Produção deve ser verificada.
+## Arquitetura frontend
+```
+public/
+  index.html
+  assets/
+    app.css
+    catalog.js
+    finance-core.js
+    decision-config.js
+    decision-engines.js
+    data-store.js
+    app.js
+```
 
-## Produto atual
+Responsabilidades separadas:
+- shell;
+- visual;
+- catálogo;
+- matemática;
+- configuração;
+- execução de motores;
+- dados;
+- UI/estado.
 
-### Free
-- ferramentas rápidas;
-- simulações básicas;
-- até 3 decisões salvas localmente;
-- biblioteca de decisões.
+## Backend
+```
+src/
+  worker.js
+  api/
+  config/
+  db/
+  http/
+```
 
-### PRO Preview
-Durante a beta, o PRO está liberado sem cobrança:
-- motores de decisão;
-- Base / Conservador / Otimista;
-- break-even;
-- sensibilidade;
-- “E se?”;
-- versões;
-- fila de revisão;
-- relatórios;
-- comparação de versões.
+O Worker não expõe CRUD financeiro sem autenticação.
 
-Preço-alvo de lançamento: **R$ 24,90/mês**, condicionado à persistência e conta online.
+## Banco
+Migrations:
+- `0001_initial.sql`
+- `0002_commercial_readiness.sql`
 
-### Família e Professional
-Estão em desenvolvimento e **não devem ser vendidos como produtos ativos**.
+Repository layer já existe para:
+- decisões e versões;
+- perfil;
+- workspaces.
 
-## Persistência
-Hoje:
-- decisões, perfil e preferências ficam no navegador;
-- `/api/health` informa se o D1 está vinculado;
-- `/api/capabilities` expõe o estado real das capacidades da beta.
+O binding D1 ainda não está ativo.
 
-Preparado no schema:
-- usuários;
-- sessões;
-- decisões;
-- versões;
-- workspaces;
-- membros;
-- perfis financeiros;
-- clientes;
-- metas;
-- assinaturas.
+## Qualidade
+CI do 1.0 valida:
+- arquitetura;
+- isolamento do projeto;
+- catálogo;
+- ausência de regressão para monólito;
+- finance-core;
+- 12 motores prioritários.
 
-Ainda não ativo:
-- autenticação;
-- persistência/sincronização D1;
-- cobrança;
-- IA interpretativa real.
+Comandos:
+```bash
+npm run verify
+npm run test:finance
+npm run test:engines
+npm test
+```
 
-## IA
-A matemática deve permanecer determinística e testável.
+Sem dependências npm de runtime nesta fase.
 
-“Pergunte ao AMARELO” atualmente faz roteamento e extração estruturada em beta. Uma camada de IA interpretativa real só deve ser anunciada quando estiver conectada e validada.
+## Comercial
+Durante a beta:
+- sem cobrança;
+- Free ativo;
+- PRO Preview ativo;
+- R$ 24,90/mês é preço-alvo de lançamento;
+- Família e Professional não são vendáveis.
 
-## Direção visual
-- amarelo como assinatura;
-- fundo quente e preto suave;
-- linguagem editorial;
-- decisões antes de ferramentas;
-- resultado como workspace;
-- mobile first.
-
-## Guardrails comerciais
-- não anunciar funcionalidade inexistente;
-- não cobrar durante a beta atual;
-- não ativar Família/Professional antes dos respectivos workspaces;
-- não afirmar sincronização enquanto os dados estiverem em localStorage;
-- não chamar roteamento local de “IA real”;
-- não integrar processador de pagamento sem aprovação explícita;
-- regras tributárias e regulatórias precisam de baseline atualizada antes do lançamento comercial.
+## Cloudflare
+Ambiente: **LUCAS DEV**  
+Worker: `amarelo`  
+URL temporária validada: `amarelo.lucas-dev-260.workers.dev`
 
 ## Documentos principais
+- `docs/AMARELO_1_0_RELEASE_PLAN.md`
+- `docs/ARCHITECTURE_1_0.md`
 - `docs/PRODUCT_NORTH_STAR.md`
-- `docs/VISUAL_SYSTEM_V11.md`
-- `docs/DECISION_ENGINES_V10.md`
-- `docs/V16_PRO_DEPTH_RETENTION.md`
 - `docs/COMMERCIAL_READINESS_V17.md`
+- `DEPLOY.md`
+
+## Regra de isolamento
+Nada do AMARELO deve compartilhar banco, segredo, deploy ou recurso com Azul, Verde ou Dourado.
