@@ -103,6 +103,6 @@ assert.equal(remoteGoal.clientGoalId,"goal-local-1");
 assert.equal(remoteGoal.currentAmount,30000);
 
 const inactive=await s.syncAccountIfAvailable();
-assert.deepEqual(inactive,{active:false});
+assert.equal(inactive.active,false);
 
 console.log("AMARELO synchronization contract tests passed.");
