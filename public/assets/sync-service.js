@@ -49,6 +49,7 @@ function localVersionPayload(v){
     status:'active',
     scenarioLabel:v.scenarioLabel||null,
     clientVersionId:String(v.id),
+    clientCreatedAt:v.date||new Date().toISOString(),
     inputs:v.assumptions||{},
     outputs:{
       primary:v.primary||'',
@@ -70,6 +71,7 @@ function remoteVersionToLocal(decision,version){
     id:stableLocalNumericId(version.id),
     remoteVersionId:version.id,
     remoteDecisionId:decision.id,
+    clientVersionId:version.client_version_id||null,
     toolId:decision.tool_id,
     title:decision.title,
     decisionName:decision.decision_name||decision.title,
@@ -106,6 +108,9 @@ async function pushLocalDecisions(){
       const payload={...localVersionPayload(version),...(remoteId?{decisionId:remoteId}:{})};
       const response=await amareloApi.saveDecision(payload);
       remoteId=response.decisionId;
+      const map=storage.get('amarelo_remote_decisions',{});
+      map[group.key]=remoteId;
+      storage.set('amarelo_remote_decisions',map);
     }
   }
 }
@@ -123,8 +128,12 @@ async function hydrateRemoteDecisions(){
 
   const local=saved();
   const merged=new Map();
-  for(const item of [...local,...remoteVersions]){
-    const key=item.remoteVersionId?'remote:'+item.remoteVersionId:'local:'+String(item.id);
+  for(const item of local){
+    const key='client:'+String(item.clientVersionId||item.id);
+    merged.set(key,item);
+  }
+  for(const item of remoteVersions){
+    const key=item.clientVersionId?'client:'+String(item.clientVersionId):'remote:'+String(item.remoteVersionId);
     merged.set(key,item);
   }
   const values=[...merged.values()].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,500);
@@ -163,4 +172,25 @@ async function syncAccountIfAvailable(){
     console.warn('AMARELO sync unavailable',String(error?.message||error));
     return {active:true,ok:false};
   }
+}
+
+async function syncDecisionVersionIfAvailable(version){
+  if(!(runtimeCapabilities.persistence&&runtimeCapabilities.authentication))return null;
+  try{
+    const key=savedDecisionKey(version);
+    const map=storage.get('amarelo_remote_decisions',{});
+    const payload={...localVersionPayload(version),...(map[key]?{decisionId:map[key]}:{})};
+    const response=await amareloApi.saveDecision(payload);
+    map[key]=response.decisionId;
+    storage.set('amarelo_remote_decisions',map);
+    return response;
+  }catch(error){
+    console.warn('AMARELO decision sync failed',String(error?.message||error));
+    return null;
+  }
+}
+async function syncProfileIfAvailable(profile){
+  if(!(runtimeCapabilities.persistence&&runtimeCapabilities.authentication))return null;
+  try{return await amareloApi.updateProfile(localProfileToApi(profile))}
+  catch(error){console.warn('AMARELO profile sync failed',String(error?.message||error));return null}
 }
