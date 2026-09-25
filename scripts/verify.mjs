@@ -28,7 +28,7 @@ const productionSurface = (frontend + "\n" + backend).toLowerCase();
 
 if (html !== rootHtml) throw new Error("Root preview and public application shell are out of sync.");
 if (/<style[\s>]/i.test(html)) throw new Error("Application shell must not contain inline CSS.");
-if (/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/i.test(html)) throw new Error("Application shell must not contain inline JavaScript.");
+if (/<script(?![^>]*\bsrc=)[^>]*>[\s\S]*?<\/script>/i.test(html)) throw new Error("Application shell must not contain inline JavaScript.");
 
 const requiredAssets = [
   "/assets/app.css",
