@@ -366,6 +366,36 @@ body:before{
 .journey:hover:before{transform:scale(1.35);opacity:.23}
 @media(max-width:760px){.libraryBar{display:block}.libraryCount{display:none}}
 
+
+/* V11 final visual polish */
+:focus-visible{outline:3px solid rgba(255,213,34,.75);outline-offset:3px}
+input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shadow:0 0 0 3px rgba(255,213,34,.10)}
+.pricingPrinciple{display:flex;align-items:center;gap:9px;margin:24px 0 0;font-size:9px;color:#8b8477}
+.pricingPrinciple span{font-size:7px;font-weight:950;letter-spacing:.13em;background:var(--v11-ink);color:#fff;border-radius:999px;padding:7px 9px}
+.pricingPrinciple span:nth-of-type(2){background:var(--v11-yellow);color:var(--v11-ink)}
+.pricingPrinciple b{font-size:9px;color:#6d665a}.pricingPrinciple i{font-style:normal;color:#b1aa9e}
+.pricing{grid-template-columns:.88fr 1.16fr .93fr .93fr}
+.plan{display:flex;flex-direction:column}.plan ul{flex:1}.featuredPlan:after{content:"";position:absolute;width:150px;height:150px;border-radius:50%;background:var(--v11-yellow);right:-95px;bottom:-100px;opacity:.08}
+.productSignature{margin-top:30px;border-top:1px solid rgba(19,19,14,.09);border-bottom:1px solid rgba(19,19,14,.09);background:rgba(255,255,255,.24)}
+.productSignature .shell{min-height:320px;display:grid;grid-template-columns:.45fr 1.55fr;align-items:center;gap:50px}
+.productSignature span{font-size:8px;font-weight:950;letter-spacing:.15em;color:#9a8420}
+.productSignature p{font-size:44px;line-height:1.02;letter-spacing:-.045em;margin:0;color:#817a6d}
+.productSignature p b{color:var(--v11-ink);font-weight:850}
+.field input:hover,.field select:hover,.modalCard input:hover{border-color:#c9c0aa}
+.inputPanel .groupTitle:not(:first-child){padding-top:7px;border-top:1px solid rgba(19,19,14,.07)}
+.resultBox strong,.resultBox b{color:#fff}
+.breakEvenBox{position:relative}
+.mobileNav{padding-bottom:max(7px,env(safe-area-inset-bottom))}
+.mobileNav button{transition:.18s}
+.mobileNav button:active{transform:scale(.96)}
+@media(max-width:1050px){.pricing{grid-template-columns:1fr 1fr}.productSignature .shell{grid-template-columns:1fr;gap:15px;padding-top:65px;padding-bottom:65px;min-height:auto}}
+@media(max-width:760px){
+  .pricingPrinciple{flex-wrap:wrap}.pricing{grid-template-columns:1fr}
+  .productSignature .shell{padding-top:52px;padding-bottom:52px}.productSignature p{font-size:34px}
+  .mobileNav{bottom:max(8px,env(safe-area-inset-bottom))}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.001ms!important;transition-duration:.001ms!important}}
+
 </style>
 </head>
 <body>
@@ -502,6 +532,7 @@ body:before{
     <div class="pricingEyebrow"><span class="kicker">PLANOS</span><b>FREE → PRO → FAMÍLIA → PROFESSIONAL</b></div>
     <h1 class="pricingTitle">Grátis para calcular. PRO para decidir com profundidade.</h1>
     <p class="pricingLead">Os valores exibidos são hipóteses de validação comercial, não uma oferta definitiva. A diferença central está na profundidade, continuidade e histórico.</p>
+    <div class="pricingPrinciple"><span>FREE</span><b>resolve a conta</b><i>→</i><span>PRO</span><b>acompanha a decisão</b></div>
     <div class="pricing">
       <article class="plan">
         <span>FREE</span><h2>R$ 0</h2><p>Para contas rápidas do dia a dia.</p>
@@ -576,6 +607,13 @@ body:before{
     </div>
   </section>
 </main>
+
+<section class="productSignature">
+  <div class="shell">
+    <span>AMARELO / PRINCÍPIO 01</span>
+    <p>Não é sobre prever o futuro.<br><b>É sobre saber o que muda a decisão.</b></p>
+  </div>
+</section>
 
 <div id="profileModal" class="modal hidden">
   <div class="modalCard">
