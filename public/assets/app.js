@@ -763,7 +763,33 @@ function renderDashboard(){
     $('nextDecision').innerHTML=`<div class="miniTool" onclick="openTool('${next[0]}')"><i>→</i><div><b>${tools.find(t=>t.id===next[0])?.title||'Próxima análise'}</b><p class="muted">${next[1]}</p></div></div>`;
   }
 }
+function exportBackup(){
+  const payload={app:'amarelo',format:1,exportedAt:new Date().toISOString(),data:storage.snapshot()};
+  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;a.download='amarelo-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
+  toast('Backup do AMARELO exportado.');
+}
+async function importBackupFile(event){
+  const input=event?.target,file=input?.files?.[0];if(!file)return;
+  try{
+    const payload=JSON.parse(await file.text());
+    if(payload?.app!=='amarelo'||payload?.format!==1||!payload?.data||typeof payload.data!=='object')throw new Error('backup inválido');
+    const entries=Object.entries(payload.data).filter(([key])=>key.startsWith('amarelo_'));
+    if(!entries.length)throw new Error('backup vazio');
+    entries.forEach(([key,value])=>storage.set(key,value));
+    state.plan=storage.get('amarelo_plan','free');
+    toast('Backup restaurado neste navegador.');
+    renderDashboard();renderHome();
+  }catch(err){console.error('AMARELO backup import error',err);toast('Não foi possível importar este backup.')}
+  finally{if(input)input.value=''}
+}
+
 function openProfile(){let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0});for(const k in p){let el=$('profile'+k[0].toUpperCase()+k.slice(1));if(el)el.value=p[k]}$('profileModal').classList.remove('hidden')}
 function closeProfile(){$('profileModal').classList.add('hidden')}
 function saveProfile(){let p={income:num('profileIncome'),wealth:num('profileWealth'),essentials:num('profileEssentials'),reserve:num('profileReserve'),monthly:num('profileMonthly'),age:num('profileAge')};storage.set('amarelo_profile',p);closeProfile();renderDashboard();toast('Perfil salvo neste navegador.')}
 renderHome();renderAskExamples();navigate('home');
+
+window.addEventListener('error',event=>console.error('AMARELO runtime error',{message:event.message,filename:event.filename,lineno:event.lineno,colno:event.colno}));
+window.addEventListener('unhandledrejection',event=>console.error('AMARELO unhandled promise rejection',String(event.reason?.message||event.reason||'unknown')));
