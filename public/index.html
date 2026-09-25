@@ -103,6 +103,17 @@ body{background:
 
 .toolCard{display:flex;flex-direction:column}.toolCard p{flex:1}.toolCardFoot{display:flex;justify-content:space-between;align-items:end;gap:8px;margin-top:14px}.toolCardFoot .tierTag{margin-top:0}.toolCardFoot b{font-size:9px;color:#7b7050;white-space:nowrap}.decisionCard{background:linear-gradient(180deg,#fffdf8,#fff8d8);border-color:#e3d38c}.decisionCard .toolIcon{background:var(--yellow)}
 
+
+.mobileNav{display:none}
+@media(max-width:760px){
+ body{padding-bottom:76px}
+ .mobileNav{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;z-index:90;left:10px;right:10px;bottom:10px;padding:7px;background:rgba(23,22,15,.94);backdrop-filter:blur(18px);border:1px solid #302f26;border-radius:22px;box-shadow:0 16px 50px rgba(0,0,0,.28)}
+ .mobileNav button{border:0;background:transparent;color:#aaa99f;border-radius:15px;padding:7px 4px;display:grid;place-items:center;gap:3px;cursor:pointer}
+ .mobileNav button span{font-size:15px;color:var(--yellow);line-height:1}
+ .mobileNav button b{font-size:8px;font-weight:850;letter-spacing:.01em}
+ .topbar .nav nav .btn{display:none}
+}
+
 </style>
 </head>
 <body>
@@ -117,6 +128,13 @@ body{background:
     </nav>
   </div>
 </header>
+
+<nav class="mobileNav" aria-label="Navegação principal">
+  <button data-route="home"><span>⌂</span><b>Início</b></button>
+  <button data-route="tools"><span>◎</span><b>Decisões</b></button>
+  <button data-route="dashboard"><span>▦</span><b>Meu AMARELO</b></button>
+  <button data-route="ask"><span>?</span><b>Pergunte</b></button>
+</nav>
 
 <main id="app">
   <section id="route-home" class="route">
