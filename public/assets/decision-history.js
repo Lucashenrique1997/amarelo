@@ -35,7 +35,17 @@ function openSavedDecision(id){
   if(d.mode==='advanced')setMode('advanced');
   toast(`Versão ${d.version||1} restaurada.`);
 }
-function deleteDecision(id){storage.set('amarelo_decisions',saved().filter(x=>x.id!==id));renderDashboard();toast('Versão removida deste navegador.')}
+async function deleteDecision(id){
+  const items=saved(),item=items.find(x=>String(x.id)===String(id));
+  if(!item)return;
+  if(runtimeCapabilities.persistence&&runtimeCapabilities.authentication&&item.remoteDecisionId&&item.remoteVersionId){
+    try{await amareloApi.deleteDecisionVersion(item.remoteDecisionId,item.remoteVersionId)}
+    catch(error){console.warn('AMARELO remote delete failed',String(error?.message||error));return toast('Não foi possível excluir a versão sincronizada.')}
+  }
+  storage.set('amarelo_decisions',items.filter(x=>String(x.id)!==String(id)));
+  renderDashboard();
+  toast(runtimeCapabilities.persistence&&runtimeCapabilities.authentication?'Versão excluída.':'Versão removida deste navegador.');
+}
 
 function decisionDocumentId(decisionKey){
   let hash=2166136261;
