@@ -1,7 +1,7 @@
 export async function listGoals(db, userId) {
   return db.prepare(
     `SELECT id, name, target_amount, current_amount, target_date, metadata_json,
-            created_at, updated_at
+            client_goal_id, created_at, updated_at
        FROM goals
       WHERE user_id = ?
       ORDER BY updated_at DESC`
