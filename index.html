@@ -122,7 +122,12 @@
   <section id="route-dashboard" class="route hidden shell page">
     <div class="dashHead">
       <div><span class="kicker">MEU AMARELO</span><h1>Sua vida financeira, organizada por decisões.</h1><p>Salve análises, acompanhe premissas e volte quando sua realidade mudar. Nesta fase, os dados ficam somente neste navegador.</p></div>
-      <button class="btn yellow" onclick="openProfile()">Editar meu perfil</button>
+      <div class="dashActions">
+        <button class="btn light" onclick="exportBackup()">Exportar backup</button>
+        <button class="btn light" onclick="document.getElementById('backupInput').click()">Importar backup</button>
+        <button class="btn yellow" onclick="openProfile()">Editar meu perfil</button>
+        <input id="backupInput" type="file" accept="application/json,.json" hidden onchange="importBackupFile(event)">
+      </div>
     </div>
     <div class="dashboardSignal"><span><i></i> Visão pessoal</span><p>Seu contexto muda. Suas decisões também. Volte, ajuste premissas e compare versões.</p></div>
     <div id="profileSummary" class="profileSummary"></div>
