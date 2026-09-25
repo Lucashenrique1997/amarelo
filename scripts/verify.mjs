@@ -17,7 +17,12 @@ const required = [
   "finSystem",
   "loanSystem",
   "propertyTax",
-  "acumulação + fase de renda"
+  "acumulação + fase de renda",
+  "AMARELO V11",
+  "decisionCockpit",
+  "dashboardSignal",
+  "toolWorkspaceMeta",
+  "productSignature"
 ];
 
 for (const marker of required) {
