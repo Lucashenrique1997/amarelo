@@ -26,6 +26,7 @@ assert.equal(cap.persistence, false);
 assert.equal(cap.authentication, false);
 assert.equal(capabilities.headers.get("X-Content-Type-Options"), "nosniff");
 assert.equal(capabilities.headers.get("Cache-Control"), "no-store");
+assert.ok(capabilities.headers.get("X-Request-ID"));
 
 const health = await call("/api/health");
 assert.equal(health.status, 200);
@@ -45,3 +46,17 @@ assert.equal(asset.headers.get("X-Frame-Options"), "DENY");
 assert.equal(asset.headers.get("Cross-Origin-Opener-Policy"), "same-origin");
 
 console.log("AMARELO Worker/API contract tests passed.");
+
+const failingEnv = {
+  ASSETS: {
+    async fetch() {
+      throw new Error("synthetic asset failure");
+    }
+  }
+};
+const safeFailure = await worker.fetch(new Request("https://amarelo.test/failure"), failingEnv);
+assert.equal(safeFailure.status, 500);
+const failureBody = await safeFailure.json();
+assert.equal(failureBody.error, "internal_error");
+assert.ok(failureBody.requestId);
+assert.equal(safeFailure.headers.get("X-Request-ID"), failureBody.requestId);
