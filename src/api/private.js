@@ -91,5 +91,36 @@ export async function handlePrivateApi(request, env, url) {
     return Response.json({ ok: true, entitlements: await getEntitlements(env.DB, userId) });
   }
 
+  if (url.pathname === "/api/v1/export") {
+    if (request.method !== "GET") return jsonError("method_not_allowed", 405);
+    const [profile, decisionList, goalList, workspaceList, entitlements] = await Promise.all([
+      getProfile(env.DB, userId),
+      listDecisions(env.DB, userId, 500),
+      listGoals(env.DB, userId),
+      listWorkspaces(env.DB, userId),
+      getEntitlements(env.DB, userId)
+    ]);
+    const decisions = decisionList.results || [];
+    const versions = {};
+    for (const decision of decisions) {
+      const result = await listDecisionVersions(env.DB, userId, decision.id);
+      versions[decision.id] = result.results || [];
+    }
+    return Response.json({
+      ok: true,
+      export: {
+        app: "amarelo",
+        format: 1,
+        exportedAt: new Date().toISOString(),
+        profile,
+        decisions,
+        versions,
+        goals: goalList.results || [],
+        workspaces: workspaceList.results || [],
+        entitlements
+      }
+    });
+  }
+
   return jsonError("not_found", 404);
 }
