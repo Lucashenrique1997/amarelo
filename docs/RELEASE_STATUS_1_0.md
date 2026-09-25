@@ -5,157 +5,148 @@ Atualizado em 25/09/2026.
 ## Situação
 A fase de protótipo incremental terminou.
 
-O projeto está em uma única release:
-- Branch: `release/amarelo-1.0`
-- PR macro: #11
-- Produção atual permanece na `main`
-- O PR continua em draft até os gates de lançamento serem cumpridos.
+Existe uma única release:
+- branch: `release/amarelo-1.0`;
+- PR macro: **#11**;
+- PR permanece em draft;
+- produção atual permanece na `main`;
+- último CI da release: verde antes desta atualização documental.
 
-## O que já está estruturalmente resolvido
+## Estrutura resolvida
 
-### Produto
-- catálogo amplo de ferramentas;
-- 12 motores prioritários definidos;
-- padrão PRO com cenários, E se?, drivers, sensibilidade, break-even e relatório;
-- Meu AMARELO;
-- decisões e versões;
-- linha do tempo;
-- fila de revisão;
-- metas acompanhadas;
-- onboarding;
-- backup local;
-- Free e PRO com promessa comercial coerente.
-
-### Engenharia
-Frontend modular:
-- shell;
-- visual;
+### Frontend modular
+- shell HTML;
+- sistema visual;
 - catálogo;
 - finance-core;
-- configuração;
-- cenários;
-- motores;
+- configuração de motores;
+- cenários/what-if/drivers;
+- execução dos motores;
 - data store;
-- capabilities;
+- runtime capabilities;
 - API client;
 - sync service;
-- histórico/relatório;
+- decisões/versões/relatórios;
 - metas;
 - dashboard;
 - runtime principal.
 
-Backend modular:
+### Backend modular
 - Worker;
-- API router;
+- router;
+- health/capabilities;
 - sessão;
-- perfil;
-- decisões;
-- versões;
-- workspaces;
-- metas;
-- entitlements;
-- exportação;
-- segurança.
+- APIs privadas;
+- repositories D1;
+- segurança;
+- rate limiting;
+- identidade provider-neutral;
+- billing provider-neutral.
 
-### D1 pronto em código
-Migrations:
+### Banco pronto em código
+Migrations append-only:
 1. schema inicial;
 2. commercial readiness;
-3. segurança de sincronização de versões;
-4. segurança de sincronização de metas.
+3. sync de versões;
+4. sync de metas;
+5. rate limits;
+6. identidade + billing provider-neutral.
 
-A migração local -> conta é idempotente:
-- `clientVersionId`;
-- `clientGoalId`.
+O CI agora aplica todas as migrations em SQLite antes do merge.
 
-### Segurança
-- nenhuma API privada anônima;
-- user_id vem da sessão do servidor;
-- headers de segurança;
-- API JSON com no-store;
-- request ID;
-- erro 500 sanitizado;
-- logs sem body financeiro;
-- exportação de dados preparada.
-
-### Qualidade
-CI cobre:
-- arquitetura;
-- isolamento do AMARELO;
+## Qualidade
+Cobertura automática:
+- arquitetura e isolamento;
 - finance-core;
 - 12 motores prioritários;
 - edge cases;
 - Worker/API;
-- sincronização.
+- sessão e segurança;
+- billing lifecycle;
+- contratos de UI;
+- sincronização;
+- migrations.
 
-## O que está implementado mas aguardando ativação
-
-### Conta + persistência
-Código pronto:
-- API de perfil;
-- decisões;
-- versões;
+## Produto
+Já implementado:
+- 42 ferramentas;
+- 12 motores prioritários em padrão ouro;
+- cenários;
+- E se?;
+- drivers;
+- break-even;
+- sensibilidade;
+- relatórios;
+- histórico e timeline;
+- fila de revisão;
 - metas;
-- workspaces;
-- sync;
-- entitlement;
-- exportação.
+- backup local;
+- sync local -> conta preparado;
+- entitlement server-side preparado;
+- PRO Beta sem cobrança.
 
-Bloqueio:
-- D1 real;
-- binding DB;
-- autenticação real;
-- migrations aplicadas.
+## Segurança pronta em código
+- token de sessão opaco de 256 bits;
+- somente hash da sessão no D1;
+- cookie HttpOnly/Secure/SameSite;
+- logout;
+- revogação de todas as sessões;
+- same-origin em mutações;
+- rate limit D1;
+- request ID;
+- erro 500 sanitizado;
+- logs sem body financeiro;
+- exportação autenticada;
+- headers de segurança.
 
-### PRO
-Código pronto:
-- entitlement server-side;
-- feature flags;
-- PRO Beta preservado sem cobrança.
+## Comercial
+No 1.0 entram somente:
+- Free;
+- PRO.
 
-Bloqueio:
-- processador de pagamento;
-- checkout/ciclo de assinatura.
+Família e Professional permanecem pós-1.0.
 
-## Bloqueios que exigem decisão/ação do responsável
+Cobrança continua desativada.
 
-### 1. Cloudflare D1
-Necessário criar o banco exclusivo `amarelo`, vincular `DB` e aplicar migrations.
+## O que realmente bloqueia o lançamento
 
-### 2. Estratégia de autenticação
-Precisa ser aprovada antes de cadastro/login/recuperação.
+### 1. D1 no Cloudflare — ação de conta
+- criar banco exclusivo `amarelo`;
+- vincular binding `DB`;
+- aplicar migrations 0001–0006.
 
-### 3. Pagamento
-Precisa escolher e aprovar processador/custos antes de cobrança.
+### 2. Identidade — decisão
+A infraestrutura de sessão e identidades está pronta, mas ainda é necessário aprovar a estratégia de autenticação antes de criar cadastro/login/recuperação.
 
-### 4. Domínio
-Confirmar registro e apontamento de `oamarelo.com.br`.
+### 3. Pagamento — decisão
+Lifecycle, entitlement, schema e idempotência estão prontos. Falta escolher o processador para checkout/webhook/cancelamento real.
 
-### 5. Jurídico/comercial final
-Aprovar:
-- responsável legal;
-- canal de suporte/privacidade;
+### 4. Domínio — ação de conta
+Confirmar registro e apontar `oamarelo.com.br`.
+
+### 5. Jurídico/comercial — aprovação
+Rascunhos já existem:
+- privacidade;
 - termos;
-- política de privacidade;
-- retenção/exclusão;
-- preço final.
+- retenção/exclusão.
 
-## Última milha após os bloqueios
+Faltam dados do responsável e aprovação final.
+
+### 6. Última milha
 Depois dos cinco pontos acima:
-1. ativar conta;
-2. validar persistência multi-dispositivo;
-3. ativar checkout;
-4. revisar regras oficiais;
-5. QA visual desktop/mobile;
-6. smoke test em produção;
-7. tirar PR #11 de draft;
-8. merge na main;
-9. verificar Cloudflare;
-10. declarar AMARELO 1.0 lançado.
+- ativar login;
+- validar sync multi-dispositivo;
+- ativar cobrança;
+- revisar baseline regulatória imediatamente antes do lançamento;
+- smoke visual final;
+- health/capabilities em produção;
+- tirar PR #11 de draft;
+- merge;
+- verificar Cloudflare;
+- lançar.
 
-## Regra operacional
-Não criar nova versão numerada para cada melhoria.
+## Regra
+Não criar V18/V19/V20.
 
-Toda alteração necessária ao lançamento entra no PR #11 até o Definition of Done.
-
-Itens não essenciais vão para pós-1.0.
+Qualquer item necessário ao lançamento entra no PR #11.  
+Qualquer ideia não necessária ao 1.0 vai para pós-lançamento.
