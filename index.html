@@ -100,6 +100,9 @@ body{background:
 
 .assumptionBox{margin-top:14px}.assumptionList{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.assumptionChip{min-width:120px;flex:1 1 120px;border:1px solid #333229;background:#191912;border-radius:14px;padding:10px}.assumptionChip small{display:block;color:#8f8e84;font-size:8px;line-height:1.25;margin-bottom:4px}.assumptionChip b{font-size:10px;color:#e6e3d8;font-weight:800}.advancedAssumption{border-style:dashed}
 
+
+.toolCard{display:flex;flex-direction:column}.toolCard p{flex:1}.toolCardFoot{display:flex;justify-content:space-between;align-items:end;gap:8px;margin-top:14px}.toolCardFoot .tierTag{margin-top:0}.toolCardFoot b{font-size:9px;color:#7b7050;white-space:nowrap}.decisionCard{background:linear-gradient(180deg,#fffdf8,#fff8d8);border-color:#e3d38c}.decisionCard .toolIcon{background:var(--yellow)}
+
 </style>
 </head>
 <body>
@@ -338,7 +341,7 @@ const journeys=[
 ['Dívidas','!','Quero resolver uma dívida','Cartão, empréstimo, renegociação e quitação.'],
 ['Planejar','∞','Quero planejar meu futuro','Reserva, metas, previdência e viver de renda.'],
 ['Trabalho','R$','Quero entender meu salário','Salário, férias, 13º, INSS, IRRF e FGTS.'],
-['Patrimônio','◎','Quero cuidar do meu patrimônio','Comprar x alugar, custo real e evolução patrimonial.']
+['Decidir','◎','Quero comparar caminhos','Amortizar ou investir, custo de oportunidade e decisões de patrimônio.']
 ];
 
 const tools=[
@@ -396,7 +399,7 @@ function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show')
 function favs(){return storage.get('amarelo_favs',[])}function saved(){return storage.get('amarelo_decisions',[])}
 function isFav(id){return favs().includes(id)}
 function toggleFav(id){let f=favs();f=f.includes(id)?f.filter(x=>x!==id):[...f,id];storage.set('amarelo_favs',f);renderHome();renderTools($('toolSearch')?.value||'');if(state.current?.id===id)updateFav()}
-function toolCard(t){return `<article class="toolCard" onclick="openTool('${t.id}')"><button class="favStar ${isFav(t.id)?'on':''}" onclick="event.stopPropagation();toggleFav('${t.id}')">${isFav(t.id)?'★':'☆'}</button><div class="toolIcon">${t.icon}</div><div class="cat">${t.cat}</div><h3>${t.title}</h3><p>${t.desc}</p><span class="tierTag ${t.tier}">${t.tier==='decision'?'Decisão PRO':t.tier==='pro'?'PRO':'Grátis'}</span></article>`}
+function toolCard(t){return `<article class="toolCard ${t.tier==='decision'?'decisionCard':''}" onclick="openTool('${t.id}')"><button class="favStar ${isFav(t.id)?'on':''}" onclick="event.stopPropagation();toggleFav('${t.id}')">${isFav(t.id)?'★':'☆'}</button><div class="toolIcon">${t.icon}</div><div class="cat">${t.cat}</div><h3>${t.title}</h3><p>${t.desc}</p><div class="toolCardFoot"><span class="tierTag ${t.tier}">${t.tier==='decision'?'Decisão PRO':t.tier==='pro'?'PRO':'Grátis'}</span><b>Colocar na conta →</b></div></article>`}
 function renderHome(){$('journeys').innerHTML=journeys.map(j=>`<div class="journey" onclick="state.category='${j[0]}';navigate('tools')"><div class="jicon">${j[1]}</div><h3>${j[2]}</h3><p>${j[3]}</p><small>Explorar ${j[0]} →</small></div>`).join('');$('featured').innerHTML=tools.filter(t=>t.featured).slice(0,8).map(toolCard).join('')}
 function renderTools(q=''){let s=q.toLowerCase();$('filters').innerHTML=categories.map(c=>`<button class="${state.category===c?'active':''}" onclick="state.category='${c}';renderTools(document.getElementById('toolSearch').value)">${c}</button>`).join('');let arr=tools.filter(t=>(state.category==='Todas'||t.cat===state.category)&&(!s||(t.title+' '+t.desc+' '+t.cat).toLowerCase().includes(s)));$('toolLibrary').innerHTML=arr.map(toolCard).join('')}
 function renderAskExamples(){let ex=[['Tenho R$ 100 mil e um financiamento. Amortizo ou invisto?','amortizar-investir'],['LCI 92% do CDI ou CDB 110%?','gross-up'],['Comprar imóvel ou continuar alugando?','comprar-alugar'],['Quanto preciso para aposentar recebendo R$ 10 mil?','aposentadoria']];$('askSuggestions').innerHTML=ex.map(x=>`<div class="askSuggestion" onclick="document.getElementById('askText').value='${x[0]}';openTool('${x[1]}')"><b>${x[0]}</b><p>Abrir análise relacionada →</p></div>`).join('')}
