@@ -52,6 +52,6 @@ async function importBackupFile(event){
   finally{if(input)input.value=''}
 }
 
-function openProfile(){let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0});for(const k in p){let el=$('profile'+k[0].toUpperCase()+k.slice(1));if(el)el.value=p[k]}$('profileModal').classList.remove('hidden')}
+function openProfile(){let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0});for(const k in p){let el=$('profile'+k[0].toUpperCase()+k.slice(1));if(el)el.value=p[k]}let privacy=$('profilePrivacy');if(privacy)privacy.textContent=runtimeCapabilities.persistence&&runtimeCapabilities.authentication?'Os dados serão sincronizados com sua conta AMARELO.':'Nesta versão os dados ficam somente neste navegador.';$('profileModal').classList.remove('hidden')}
 function closeProfile(){$('profileModal').classList.add('hidden')}
 function saveProfile(){let p={income:num('profileIncome'),wealth:num('profileWealth'),essentials:num('profileEssentials'),reserve:num('profileReserve'),monthly:num('profileMonthly'),age:num('profileAge')};storage.set('amarelo_profile',p);syncProfileIfAvailable(p);closeProfile();renderDashboard();toast(runtimeCapabilities.persistence&&runtimeCapabilities.authentication?'Perfil salvo e sincronizado.':'Perfil salvo neste navegador.')}
