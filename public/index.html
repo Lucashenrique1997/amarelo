@@ -8,11 +8,22 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="AMARELO">
 <title>AMARELO — Antes de decidir, coloque na conta.</title>
-<meta name="description" content="Sua central de decisões financeiras: ferramentas, comparações, metas e planejamento em um só lugar.">
+<meta name="description" content="Compare decisões financeiras com cenários, ponto de equilíbrio, sensibilidade e histórico. Antes de decidir, coloque na conta.">
+<meta name="robots" content="index,follow">
+<meta name="color-scheme" content="light">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:site_name" content="AMARELO">
+<meta property="og:title" content="AMARELO — Antes de decidir, coloque na conta.">
+<meta property="og:description" content="Crédito, investimentos, tempo e patrimônio na mesma decisão.">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="AMARELO — Decisões financeiras com contexto">
+<meta name="twitter:description" content="Cenários, break-even, sensibilidade e acompanhamento para decisões financeiras.">
 
 <link rel="stylesheet" href="/assets/app.css">
 </head>
 <body>
+<a class="skipLink" href="#app">Pular para o conteúdo</a>
 <header class="topbar">
   <div class="shell nav">
     <button class="brand naked" data-route="home"><span class="brandmark"></span><span>AMARELO</span><em class="betaBadge">BETA</em></button>
@@ -40,7 +51,7 @@
         <h1>Decisões grandes<br><em>merecem contexto.</em></h1>
         <p class="lead">O AMARELO coloca crédito, investimentos, tempo e patrimônio na mesma tela — para você enxergar a consequência antes de assumir o compromisso.</p>
         <div class="askbox">
-          <input id="heroAsk" placeholder="Ex.: tenho R$ 100 mil. Amortizo meu financiamento ou invisto?">
+          <input id="heroAsk" aria-label="Descreva sua decisão financeira" placeholder="Ex.: tenho R$ 100 mil. Amortizo meu financiamento ou invisto?">
           <button class="btn yellow" onclick="askAmarelo(document.getElementById('heroAsk').value)">Colocar na conta →</button>
         </div>
         <div class="quick">
@@ -114,7 +125,7 @@
     <div class="pageHead">
       <div><span class="kicker">BIBLIOTECA DE DECISÕES</span><h1>Uma conta para cada decisão. Não o contrário.</h1><p>Use as ferramentas rápidas quando a pergunta for simples. Quando a decisão envolver patrimônio, crédito, tempo ou risco, entre nos motores completos.</p></div>
     </div>
-    <div class="searchbar"><input id="toolSearch" placeholder="Buscar: férias, CDB, consórcio, salário..." oninput="renderTools(this.value)"></div>
+    <div class="searchbar"><input id="toolSearch" aria-label="Buscar decisões financeiras" placeholder="Buscar: férias, CDB, consórcio, salário..." oninput="renderTools(this.value)"></div>
     <div class="libraryBar"><div id="filters" class="filters"></div><div class="libraryCount"><span id="toolCount">0</span> decisões</div></div>
     <div id="toolLibrary" class="toolGrid library"></div>
   </section>
@@ -229,7 +240,7 @@
     <h1>Comece pela dúvida. O AMARELO encontra a conta.</h1>
     <p class="muted">Escreva a situação do seu jeito. Nesta fase, o AMARELO identifica o motor de cálculo mais adequado; a interpretação por IA será conectada ao backend em uma etapa posterior.</p>
     <div class="bigAsk">
-      <textarea id="askText" placeholder="Ex.: Tenho 42 anos, R$ 180 mil investidos e consigo guardar R$ 3.500 por mês. Quero parar de trabalhar aos 60 recebendo R$ 12 mil em dinheiro de hoje. Estou no caminho?"></textarea>
+      <textarea id="askText" aria-label="Conte sua dúvida financeira" placeholder="Ex.: Tenho 42 anos, R$ 180 mil investidos e consigo guardar R$ 3.500 por mês. Quero parar de trabalhar aos 60 recebendo R$ 12 mil em dinheiro de hoje. Estou no caminho?"></textarea>
       <button class="btn yellow" onclick="askAmarelo(document.getElementById('askText').value)">Encontrar a análise →</button>
     </div>
     <div id="askSuggestions" class="askSuggestions"></div>
