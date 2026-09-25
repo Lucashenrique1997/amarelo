@@ -114,6 +114,9 @@ body{background:
  .topbar .nav nav .btn{display:none}
 }
 
+
+@media(max-width:760px){.mobileNav button.active{background:#2a291f;color:#fff}.mobileNav button.active b{color:#fff}}
+
 </style>
 </head>
 <body>
@@ -411,7 +414,7 @@ const tools=[
 const deepIds=new Set(['renda-fixa','gross-up','financiamento-consorcio','comprar-alugar','avista-parcelado','amortizar-investir','plano-dividas','meta-financeira','viver-renda','aposentadoria','salario-liquido','quanto-rende']);
 const categories=['Todas',...new Set(tools.map(t=>t.cat))];
 
-function navigate(route){state.route=route;document.querySelectorAll('.route').forEach(x=>x.classList.add('hidden'));$('route-'+route).classList.remove('hidden');window.scrollTo({top:0,behavior:'smooth'});if(route==='home')renderHome();if(route==='tools')renderTools('');if(route==='dashboard')renderDashboard();if(route==='ask')renderAskExamples()}
+function navigate(route){state.route=route;document.querySelectorAll('.route').forEach(x=>x.classList.add('hidden'));$('route-'+route).classList.remove('hidden');document.querySelectorAll('.mobileNav button').forEach(b=>b.classList.toggle('active',b.dataset.route===(route==='tool'?'tools':route)));window.scrollTo({top:0,behavior:'smooth'});if(route==='home')renderHome();if(route==='tools')renderTools('');if(route==='dashboard')renderDashboard();if(route==='ask')renderAskExamples()}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-route]');if(b)navigate(b.dataset.route)});
 function toast(msg){const t=$('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200)}
 function favs(){return storage.get('amarelo_favs',[])}function saved(){return storage.get('amarelo_decisions',[])}
