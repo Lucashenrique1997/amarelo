@@ -684,7 +684,7 @@ const storage={
  get(k,f){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}},
  set(k,v){localStorage.setItem(k,JSON.stringify(v))}
 };
-let state={route:'home',category:'Todas',current:null,mode:'simple',last:null,plan:storage.get('amarelo_plan','free')};
+let state={route:'home',category:'Todas',current:null,mode:'simple',last:null,plan:storage.get('amarelo_plan','free'),scenario:null,scenarioBusy:false};
 
 const journeys=[
 ['Investir','↗','Quero investir melhor','Renda fixa, juros, inflação, metas e aposentadoria.'],
@@ -757,11 +757,242 @@ function renderAskExamples(){let ex=[['Tenho R$ 100 mil e um financiamento. Amor
 function askAmarelo(q){q=(q||'').toLowerCase();let id='quanto-rende';const map=[['financiamento-consorcio',['consórc','consorc','financiar ou']],['comprar-alugar',['alugar','aluguel']],['amortizar-investir',['amort','quitar financiamento']],['aposentadoria',['aposent','previd']],['viver-renda',['viver de renda','renda mensal']],['salario-liquido',['salário','salario','quanto cai']],['gross-up',['lci','lca','gross','cdb']],['plano-dividas',['dívida','divida','cartão','cartao']],['avista-parcelado',['à vista','a vista','parcelado']],['meta-financeira',['meta','chegar em']]];for(const [i,words] of map)if(words.some(w=>q.includes(w))){id=i;break}openTool(id)}
 function planAllows(t){return t.tier==='free'||state.plan!=='free'}
 function setDemoPlan(p){state.plan=p;storage.set('amarelo_plan',p);toast('Plano de demonstração: '+p.toUpperCase());if(state.current)openCurrentTool();renderDashboard()}
+
+const scenarioDecisionIds=new Set(['financiamento-consorcio','comprar-alugar','amortizar-investir','aposentadoria']);
+const scenarioNames={base:'Base',conservative:'Conservador',optimistic:'Otimista'};
+const scenarioNotes={
+ base:'Suas premissas atuais. Este é o ponto de partida da comparação.',
+ conservative:'Premissas mais prudentes para testar a resistência da decisão. Não é previsão.',
+ optimistic:'Premissas mais favoráveis para testar a folga do plano. Não é previsão.'
+};
+const cloneData=x=>JSON.parse(JSON.stringify(x));
+function scenarioEnabled(){return !!state.current&&scenarioDecisionIds.has(state.current.id)}
+function setAssumptions(values){Object.entries(values||{}).forEach(([id,v])=>{let el=$(id);if(el)el.value=v})}
+function scenarioNumber(obj,id){let v=parseFloat(obj[id]);return Number.isFinite(v)?v:0}
+function setScenarioNumber(obj,id,value,min=-Infinity,max=Infinity){obj[id]=String(Math.min(max,Math.max(min,value)))}
+function buildScenarioPreset(base,type){
+ let a=cloneData(base),stress=type==='conservative',opti=type==='optimistic';
+ if(!stress&&!opti)return a;
+ const e=state.current.engine;
+ if(e==='buyPaths'){
+   setScenarioNumber(a,'finM',scenarioNumber(a,'finM')+(stress?.15:-.15),0);
+   setScenarioNumber(a,'cont',Math.round(scenarioNumber(a,'cont')*(stress?1.45:.75)),1,scenarioNumber(a,'consN')||1200);
+   setScenarioNumber(a,'reaj',scenarioNumber(a,'reaj')+(stress?1.5:-1),0);
+   setScenarioNumber(a,'inv',scenarioNumber(a,'inv')+(stress?-2:2),0);
+   setScenarioNumber(a,'rent',scenarioNumber(a,'rent')*(stress?1.1:.95),0);
+ }else if(e==='buyRent'){
+   setScenarioNumber(a,'app',scenarioNumber(a,'app')+(stress?-2:2),-20,30);
+   setScenarioNumber(a,'inv',scenarioNumber(a,'inv')+(stress?-2:2),0);
+   setScenarioNumber(a,'rentGrow',scenarioNumber(a,'rentGrow')+(stress?1:-1),0);
+   setScenarioNumber(a,'finM',scenarioNumber(a,'finM')+(stress?.1:-.1),0);
+   setScenarioNumber(a,'maintenance',scenarioNumber(a,'maintenance')+(stress?.25:-.2),0);
+ }else if(e==='amortInvest'){
+   setScenarioNumber(a,'invGross',scenarioNumber(a,'invGross')+(stress?-2:2),0);
+   setScenarioNumber(a,'fee',scenarioNumber(a,'fee')+(stress?.25:-.25),0);
+   setScenarioNumber(a,'months',Math.round(scenarioNumber(a,'months')+(stress?12:-12)),1);
+ }else if(e==='retirement'){
+   setScenarioNumber(a,'real',scenarioNumber(a,'real')+(stress?-1:1),-10,30);
+   setScenarioNumber(a,'fee',scenarioNumber(a,'fee')+(stress?.25:-.25),0);
+   setScenarioNumber(a,'inflation',scenarioNumber(a,'inflation')+(stress?1:-.5),0);
+ }
+ return a;
+}
+function scenarioWhatIfConfig(){
+ const e=state.current?.engine;
+ if(e==='buyPaths')return[
+   {id:'finM',label:'Taxa do crédito',step:.1,suffix:'% a.m.',min:0},
+   {id:'cont',label:'Contemplação',step:6,suffix:' meses',min:1},
+   {id:'inv',label:'Retorno alternativo',step:1,suffix:'% a.a.',min:0}
+ ];
+ if(e==='buyRent')return[
+   {id:'app',label:'Valorização do imóvel',step:1,suffix:'% a.a.',min:-20},
+   {id:'inv',label:'Retorno investido',step:1,suffix:'% a.a.',min:0},
+   {id:'rent',label:'Aluguel mensal',step:250,prefix:'R$ ',min:0}
+ ];
+ if(e==='amortInvest')return[
+   {id:'invGross',label:'Retorno do investimento',step:1,suffix:'% a.a.',min:0},
+   {id:'cash',label:'Capital disponível',step:10000,prefix:'R$ ',min:0},
+   {id:'months',label:'Prazo restante',step:12,suffix:' meses',min:1}
+ ];
+ if(e==='retirement')return[
+   {id:'real',label:'Retorno real',step:.5,suffix:'% a.a.',min:-10},
+   {id:'pmt',label:'Aporte mensal',step:250,prefix:'R$ ',min:0},
+   {id:'ret',label:'Idade de aposentadoria',step:1,suffix:' anos',min:num('age')+1}
+ ];
+ return[];
+}
+function formatScenarioValue(cfg,value){
+ let n=parseFloat(value)||0;
+ if(cfg.prefix==='R$ ')return BRL(n);
+ let decimals=Math.abs(cfg.step)<1?2:0;
+ return n.toLocaleString('pt-BR',{maximumFractionDigits:decimals,minimumFractionDigits:decimals})+(cfg.suffix||'');
+}
+function getScenarioLabel(id){
+ if(scenarioNames[id])return scenarioNames[id];
+ return state.scenario?.labels?.[id]||'Cenário';
+}
+function initScenarioLab(){
+ state.scenario=null;
+ const lab=$('scenarioLab');
+ if(!scenarioEnabled()){lab.classList.add('hidden');$('saveDecisionBtn').textContent='Salvar decisão';return}
+ const base=captureAssumptions();
+ state.scenario={
+   active:'base',
+   sets:{base:cloneData(base),conservative:buildScenarioPreset(base,'conservative'),optimistic:buildScenarioPreset(base,'optimistic')},
+   labels:{},
+   dirty:{base:false,conservative:false,optimistic:false},
+   snapshots:{base:state.last?cloneData(state.last):null},
+   customCount:0
+ };
+ lab.classList.remove('hidden');
+ $('saveDecisionBtn').textContent='Salvar versão';
+ renderScenarioLab();
+ recordScenarioSnapshot();
+}
+function persistActiveScenario(){
+ if(!state.scenario||state.scenarioBusy)return;
+ const id=state.scenario.active,vals=captureAssumptions();
+ state.scenario.sets[id]=cloneData(vals);
+ if(id==='base'){
+   if(!state.scenario.dirty.conservative)state.scenario.sets.conservative=buildScenarioPreset(vals,'conservative');
+   if(!state.scenario.dirty.optimistic)state.scenario.sets.optimistic=buildScenarioPreset(vals,'optimistic');
+ }else{
+   state.scenario.dirty[id]=true;
+ }
+}
+function renderScenarioLab(){
+ if(!state.scenario)return;
+ const ids=Object.keys(state.scenario.sets);
+ $('scenarioTabs').innerHTML=ids.map(id=>`<button class="scenarioTab ${state.scenario.active===id?'active':''}" onclick="switchScenario('${id}')"><small>${id.startsWith('custom')?'CENÁRIO LIVRE':'CENÁRIO'}</small><b>${getScenarioLabel(id)}</b><span>${id==='base'?'premissas atuais':id==='conservative'?'mais prudente':id==='optimistic'?'mais favorável':'editável'}</span></button>`).join('');
+ $('scenarioDescription').textContent=scenarioNotes[state.scenario.active]||'Cópia independente para testar outra hipótese.';
+ renderWhatIfQuick();
+}
+function renderWhatIfQuick(){
+ if(!state.scenario)return;
+ const cfgs=scenarioWhatIfConfig();
+ $('whatIfQuick').innerHTML=cfgs.map(cfg=>{let el=$(cfg.id),v=el?.value??0;return`<div class="whatIfControl"><button aria-label="Reduzir ${cfg.label}" onclick="adjustWhatIf('${cfg.id}',${-cfg.step},${Number.isFinite(cfg.min)?cfg.min:'null'},${Number.isFinite(cfg.max)?cfg.max:'null'})">−</button><div class="whatIfValue"><small>${cfg.label}</small><b>${formatScenarioValue(cfg,v)}</b></div><button aria-label="Aumentar ${cfg.label}" onclick="adjustWhatIf('${cfg.id}',${cfg.step},${Number.isFinite(cfg.min)?cfg.min:'null'},${Number.isFinite(cfg.max)?cfg.max:'null'})">+</button></div>`}).join('');
+}
+function adjustWhatIf(id,delta,min=null,max=null){
+ let el=$(id);if(!el)return;
+ let v=(parseFloat(el.value)||0)+delta;
+ if(min!==null)v=Math.max(min,v);if(max!==null)v=Math.min(max,v);
+ el.value=String(Math.round(v*10000)/10000);
+ calculateTool();
+ renderScenarioLab();
+}
+function switchScenario(id){
+ if(!state.scenario||!state.scenario.sets[id])return;
+ persistActiveScenario();
+ state.scenario.active=id;
+ state.scenarioBusy=true;
+ setAssumptions(state.scenario.sets[id]);
+ calculateTool();
+ state.scenarioBusy=false;
+ renderScenarioLab();
+}
+function duplicateScenario(){
+ if(!state.scenario)return;
+ persistActiveScenario();
+ const id='custom'+(++state.scenario.customCount);
+ state.scenario.labels[id]='Cópia '+state.scenario.customCount;
+ state.scenario.sets[id]=cloneData(state.scenario.sets[state.scenario.active]);
+ state.scenario.dirty[id]=true;
+ state.scenario.active=id;
+ state.scenarioBusy=true;
+ setAssumptions(state.scenario.sets[id]);
+ calculateTool();
+ state.scenarioBusy=false;
+ renderScenarioLab();
+ toast('Cenário duplicado. Ajuste as premissas livremente.');
+}
+function recordScenarioSnapshot(){
+ if(!state.scenario||!state.last)return;
+ state.scenario.snapshots[state.scenario.active]={...cloneData(state.last),assumptions:captureAssumptions()};
+}
+function renderScenarioCompare(){
+ if(!state.scenario)return;
+ const ids=Object.keys(state.scenario.sets);
+ $('scenarioCompare').innerHTML=`<div class="scenarioCompareHead"><h4>Comparação de cenários</h4><button onclick="document.getElementById('scenarioCompare').classList.add('hidden')">Fechar ×</button></div><div class="scenarioCompareGrid">${ids.map(id=>{let s=state.scenario.snapshots[id];if(!s)return'';let metrics=(s.metrics||[]).slice(0,3);return`<article class="scenarioSnapshot ${state.scenario.active===id?'active':''}"><span>${getScenarioLabel(id)}</span><h5>${state.current.title}</h5><div class="snapshotPrimary">${s.primary}</div><div class="snapshotSubtitle">${s.subtitle||''}</div><div class="snapshotMetrics">${metrics.map(m=>`<div><span>${m[0]}</span><b>${m[1]}</b></div>`).join('')}</div></article>`}).join('')}</div>`;
+ $('scenarioCompare').classList.remove('hidden');
+}
+function compareScenarios(){
+ if(!state.scenario)return;
+ persistActiveScenario();
+ const original=state.scenario.active,originalValues=cloneData(state.scenario.sets[original]);
+ state.scenarioBusy=true;
+ for(const id of Object.keys(state.scenario.sets)){
+   state.scenario.active=id;
+   setAssumptions(state.scenario.sets[id]);
+   calculateTool();
+ }
+ state.scenario.active=original;
+ setAssumptions(originalValues);
+ calculateTool();
+ state.scenarioBusy=false;
+ renderScenarioLab();
+ renderScenarioCompare();
+}
+function decisionDrivers(){
+ if(!scenarioEnabled())return[];
+ const e=state.current.engine;
+ if(e==='buyPaths')return[
+   ['Taxa do financiamento',PCT(num('finM'))+' a.m.','mexe no custo do crédito'],
+   ['Contemplação simulada',Math.round(num('cont'))+' meses','mexe no tempo de espera'],
+   ['Retorno alternativo',PCT(num('inv'))+' a.a.','mexe no custo de oportunidade'],
+   ['Reajuste da carta',PCT(num('reaj'))+' a.a.','mexe no fluxo do consórcio']
+ ];
+ if(e==='buyRent')return[
+   ['Valorização do imóvel',PCT(num('app'))+' a.a.','mexe no patrimônio do proprietário'],
+   ['Retorno investido',PCT(num('inv'))+' a.a.','mexe no patrimônio do inquilino'],
+   ['Aluguel inicial',BRL(num('rent')),'mexe no caixa mensal'],
+   ['Taxa do financiamento',PCT(num('finM'))+' a.m.','mexe no custo de comprar']
+ ];
+ if(e==='amortInvest')return[
+   ['Custo da dívida',PCT(num('debtA'))+' a.a.','define a economia potencial'],
+   ['Retorno do investimento',PCT(num('invGross'))+' a.a.','define o ganho alternativo'],
+   ['Capital disponível',BRL(num('cash')),'define o tamanho da decisão'],
+   ['Prazo restante',Math.round(num('months'))+' meses','define por quanto tempo o efeito se acumula']
+ ];
+ if(e==='retirement')return[
+   ['Retorno real líquido',PCT(num('real')-num('fee'))+' a.a.','mexe na acumulação e na fase de renda'],
+   ['Aporte mensal',BRL(num('pmt')),'mexe na velocidade de formação'],
+   ['Tempo até aposentar',Math.max(0,num('ret')-num('age')).toFixed(1).replace('.',',')+' anos','mexe no tempo de capitalização'],
+   ['Renda desejada',BRL(num('income'))+'/mês','mexe no capital necessário']
+ ];
+ return[];
+}
+function renderDecisionDrivers(){
+ const drivers=decisionDrivers();
+ if(!drivers.length){$('driverBox').classList.add('hidden');return}
+ $('decisionDrivers').innerHTML=drivers.map(d=>`<div class="driverChip"><small>${d[0]}</small><b>${d[1]}</b><span>${d[2]}</span></div>`).join('');
+ $('driverBox').classList.remove('hidden');
+}
+function exportScenarioState(){
+ if(!state.scenario)return null;
+ persistActiveScenario();
+ return cloneData({active:state.scenario.active,sets:state.scenario.sets,labels:state.scenario.labels,dirty:state.scenario.dirty,customCount:state.scenario.customCount});
+}
+function restoreScenarioState(savedState){
+ if(!state.scenario||!savedState?.sets)return false;
+ state.scenario.sets=cloneData(savedState.sets);
+ state.scenario.labels=cloneData(savedState.labels||{});
+ state.scenario.dirty=cloneData(savedState.dirty||{});
+ state.scenario.customCount=savedState.customCount||0;
+ state.scenario.active=savedState.active&&state.scenario.sets[savedState.active]?savedState.active:'base';
+ state.scenario.snapshots={};
+ state.scenarioBusy=true;
+ setAssumptions(state.scenario.sets[state.scenario.active]);
+ calculateTool();
+ state.scenarioBusy=false;
+ renderScenarioLab();
+ return true;
+}
+
 function openTool(id){state.current=tools.find(t=>t.id===id);navigate('tool');openCurrentTool()}
-function openCurrentTool(){const t=state.current;$('toolTitle').textContent=t.title;$('toolDescription').textContent=t.desc;$('toolCategory').textContent=t.cat.toUpperCase();$('toolTier').textContent=t.tier==='decision'?'DECISÃO PRO':t.tier==='pro'?'PRO':'GRÁTIS';$('toolTier').className='tier '+t.tier;$('toolForm').innerHTML=buildForm(t.engine);$('methodology').textContent=method(t.engine);state.mode='simple';setMode('simple');updateFav();state.last=null;clearResult();let allowed=planAllows(t);$('paywall').classList.toggle('hidden',allowed);$('calculator').classList.toggle('hidden',!allowed);if(allowed)calculateTool()}
+function openCurrentTool(){const t=state.current;state.scenario=null;state.scenarioBusy=false;$('scenarioLab').classList.add('hidden');$('scenarioCompare').classList.add('hidden');$('toolTitle').textContent=t.title;$('toolDescription').textContent=t.desc;$('toolCategory').textContent=t.cat.toUpperCase();$('toolTier').textContent=t.tier==='decision'?'DECISÃO PRO':t.tier==='pro'?'PRO':'GRÁTIS';$('toolTier').className='tier '+t.tier;$('toolForm').innerHTML=buildForm(t.engine);$('methodology').textContent=method(t.engine);state.mode='simple';setMode('simple');updateFav();state.last=null;clearResult();let allowed=planAllows(t);$('paywall').classList.toggle('hidden',allowed);$('calculator').classList.toggle('hidden',!allowed);if(allowed){calculateTool();initScenarioLab()}}
 function updateFav(){$('favoriteBtn').textContent=(isFav(state.current.id)?'★':'☆')+' Favoritar'}function toggleFavoriteCurrent(){toggleFav(state.current.id);updateFav()}
 function setMode(m){state.mode=m;$('simpleMode').classList.toggle('active',m==='simple');$('advancedMode').classList.toggle('active',m==='advanced');$('toolForm').classList.toggle('advanced',m==='advanced')}
-function clearResult(){$('resultPrimary').textContent='Calculando...';$('resultSubtitle').textContent='';$('resultMetrics').innerHTML='';['resultInsight','breakEvenBox','sensitivityBox','chartBox','assumptionBox'].forEach(id=>$(id).classList.add('hidden'));$('nextTools').innerHTML=''}
+function clearResult(){$('resultPrimary').textContent='Calculando...';$('resultSubtitle').textContent='';$('resultMetrics').innerHTML='';['resultInsight','breakEvenBox','sensitivityBox','chartBox','assumptionBox','driverBox'].forEach(id=>$(id).classList.add('hidden'));$('nextTools').innerHTML=''}
 function F(id,label,value,adv=false){return `<div class="field ${adv?'advancedField':''}"><label>${label}<input id="${id}" type="number" step="any" value="${value}"></label></div>`}
 function S(id,label,opts,adv=false){return `<div class="field ${adv?'advancedField':''}"><label>${label}<select id="${id}">${opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')}</select></label></div>`}
 function G(title,html){return `<div class="groupTitle">${title}</div><div class="formGrid">${html}</div>`}
@@ -812,10 +1043,10 @@ function taxLots(P,pmt,a,N){let m=monthly(a),gross=P*Math.pow(1+m,N),tax=(gross-
 function solveRate(fn,target,lo=-.99,hi=3){for(let i=0;i<70;i++){let mid=(lo+hi)/2;if(fn(mid)>target)hi=mid;else lo=mid}return(lo+hi)/2}
 function metric(a,b){return `<div class="metric"><small>${a}</small><b>${b}</b></div>`}
 function renderAssumptions(){let items=[...document.querySelectorAll('#toolForm .field')].map(w=>{let el=w.querySelector('input,select'),label=w.querySelector('label');if(!el||!label)return null;let name=[...label.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join(' ').trim()||el.id;let value=el.tagName==='SELECT'?(el.options[el.selectedIndex]?.text||el.value):el.value;return{name,value,advanced:w.classList.contains('advancedField')}}).filter(Boolean);if(!items.length){$('assumptionBox').classList.add('hidden');return}$('assumptionList').innerHTML=items.map(x=>`<div class="assumptionChip ${x.advanced?'advancedAssumption':''}"><small>${x.name}</small><b>${x.value}</b></div>`).join('');$('assumptionBox').classList.remove('hidden')}
-function setResult(primary,subtitle,metrics=[],insight='',be=null,sens=null,series=null,label=''){state.last={primary,subtitle,metrics,insight,be};renderAssumptions();$('resultPrimary').textContent=primary;$('resultSubtitle').textContent=subtitle;$('resultMetrics').innerHTML=metrics.map(x=>metric(x[0],x[1])).join('');if(insight){$('resultInsight').classList.remove('hidden');$('insightText').innerHTML=insight}else $('resultInsight').classList.add('hidden');if(be){$('breakEvenBox').classList.remove('hidden');$('breakEven').innerHTML=be}else $('breakEvenBox').classList.add('hidden');if(sens?.length){$('sensitivityBox').classList.remove('hidden');$('sensitivity').innerHTML=sens.map(x=>`<div class="sens"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('')}else $('sensitivityBox').classList.add('hidden');if(series?.length){$('chartBox').classList.remove('hidden');$('chartLabel').textContent=label;drawChart(series)}else $('chartBox').classList.add('hidden');renderNext()}
+function setResult(primary,subtitle,metrics=[],insight='',be=null,sens=null,series=null,label=''){state.last={primary,subtitle,metrics,insight,be};renderAssumptions();renderDecisionDrivers();recordScenarioSnapshot();$('resultPrimary').textContent=primary;$('resultSubtitle').textContent=subtitle;$('resultMetrics').innerHTML=metrics.map(x=>metric(x[0],x[1])).join('');if(insight){$('resultInsight').classList.remove('hidden');$('insightText').innerHTML=insight}else $('resultInsight').classList.add('hidden');if(be){$('breakEvenBox').classList.remove('hidden');$('breakEven').innerHTML=be}else $('breakEvenBox').classList.add('hidden');if(sens?.length){$('sensitivityBox').classList.remove('hidden');$('sensitivity').innerHTML=sens.map(x=>`<div class="sens"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('')}else $('sensitivityBox').classList.add('hidden');if(series?.length){$('chartBox').classList.remove('hidden');$('chartLabel').textContent=label;drawChart(series)}else $('chartBox').classList.add('hidden');renderNext()}
 function drawChart(series){const w=720,h=220,pad=28,all=series.flatMap(s=>s.data.map(x=>x.y)),min=Math.min(0,...all),max=Math.max(...all,1),span=max-min||1,colors=['#f3c62e','#7ed3af','#8fb5ff','#ff9a82'],maxLen=Math.max(...series.map(s=>s.data.length)),sx=i=>pad+(w-2*pad)*(maxLen<=1?0:i/(maxLen-1)),sy=y=>h-pad-(h-2*pad)*((y-min)/span);let grid='';for(let k=0;k<5;k++){let y=pad+(h-2*pad)*k/4;grid+=`<line x1="${pad}" y1="${y}" x2="${w-pad}" y2="${y}" stroke="#303029" stroke-width="1"/>`}let paths=series.map((s,si)=>`<path d="${s.data.map((p,i)=>(i?'L':'M')+sx(i)+' '+sy(p.y)).join(' ')}" fill="none" stroke="${colors[si%colors.length]}" stroke-width="3" stroke-linecap="round"/>`).join('');$('chart').innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${grid}${paths}</svg>`;$('legend').innerHTML=series.map((s,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${s.name}</span>`).join('')}
 function renderNext(){let map={'financiamento-consorcio':['comprar-alugar','amortizar-investir'],'comprar-alugar':['financiamento-consorcio','amortizar-investir'],'amortizar-investir':['renda-fixa','meta-financeira'],'renda-fixa':['gross-up','meta-financeira'],'gross-up':['renda-fixa'],'aposentadoria':['viver-renda','meta-financeira'],'reserva':['quanto-rende'],'salario-liquido':['reserva','quanto-guardar']};let ids=map[state.current.id]||[];$('nextTools').innerHTML=ids.length?'<h4>Próximas análises relacionadas</h4>'+ids.map(id=>{let t=tools.find(x=>x.id===id);return t?`<button onclick="openTool('${id}')">${t.title} →</button>`:''}).join(''):''}
-function calculateTool(){const e=state.current.engine;try{
+function calculateTool(){if(state.scenario&&!state.scenarioBusy)persistActiveScenario();const e=state.current.engine;try{
  if(e==='compound'){let P=num('p'),pmt=num('pmt'),years=num('years'),r=num('rate')/100,inf=num('inflation')/100,tax=num('tax')/100,N=years*12,gross=fv(P,pmt,r,N),invested=P+pmt*N,gain=gross-invested,net=gross-gain*tax,real=net/Math.pow(1+inf,years);let sens=[Math.max(0,r-.02),r,r+.02].map(rr=>[PCT(rr*100)+' a.a.',BRL(fv(P,pmt,rr,N))]),series=[],b=P,mi=monthly(r);for(let m=1;m<=N;m++){b=b*(1+mi)+pmt;if(m%12===0)series.push({y:b})}setResult(BRL(net),'Patrimônio líquido nominal estimado.',[['Total aportado',BRL(invested)],['Ganho líquido',BRL(net-invested)],['Em dinheiro de hoje',BRL(real)]],`Tempo e aportes são os grandes motores. A inflação reduz o poder de compra do valor nominal.`,`Para preservar poder de compra, o retorno precisa superar <b>${PCT(inf*100)}</b> antes de custos e impostos.`,sens,[{name:'Patrimônio',data:series}],'saldo')}
  else if(e==='fixedIncome'){
   let P=num('p'),pmt=num('pmt'),N=Math.max(1,Math.round(num('months'))),cdi=num('cdi')/100,cdbPct=num('cdb')/100,lciPct=num('lci')/100,third=num('third')/100,fee=num('fee')/100,cdb=taxLots(P,pmt,cdi*cdbPct,N),lciNet=fv(P,pmt,cdi*lciPct,N),thirdCalc=taxLots(P,pmt,Math.max(-.99,third-fee),N),thirdNet=thirdCalc.net,arr=[['CDB',cdb.net],['LCI/LCA',lciNet],['Alternativa 3',thirdNet]].sort((a,b)=>b[1]-a[1]),tax=irDays(N*30),eqConventional=lciPct/(1-tax),eqExact=solveRate(mult=>taxLots(P,pmt,cdi*mult,N).net,lciNet,0,4),invested=P+pmt*N,sc=[],sl=[],st=[];
