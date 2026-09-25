@@ -396,6 +396,31 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.001ms!important;transition-duration:.001ms!important}}
 
+
+/* ===== AMARELO V12 — Decision System ===== */
+.scenarioLab{margin-top:18px;margin-bottom:14px;border:1px solid rgba(19,19,14,.09);border-radius:28px;background:linear-gradient(145deg,rgba(255,254,250,.88),rgba(255,249,220,.62));overflow:hidden}
+.scenarioLabHead{display:flex;justify-content:space-between;align-items:flex-end;gap:28px;padding:22px 23px 17px}
+.scenarioLabHead h3{font-size:22px;letter-spacing:-.035em;margin:6px 0 4px}.scenarioLabHead p{font-size:9px;color:#827b6f;margin:0;line-height:1.5}
+.scenarioLabActions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.scenarioLabActions button{border:1px solid rgba(19,19,14,.1);background:rgba(255,255,255,.68);border-radius:999px;padding:8px 11px;font-size:8px;font-weight:900;cursor:pointer}
+.scenarioLabActions .scenarioCompareBtn{background:var(--v11-ink);color:#fff;border-color:var(--v11-ink)}
+.scenarioTabs{display:flex;gap:6px;padding:0 23px 17px;overflow:auto}.scenarioTab{min-width:128px;border:1px solid rgba(19,19,14,.09);background:rgba(255,255,255,.55);border-radius:16px;padding:11px 12px;text-align:left;cursor:pointer;transition:.18s}
+.scenarioTab:hover{background:#fff}.scenarioTab.active{background:var(--v11-ink);border-color:var(--v11-ink);color:#fff}
+.scenarioTab small{display:block;font-size:6px;letter-spacing:.13em;text-transform:uppercase;color:#968e80;margin-bottom:4px}.scenarioTab.active small{color:#88877d}.scenarioTab b{display:block;font-size:10px}.scenarioTab span{display:block;font-size:7px;color:#948d80;margin-top:4px}.scenarioTab.active span{color:#aaa99e}
+.whatIfBlock{display:grid;grid-template-columns:190px 1fr;gap:20px;padding:17px 23px;border-top:1px solid rgba(19,19,14,.07);background:rgba(255,255,255,.32)}
+.whatIfHead span{font-size:7px;font-weight:950;letter-spacing:.14em;color:#967f19}.whatIfHead p{font-size:8px;line-height:1.5;color:#8a8377;margin:5px 0 0}
+.whatIfQuick{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.whatIfControl{display:grid;grid-template-columns:28px 1fr 28px;align-items:center;border:1px solid rgba(19,19,14,.08);border-radius:14px;background:#fff;overflow:hidden}
+.whatIfControl button{height:100%;border:0;background:#f5f2e9;font-size:14px;cursor:pointer}.whatIfControl button:hover{background:#efe8cb}
+.whatIfValue{text-align:center;padding:8px 3px}.whatIfValue small{display:block;font-size:6px;letter-spacing:.07em;text-transform:uppercase;color:#90897d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.whatIfValue b{font-size:10px}
+.scenarioCompare{border-top:1px solid rgba(19,19,14,.08);padding:20px 23px 23px;background:#f0ede4}.scenarioCompareHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.scenarioCompareHead h4{margin:0;font-size:13px}.scenarioCompareHead button{border:0;background:transparent;font-size:8px;font-weight:900;cursor:pointer}
+.scenarioCompareGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.scenarioSnapshot{background:#fff;border:1px solid rgba(19,19,14,.08);border-radius:18px;padding:15px}
+.scenarioSnapshot.active{border-color:#c4a526;box-shadow:inset 0 0 0 1px rgba(196,165,38,.15)}.scenarioSnapshot>span{font-size:6px;letter-spacing:.12em;text-transform:uppercase;color:#9b9385}.scenarioSnapshot h5{font-size:13px;margin:5px 0 10px}
+.snapshotPrimary{font-size:17px;font-weight:900;letter-spacing:-.035em;margin-bottom:3px}.snapshotSubtitle{font-size:7px;color:#918a7e;line-height:1.4;min-height:20px}
+.snapshotMetrics{margin-top:10px;border-top:1px solid #eee9dd;padding-top:7px}.snapshotMetrics div{display:flex;justify-content:space-between;gap:10px;font-size:7px;padding:4px 0}.snapshotMetrics b{text-align:right;font-size:8px}
+.driverBox{margin-top:11px}.decisionDrivers{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:8px}.driverChip{border:1px solid #303027;background:#171711;border-radius:15px;padding:11px}.driverChip small{display:block;color:#89887d;font-size:7px;line-height:1.3}.driverChip b{display:block;color:#eeeae0;font-size:10px;margin:4px 0 2px}.driverChip span{display:block;color:#77766d;font-size:7px;line-height:1.35}
+.versionBadge{display:inline-flex;align-items:center;gap:5px;margin-left:6px;padding:4px 7px;border-radius:999px;background:rgba(255,213,34,.12);color:#b59614;font-size:6px;font-weight:950;letter-spacing:.08em}
+@media(max-width:900px){.scenarioLabHead{display:block}.scenarioLabActions{justify-content:flex-start;margin-top:14px}.whatIfBlock{grid-template-columns:1fr}.scenarioCompareGrid{grid-template-columns:1fr}.decisionDrivers{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.scenarioLab{border-radius:23px}.scenarioLabHead{padding:18px 17px 14px}.scenarioTabs{padding:0 17px 14px}.scenarioTab{min-width:118px}.whatIfBlock{padding:14px 17px}.whatIfQuick{grid-template-columns:1fr}.scenarioCompare{padding:17px}.decisionDrivers{grid-template-columns:1fr 1fr}}
+
 </style>
 </head>
 <body>
@@ -584,6 +609,21 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
       <button class="btn yellow" onclick="setDemoPlan('pro'); openCurrentTool()">Testar PRO nesta versão</button>
     </div>
     <div class="toolWorkspaceMeta"><span><i></i> Motor determinístico</span><span>premissas visíveis</span><span>cenários comparáveis</span></div>
+    <section id="scenarioLab" class="scenarioLab hidden">
+      <div class="scenarioLabHead">
+        <div><span class="kicker">LABORATÓRIO DE CENÁRIOS</span><h3>Uma decisão. Mais de um futuro.</h3><p id="scenarioDescription">Compare hipóteses sem perder a sua base.</p></div>
+        <div class="scenarioLabActions">
+          <button onclick="duplicateScenario()">Duplicar cenário</button>
+          <button class="scenarioCompareBtn" onclick="compareScenarios()">Comparar cenários</button>
+        </div>
+      </div>
+      <div id="scenarioTabs" class="scenarioTabs"></div>
+      <div class="whatIfBlock">
+        <div class="whatIfHead"><span>E SE?</span><p>Ajuste os principais direcionadores sem reconstruir a simulação.</p></div>
+        <div id="whatIfQuick" class="whatIfQuick"></div>
+      </div>
+      <div id="scenarioCompare" class="scenarioCompare hidden"></div>
+    </section>
     <div id="calculator" class="calculator">
       <aside class="inputPanel">
         <div class="modeToggle"><button id="simpleMode" class="active" onclick="setMode('simple')">Simples</button><button id="advancedMode" onclick="setMode('advanced')">Avançado</button></div>
@@ -596,12 +636,13 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
         <div class="resultGuide"><div>RESPOSTA</div><div>DIRECIONADORES</div><div>BREAK-EVEN</div><div>E SE?</div></div>
         <div class="resultHero"><span>RESPOSTA DIRETA</span><h2 id="resultPrimary">Preencha os dados</h2><p id="resultSubtitle"></p></div>
         <div id="resultMetrics" class="metrics"></div>
+        <div id="driverBox" class="resultBox driverBox hidden"><div class="boxHead"><h3>O que move esta decisão</h3><span>DRIVERS</span></div><div id="decisionDrivers" class="decisionDrivers"></div></div>
         <div id="assumptionBox" class="resultBox assumptionBox hidden"><div class="boxHead"><h3>Premissas usadas nesta conta</h3><span>TRANSPARÊNCIA</span></div><div id="assumptionList" class="assumptionList"></div></div>
         <div id="resultInsight" class="resultBox hidden"><div class="boxHead"><h3>O que isso significa?</h3></div><div id="insightText"></div></div>
         <div id="breakEvenBox" class="resultBox hidden"><div class="boxHead"><h3>Ponto de equilíbrio</h3><span>BREAK-EVEN</span></div><div id="breakEven"></div></div>
         <div id="sensitivityBox" class="resultBox hidden"><div class="boxHead"><h3>E se?</h3><span>SENSIBILIDADE</span></div><div id="sensitivity" class="sensitivity"></div></div>
         <div id="chartBox" class="resultBox hidden"><div class="boxHead"><h3>Evolução</h3><span id="chartLabel"></span></div><div id="chart" class="chart"></div><div id="legend" class="legend"></div></div>
-        <div class="resultButtons"><button class="btn outline" onclick="saveDecision()">Salvar decisão</button><button class="btn ghost" onclick="copyResult()">Copiar resumo</button></div>
+        <div class="resultButtons"><button id="saveDecisionBtn" class="btn outline" onclick="saveDecision()">Salvar decisão</button><button class="btn ghost" onclick="copyResult()">Copiar resumo</button></div>
         <div id="nextTools" class="nextTools"></div>
       </section>
     </div>
