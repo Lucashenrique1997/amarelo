@@ -100,10 +100,10 @@ Quando aplicável:
 ### C. Conta e identidade
 - [ ] estratégia de autenticação aprovada
 - [ ] cadastro/login
-- [ ] sessão segura
-- [ ] logout
+- [x] sessão segura (token opaco, hash no D1, HttpOnly/Secure/SameSite; ativação depende de login)
+- [x] logout e revogação de todas as sessões (endpoints implementados; ativação depende de login)
 - [ ] recuperação de conta
-- [ ] proteção contra abuso
+- [x] proteção base contra abuso (same-origin + rate limit D1 em mutações privadas; login terá gate próprio quando escolhido)
 
 **Gate:** nenhuma API de dados pessoais sem identidade autenticada.
 
@@ -144,7 +144,7 @@ Quando aplicável:
 - [ ] assinatura
 - [ ] cancelamento
 - [ ] falha de pagamento
-- [ ] downgrade sem perda indevida de dados
+- [x] downgrade sem perda de dados no modelo interno (entitlement muda; dados não são apagados)
 
 **Gate:** cobrança só é ativada quando entitlement e ciclo de assinatura funcionarem ponta a ponta.
 
@@ -171,8 +171,8 @@ Quando aplicável:
 ### I. Lançamento
 - [ ] domínio `oamarelo.com.br`
 - [x] SEO/meta/social
-- [ ] mobile final
-- [ ] desktop final
+- [x] hardening responsivo/mobile implementado (validação visual final no smoke test)
+- [x] hardening desktop/modal/relatório implementado (validação visual final no smoke test)
 - [ ] smoke test de produção
 - [ ] checkout testado
 - [ ] health/capabilities verdes
