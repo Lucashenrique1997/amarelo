@@ -12,6 +12,13 @@ export async function upsertGoal(db, userId, goal) {
   const now = new Date().toISOString();
   let id = goal.id || null;
 
+  if (id) {
+    const owned = await db.prepare(
+      "SELECT id FROM goals WHERE id = ? AND user_id = ?"
+    ).bind(id, userId).first();
+    if (!owned) id = null;
+  }
+
   if (!id && goal.clientGoalId) {
     const existing = await db.prepare(
       "SELECT id FROM goals WHERE user_id = ? AND client_goal_id = ?"
