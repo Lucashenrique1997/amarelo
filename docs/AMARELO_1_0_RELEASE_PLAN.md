@@ -91,8 +91,8 @@ Quando aplicável:
 - [x] baseline regulatória 2026
 - [x] motores prioritários existentes
 - [x] testes do núcleo financeiro
-- [ ] casos de teste de referência por motor prioritário
-- [ ] edge cases: zero, prazo curto, retorno negativo, taxas extremas
+- [x] casos de teste de referência por motor prioritário
+- [x] edge cases: zero, prazo curto, retorno negativo, taxas extremas
 - [ ] revisão final de regras tributárias imediatamente antes do lançamento
 
 **Gate:** nenhum motor prioritário vai ao lançamento sem caso de teste conhecido.
@@ -114,9 +114,9 @@ Quando aplicável:
 - [ ] D1 `amarelo` criado no Cloudflare
 - [ ] binding `DB`
 - [ ] migrations aplicadas
-- [ ] API autenticada de perfil
-- [ ] API autenticada de decisões
-- [ ] API autenticada de versões
+- [x] API autenticada de perfil (implementada; ativação depende de D1 + login)
+- [x] API autenticada de decisões (implementada; ativação depende de D1 + login)
+- [x] API autenticada de versões (implementada; ativação depende de D1 + login)
 - [ ] migração localStorage -> conta
 - [ ] sincronização multi-dispositivo
 - [ ] conflito/versionamento
@@ -162,15 +162,15 @@ Quando aplicável:
 - [ ] política de privacidade
 - [ ] termos de uso
 - [ ] política de retenção/exclusão
-- [ ] headers revisados
+- [x] headers revisados
 - [ ] rate limiting de APIs sensíveis
-- [ ] logs sem dados financeiros sensíveis
-- [ ] tratamento global de erros
+- [x] logs sem dados financeiros sensíveis
+- [x] tratamento global de erros
 - [x] backup/exportação básica do usuário
 
 ### I. Lançamento
 - [ ] domínio `oamarelo.com.br`
-- [ ] SEO/meta/social
+- [x] SEO/meta/social
 - [ ] analytics de produto com privacidade
 - [ ] mobile final
 - [ ] desktop final
