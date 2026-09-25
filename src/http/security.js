@@ -6,11 +6,13 @@ const BASE_SECURITY_HEADERS = Object.freeze({
   "Cross-Origin-Opener-Policy": "same-origin"
 });
 
-export function withSecurityHeaders(response) {
+export function withSecurityHeaders(response, requestId = null) {
   const headers = new Headers(response.headers);
   for (const [name, value] of Object.entries(BASE_SECURITY_HEADERS)) {
     headers.set(name, value);
   }
+
+  if (requestId) headers.set("X-Request-ID", requestId);
 
   if (headers.get("Content-Type")?.includes("application/json")) {
     headers.set("Cache-Control", "no-store");
