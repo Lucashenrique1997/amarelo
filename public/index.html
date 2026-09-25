@@ -1624,6 +1624,24 @@ function calculateTool(){if(state.scenario&&!state.scenarioBusy)persistActiveSce
  }
  else if(e==='cashInstallment'){let cash=num('cashPrice'),inst=num('install'),N=num('n'),r=num('returnM')/100,cb=num('cashback')/100,now=$('timing').value==='now',pv=0;for(let k=0;k<N;k++){let t=now?k:k+1;pv+=inst/Math.pow(1+r,t)}pv-=inst*N*cb;let nominal=inst*N*(1-cb),be=solveRate(rr=>{let x=0;for(let k=0;k<N;k++){let t=now?k:k+1;x+=inst/Math.pow(1+rr,t)}return x-inst*N*cb},cash,0,.2);setResult(pv>cash?'À vista':'Parcelado','Menor custo por valor presente.',[['À vista',BRL(cash)],['Parcelado nominal',BRL(nominal)],['Valor presente',BRL(pv)]],`A soma nominal não basta. O valor presente desconta cada parcela pelo retorno do dinheiro.`,`O empate acontece perto de <b>${PCT(be*100)} ao mês</b> de retorno líquido.`)}
  else if(e==='loan'){let pv=Math.max(0,num('price')-num('down')),i=num('rate')/100,N=num('n'),p=loanPay(pv,i,N),tot=p*N;setResult(BRL(p),'Parcela estimada.',[['Financiado',BRL(pv)],['Total parcelas',BRL(tot)],['Juros',BRL(tot-pv)]])}
+ else if(e==='loanCompare'){
+  let price=Math.max(0,num('cmpPrice')),down=Math.min(price,Math.max(0,num('cmpDown'))),credit=Math.max(0,price-down),H=Math.max(1,Math.round(num('cmpHorizon'))),disc=Math.max(-.99,num('cmpDiscount')/100);
+  function proposal(prefix,rateOverride=null){
+    let system=$(prefix+'System').value,rate=(rateOverride===null?num(prefix+'Rate'):rateOverride)/100,N=Math.max(1,Math.round(num(prefix+'N'))),upfront=Math.max(0,num(prefix+'Upfront')),monthlyExtra=Math.max(0,num(prefix+'Monthly')),base=loanFlow(credit,rate,N,system,0),flows=base.flows.map(x=>x+monthlyExtra),pv=upfront+pvFlows(flows,disc),total=upfront+flows.reduce((s,x)=>s+x,0),h=Math.min(H,N),balance=credit,cum=upfront,curve=[],balanceAtH=credit;
+    let amortSac=N?credit/N:0;
+    for(let m=1;m<=N;m++){
+      let contractual=base.flows[m-1]||0,j=balance*rate,a=system==='sac'?Math.min(amortSac,balance):Math.max(0,contractual-j);
+      balance=Math.max(0,balance-a);cum+=flows[m-1]||0;curve.push({y:cum});if(m===h)balanceAtH=balance;
+    }
+    return{system,rate,N,upfront,monthlyExtra,base,flows,pv,total,curve,balanceAtH,cashAtH:upfront+flows.slice(0,h).reduce((s,x)=>s+x,0)};
+  }
+  let A=proposal('cmpA'),B=proposal('cmpB'),winner=A.pv<=B.pv?'Proposta A':'Proposta B',diff=Math.abs(A.pv-B.pv),target=A.pv,lo=0,hi=5,breakB=null,flo=proposal('cmpB',lo).pv-target,fhi=proposal('cmpB',hi).pv-target;
+  if(flo*fhi<=0){for(let i=0;i<70;i++){let mid=(lo+hi)/2,fm=proposal('cmpB',mid).pv-target;if(flo*fm<=0){hi=mid;fhi=fm}else{lo=mid;flo=fm}}breakB=(lo+hi)/2}
+  let sens=[Math.max(0,num('cmpBRate')-.1),num('cmpBRate'),num('cmpBRate')+.1].map(r=>{let b=proposal('cmpB',r),d=b.pv-A.pv;return[PCT(r)+' a.m. proposta B',(d<=0?'B - ':'B + ')+BRL(Math.abs(d))+' VP']});
+  let insight=`Taxa menor não garante menor custo quando prazo, seguros e tarifas mudam. O comparador olha o fluxo completo e também mostra o saldo devedor que permanece no horizonte escolhido.`;
+  let be=breakB!==null?`Mantidas as demais condições da Proposta B, uma taxa perto de <b>${PCT(breakB)} a.m.</b> faria seu valor presente empatar com a Proposta A.`:'Não apareceu uma taxa de equilíbrio da Proposta B entre 0% e 5% a.m. com as condições atuais.';
+  setResult(winner,'Menor valor presente estimado dos desembolsos.',[['Valor financiado',BRL(credit)],['A · 1ª parcela',BRL(A.flows[0]||0)],['B · 1ª parcela',BRL(B.flows[0]||0)],['A · valor presente',BRL(A.pv)],['B · valor presente',BRL(B.pv)],['A · total nominal',BRL(A.total)],['B · total nominal',BRL(B.total)],['A · saldo no horizonte',BRL(A.balanceAtH)],['B · saldo no horizonte',BRL(B.balanceAtH)],['A · caixa pago no horizonte',BRL(A.cashAtH)],['B · caixa pago no horizonte',BRL(B.cashAtH)]],insight,be,sens,[{name:'Proposta A · desembolso',data:A.curve},{name:'Proposta B · desembolso',data:B.curve}],'desembolso acumulado');
+ }
  else if(e==='carCost'){let p=num('price'),y=num('years'),dep=p*num('dep')/100,rec=num('insurance')*y+num('tax')*y+num('fuel')*12*y+num('maint')*y,total=dep+rec;setResult(BRL(total),'Custo de uso + perda de valor.',[['Depreciação',BRL(dep)],['Custos recorrentes',BRL(rec)],['Média mensal',BRL(total/(12*y))]])}
  else if(e==='amortInvest'){
   let bal=num('balance'),da=num('debtA')/100,N=Math.max(1,Math.round(num('months'))),cash=Math.min(num('cash'),bal),ig=num('invGross')/100,tax=Math.max(0,Math.min(.999,num('tax')/100)),fee=num('fee')/100,system=$('loanSystem').value,mode=$('amortMode').value,m=monthly(da),newBal=Math.max(0,bal-cash);
