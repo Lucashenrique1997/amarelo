@@ -1,5 +1,11 @@
 /* AMARELO 1.0 — Meu AMARELO dashboard, profile and backup */
 function renderDashboard(){
+  let badge=$('dataModeBadge'),text=$('dataModeText');
+  if(badge&&text){
+    let synced=runtimeCapabilities.persistence&&runtimeCapabilities.authentication;
+    badge.textContent=synced?'Sincronizado com sua conta':'Somente neste navegador';
+    text.textContent=synced?'Suas decisões e versões estão persistidas na sua conta AMARELO.':'Exporte um backup enquanto a sincronização online não está ativa.';
+  }
   let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0}),months=p.essentials?p.reserve/p.essentials:0;
   $('profileSummary').innerHTML=[['Renda líquida',BRL(p.income)],['Patrimônio financeiro',BRL(p.wealth)],['Reserva',months?months.toFixed(1)+' meses':'—'],['Investimento mensal',BRL(p.monthly)]].map(x=>`<div class="profileStat"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('');
   let d=saved(),groups=groupSavedDecisions(d),now=Date.now(),day=86400000,review=groups.filter(g=>(now-new Date(g.versions[0].date).getTime())/day>=45),multi=groups.filter(g=>g.versions.length>1),recent=groups.filter(g=>(now-new Date(g.versions[0].date).getTime())/day<30);
