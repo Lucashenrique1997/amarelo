@@ -1,5 +1,5 @@
 import { authenticatedUserId } from "../auth/session.js";
-import { readJson, jsonError } from "./json.js";
+import { readJson, jsonError, mutationOriginAllowed } from "./json.js";
 import { getProfile, upsertProfile } from "../db/profiles.js";
 import { listDecisions, listDecisionVersions, upsertDecisionWithVersion, deleteDecisionVersion } from "../db/decisions.js";
 import { listWorkspaces } from "../db/workspaces.js";
@@ -19,6 +19,10 @@ export async function handlePrivateApi(request, env, url) {
 
   const userId = await authenticatedUserId(request, env);
   if (!userId) return jsonError("authentication_required", 401);
+
+  if (!mutationOriginAllowed(request)) {
+    return jsonError("origin_not_allowed", 403);
+  }
 
   if (url.pathname === "/api/v1/profile") {
     if (request.method === "GET") {
