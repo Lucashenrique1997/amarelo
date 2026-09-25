@@ -72,6 +72,8 @@ Body conceitual:
   "status":"active",
   "workspaceId":"opcional",
   "scenarioLabel":"Base",
+  "clientVersionId":"id estável da versão no navegador",
+  "clientCreatedAt":"ISO-8601 da criação original",
   "inputs":{},
   "outputs":{},
   "assumptions":{},
@@ -87,8 +89,26 @@ O servidor ignora qualquer tentativa de enviar user_id.
 ### GET /api/v1/decisions/:id/versions
 Lista versões da decisão, desde que ela pertença ao usuário autenticado.
 
+### DELETE /api/v1/decisions/:id/versions/:versionId
+Remove uma versão pertencente ao usuário autenticado. Se era a única versão, a decisão também é removida.
+
 ### GET /api/v1/workspaces
 Lista workspaces dos quais o usuário autenticado participa.
+
+### GET /api/v1/goals
+Lista metas persistentes.
+
+### POST|PUT /api/v1/goals
+Cria ou atualiza meta. O cliente envia `clientGoalId` para tornar a migração idempotente.
+
+### DELETE /api/v1/goals/:id
+Remove uma meta pertencente ao usuário autenticado.
+
+### GET /api/v1/entitlements
+Retorna permissões do plano. Enquanto `BILLING_ENABLED=false` e a fase for beta, o PRO Beta permanece liberado.
+
+### GET /api/v1/export
+Exportação estruturada dos dados da conta.
 
 ## Ainda não montadas
 - cadastro;
