@@ -26,6 +26,7 @@ const amareloApi={
   decisions(){return this.request('/api/v1/decisions')},
   saveDecision(decision){return this.request('/api/v1/decisions',{method:'POST',body:decision})},
   decisionVersions(id){return this.request('/api/v1/decisions/'+encodeURIComponent(id)+'/versions')},
+  deleteDecisionVersion(decisionId,versionId){return this.request('/api/v1/decisions/'+encodeURIComponent(decisionId)+'/versions/'+encodeURIComponent(versionId),{method:'DELETE'})},
   workspaces(){return this.request('/api/v1/workspaces')},
   goals(){return this.request('/api/v1/goals')},
   saveGoal(goal){return this.request('/api/v1/goals',{method:goal?.id?'PUT':'POST',body:goal})},
