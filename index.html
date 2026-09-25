@@ -396,6 +396,59 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation-duration:.001ms!important;transition-duration:.001ms!important}}
 
+
+/* ===== AMARELO V12 — Decision System ===== */
+.scenarioLab{margin-top:18px;margin-bottom:14px;border:1px solid rgba(19,19,14,.09);border-radius:28px;background:linear-gradient(145deg,rgba(255,254,250,.88),rgba(255,249,220,.62));overflow:hidden}
+.scenarioLabHead{display:flex;justify-content:space-between;align-items:flex-end;gap:28px;padding:22px 23px 17px}
+.scenarioLabHead h3{font-size:22px;letter-spacing:-.035em;margin:6px 0 4px}.scenarioLabHead p{font-size:9px;color:#827b6f;margin:0;line-height:1.5}
+.scenarioLabActions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.scenarioLabActions button{border:1px solid rgba(19,19,14,.1);background:rgba(255,255,255,.68);border-radius:999px;padding:8px 11px;font-size:8px;font-weight:900;cursor:pointer}
+.scenarioLabActions .scenarioCompareBtn{background:var(--v11-ink);color:#fff;border-color:var(--v11-ink)}
+.scenarioTabs{display:flex;gap:6px;padding:0 23px 17px;overflow:auto}.scenarioTab{min-width:128px;border:1px solid rgba(19,19,14,.09);background:rgba(255,255,255,.55);border-radius:16px;padding:11px 12px;text-align:left;cursor:pointer;transition:.18s}
+.scenarioTab:hover{background:#fff}.scenarioTab.active{background:var(--v11-ink);border-color:var(--v11-ink);color:#fff}
+.scenarioTab small{display:block;font-size:6px;letter-spacing:.13em;text-transform:uppercase;color:#968e80;margin-bottom:4px}.scenarioTab.active small{color:#88877d}.scenarioTab b{display:block;font-size:10px}.scenarioTab span{display:block;font-size:7px;color:#948d80;margin-top:4px}.scenarioTab.active span{color:#aaa99e}
+.whatIfBlock{display:grid;grid-template-columns:190px 1fr;gap:20px;padding:17px 23px;border-top:1px solid rgba(19,19,14,.07);background:rgba(255,255,255,.32)}
+.whatIfHead span{font-size:7px;font-weight:950;letter-spacing:.14em;color:#967f19}.whatIfHead p{font-size:8px;line-height:1.5;color:#8a8377;margin:5px 0 0}
+.whatIfQuick{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.whatIfControl{display:grid;grid-template-columns:28px 1fr 28px;align-items:center;border:1px solid rgba(19,19,14,.08);border-radius:14px;background:#fff;overflow:hidden}
+.whatIfControl button{height:100%;border:0;background:#f5f2e9;font-size:14px;cursor:pointer}.whatIfControl button:hover{background:#efe8cb}
+.whatIfValue{text-align:center;padding:8px 3px}.whatIfValue small{display:block;font-size:6px;letter-spacing:.07em;text-transform:uppercase;color:#90897d;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.whatIfValue b{font-size:10px}
+.scenarioCompare{border-top:1px solid rgba(19,19,14,.08);padding:20px 23px 23px;background:#f0ede4}.scenarioCompareHead{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.scenarioCompareHead h4{margin:0;font-size:13px}.scenarioCompareHead button{border:0;background:transparent;font-size:8px;font-weight:900;cursor:pointer}
+.scenarioCompareGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.scenarioSnapshot{background:#fff;border:1px solid rgba(19,19,14,.08);border-radius:18px;padding:15px}
+.scenarioSnapshot.active{border-color:#c4a526;box-shadow:inset 0 0 0 1px rgba(196,165,38,.15)}.scenarioSnapshot>span{font-size:6px;letter-spacing:.12em;text-transform:uppercase;color:#9b9385}.scenarioSnapshot h5{font-size:13px;margin:5px 0 10px}
+.snapshotPrimary{font-size:17px;font-weight:900;letter-spacing:-.035em;margin-bottom:3px}.snapshotSubtitle{font-size:7px;color:#918a7e;line-height:1.4;min-height:20px}
+.snapshotMetrics{margin-top:10px;border-top:1px solid #eee9dd;padding-top:7px}.snapshotMetrics div{display:flex;justify-content:space-between;gap:10px;font-size:7px;padding:4px 0}.snapshotMetrics b{text-align:right;font-size:8px}
+.driverBox{margin-top:11px}.decisionDrivers{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-top:8px}.driverChip{border:1px solid #303027;background:#171711;border-radius:15px;padding:11px}.driverChip small{display:block;color:#89887d;font-size:7px;line-height:1.3}.driverChip b{display:block;color:#eeeae0;font-size:10px;margin:4px 0 2px}.driverChip span{display:block;color:#77766d;font-size:7px;line-height:1.35}
+.versionBadge{display:inline-flex;align-items:center;gap:5px;margin-left:6px;padding:4px 7px;border-radius:999px;background:rgba(255,213,34,.12);color:#b59614;font-size:6px;font-weight:950;letter-spacing:.08em}
+@media(max-width:900px){.scenarioLabHead{display:block}.scenarioLabActions{justify-content:flex-start;margin-top:14px}.whatIfBlock{grid-template-columns:1fr}.scenarioCompareGrid{grid-template-columns:1fr}.decisionDrivers{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.scenarioLab{border-radius:23px}.scenarioLabHead{padding:18px 17px 14px}.scenarioTabs{padding:0 17px 14px}.scenarioTab{min-width:118px}.whatIfBlock{padding:14px 17px}.whatIfQuick{grid-template-columns:1fr}.scenarioCompare{padding:17px}.decisionDrivers{grid-template-columns:1fr 1fr}}
+
+
+/* V12 version history */
+.decisionTitleLine{display:flex;align-items:center;gap:7px}.decisionTitleLine h4{margin:0}.decisionTitleLine span{font-size:6px;font-weight:950;letter-spacing:.08em;background:var(--v11-cream);color:#927b18;border-radius:999px;padding:4px 6px}
+.versionModalCard{width:min(1040px,100%);max-height:90vh;overflow:auto}.versionModalLead{font-size:10px;color:#817a6e;margin-top:-8px;margin-bottom:20px}
+.versionCompareGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.versionCard{border:1px solid rgba(19,19,14,.09);background:#faf8f1;border-radius:19px;padding:15px;display:flex;flex-direction:column;min-height:300px}
+.versionCard.latest{background:linear-gradient(145deg,#fffef9,#fff6c9);border-color:#dfce7e}.versionCardTop{display:flex;justify-content:space-between;gap:8px;font-size:6px;letter-spacing:.09em;color:#8e877a}.versionCardTop span{font-weight:950}.versionCardTop b{font-weight:750}
+.versionCard h3{font-size:12px;margin:14px 0 6px}.versionPrimary{font-size:18px;font-weight:900;letter-spacing:-.035em}.versionCard>p{font-size:7px;color:#8d8679;line-height:1.45;min-height:30px}
+.versionMetrics{margin-top:9px;border-top:1px solid #e6e0d3;padding-top:6px;flex:1}.versionMetrics div{display:flex;justify-content:space-between;gap:8px;padding:4px 0;font-size:7px}.versionMetrics b{font-size:7px;text-align:right}
+.versionCard>button{border:0;background:transparent;text-align:left;padding:10px 0 0;font-size:8px;font-weight:900;color:#6f5d16;cursor:pointer}
+@media(max-width:900px){.versionCompareGrid{grid-template-columns:1fr 1fr}}@media(max-width:560px){.versionCompareGrid{grid-template-columns:1fr}}
+
+
+/* V12 scenario matrix */
+.decisionRibbon .versionBadge{font-style:normal;vertical-align:middle}
+.scenarioCompareHead>div>span{display:block;font-size:6px;letter-spacing:.13em;font-weight:950;color:#9a8120;margin-bottom:4px}
+.scenarioMatrixWrap{margin-top:12px;overflow:auto;border:1px solid rgba(19,19,14,.08);border-radius:16px;background:#fff}
+.scenarioMatrix{width:100%;border-collapse:collapse;min-width:620px}.scenarioMatrix th,.scenarioMatrix td{padding:10px 12px;border-bottom:1px solid #eee9dd;text-align:right;font-size:8px;white-space:nowrap}
+.scenarioMatrix th:first-child,.scenarioMatrix td:first-child{text-align:left}.scenarioMatrix th{font-size:6px;letter-spacing:.1em;text-transform:uppercase;color:#958d7f;background:#faf8f1}.scenarioMatrix td:first-child{font-weight:850;color:#6d665b}
+.scenarioMatrix tr:last-child td{border-bottom:0}
+
+
+/* V12 question interpretation */
+.askContextBanner{display:grid;grid-template-columns:42px 1fr;gap:14px;margin-top:18px;padding:17px 18px;border:1px solid #dfcf86;border-radius:20px;background:linear-gradient(135deg,#fffdf4,#fff5bd)}
+.askContextIcon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--v11-ink);color:var(--v11-yellow);font-weight:950;font-size:13px}.askContextBody>span{display:block;font-size:6px;font-weight:950;letter-spacing:.13em;color:#9b8220}
+.askContextBody h3{font-size:14px;letter-spacing:-.02em;margin:4px 0 10px}.askUnderstood{display:flex;flex-wrap:wrap;gap:6px}.askUnderstood>span{border:1px solid rgba(19,19,14,.08);background:rgba(255,255,255,.62);border-radius:12px;padding:7px 9px}.askUnderstood small{display:block;font-size:6px;color:#8b8374;margin-bottom:2px}.askUnderstood b{font-size:9px}
+.askMissing{margin-top:9px;font-size:8px;color:#796f5e;line-height:1.5}.askMissing b{color:#4f493f}
+@media(max-width:600px){.askContextBanner{grid-template-columns:1fr}.askContextIcon{width:32px;height:32px}}
+
 </style>
 </head>
 <body>
@@ -583,7 +636,31 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
       <div><span class="kicker gold">RECURSO PRO</span><h2>Veja a decisão completa.</h2><p>O modo gratuito mostra a conta básica. O PRO libera cenários, ponto de equilíbrio, “E se?”, gráfico e histórico.</p></div>
       <button class="btn yellow" onclick="setDemoPlan('pro'); openCurrentTool()">Testar PRO nesta versão</button>
     </div>
+    <div id="askContextBanner" class="askContextBanner hidden">
+      <div class="askContextIcon">?</div>
+      <div class="askContextBody">
+        <span>O AMARELO ENTENDEU</span>
+        <h3 id="askContextTitle">Transformei sua pergunta em premissas.</h3>
+        <div id="askUnderstood" class="askUnderstood"></div>
+        <div id="askMissing" class="askMissing"></div>
+      </div>
+    </div>
     <div class="toolWorkspaceMeta"><span><i></i> Motor determinístico</span><span>premissas visíveis</span><span>cenários comparáveis</span></div>
+    <section id="scenarioLab" class="scenarioLab hidden">
+      <div class="scenarioLabHead">
+        <div><span class="kicker">LABORATÓRIO DE CENÁRIOS</span><h3>Uma decisão. Mais de um futuro.</h3><p id="scenarioDescription">Compare hipóteses sem perder a sua base.</p></div>
+        <div class="scenarioLabActions">
+          <button onclick="duplicateScenario()">Duplicar cenário</button>
+          <button class="scenarioCompareBtn" onclick="compareScenarios()">Comparar cenários</button>
+        </div>
+      </div>
+      <div id="scenarioTabs" class="scenarioTabs"></div>
+      <div class="whatIfBlock">
+        <div class="whatIfHead"><span>E SE?</span><p>Ajuste os principais direcionadores sem reconstruir a simulação.</p></div>
+        <div id="whatIfQuick" class="whatIfQuick"></div>
+      </div>
+      <div id="scenarioCompare" class="scenarioCompare hidden"></div>
+    </section>
     <div id="calculator" class="calculator">
       <aside class="inputPanel">
         <div class="modeToggle"><button id="simpleMode" class="active" onclick="setMode('simple')">Simples</button><button id="advancedMode" onclick="setMode('advanced')">Avançado</button></div>
@@ -592,16 +669,17 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
         <div id="methodology" class="methodology"></div>
       </aside>
       <section class="resultPanel">
-        <div class="decisionRibbon"><span>SIMULAÇÃO EDUCACIONAL · PREMISSAS EDITÁVEIS</span><b>AMARELO / DECISÃO</b></div>
+        <div class="decisionRibbon"><span>SIMULAÇÃO EDUCACIONAL · PREMISSAS EDITÁVEIS <i id="scenarioActiveBadge" class="versionBadge hidden"></i></span><b>AMARELO / DECISÃO</b></div>
         <div class="resultGuide"><div>RESPOSTA</div><div>DIRECIONADORES</div><div>BREAK-EVEN</div><div>E SE?</div></div>
         <div class="resultHero"><span>RESPOSTA DIRETA</span><h2 id="resultPrimary">Preencha os dados</h2><p id="resultSubtitle"></p></div>
         <div id="resultMetrics" class="metrics"></div>
+        <div id="driverBox" class="resultBox driverBox hidden"><div class="boxHead"><h3>O que move esta decisão</h3><span>DRIVERS</span></div><div id="decisionDrivers" class="decisionDrivers"></div></div>
         <div id="assumptionBox" class="resultBox assumptionBox hidden"><div class="boxHead"><h3>Premissas usadas nesta conta</h3><span>TRANSPARÊNCIA</span></div><div id="assumptionList" class="assumptionList"></div></div>
         <div id="resultInsight" class="resultBox hidden"><div class="boxHead"><h3>O que isso significa?</h3></div><div id="insightText"></div></div>
         <div id="breakEvenBox" class="resultBox hidden"><div class="boxHead"><h3>Ponto de equilíbrio</h3><span>BREAK-EVEN</span></div><div id="breakEven"></div></div>
         <div id="sensitivityBox" class="resultBox hidden"><div class="boxHead"><h3>E se?</h3><span>SENSIBILIDADE</span></div><div id="sensitivity" class="sensitivity"></div></div>
         <div id="chartBox" class="resultBox hidden"><div class="boxHead"><h3>Evolução</h3><span id="chartLabel"></span></div><div id="chart" class="chart"></div><div id="legend" class="legend"></div></div>
-        <div class="resultButtons"><button class="btn outline" onclick="saveDecision()">Salvar decisão</button><button class="btn ghost" onclick="copyResult()">Copiar resumo</button></div>
+        <div class="resultButtons"><button id="saveDecisionBtn" class="btn outline" onclick="saveDecision()">Salvar decisão</button><button class="btn ghost" onclick="copyResult()">Copiar resumo</button></div>
         <div id="nextTools" class="nextTools"></div>
       </section>
     </div>
@@ -632,6 +710,16 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
   </div>
 </div>
 
+<div id="versionModal" class="modal hidden">
+  <div class="modalCard versionModalCard">
+    <button class="modalClose naked" onclick="closeVersionCompare()">×</button>
+    <span class="kicker">HISTÓRICO DA DECISÃO</span>
+    <h2 id="versionModalTitle">Compare versões.</h2>
+    <p class="versionModalLead">Veja como a mesma decisão mudou quando as premissas mudaram.</p>
+    <div id="versionCompareGrid" class="versionCompareGrid"></div>
+  </div>
+</div>
+
 <footer><div class="shell footer"><div><b>AMARELO</b><br>Antes de decidir, coloque na conta.</div><div>Simulações educacionais. Premissas, regras tributárias e parâmetros regulados precisam ser mantidos atualizados antes do lançamento comercial.</div></div></footer>
 <div id="toast" class="toast"></div>
 <script>
@@ -643,7 +731,7 @@ const storage={
  get(k,f){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}},
  set(k,v){localStorage.setItem(k,JSON.stringify(v))}
 };
-let state={route:'home',category:'Todas',current:null,mode:'simple',last:null,plan:storage.get('amarelo_plan','free')};
+let state={route:'home',category:'Todas',current:null,mode:'simple',last:null,plan:storage.get('amarelo_plan','free'),scenario:null,scenarioBusy:false,pendingAsk:null,askContext:null};
 
 const journeys=[
 ['Investir','↗','Quero investir melhor','Renda fixa, juros, inflação, metas e aposentadoria.'],
@@ -713,14 +801,396 @@ function toolCard(t){return `<article class="toolCard ${t.tier==='decision'?'dec
 function renderHome(){$('journeys').innerHTML=journeys.map(j=>`<div class="journey" onclick="state.category='${j[0]}';navigate('tools')"><div class="jicon">${j[1]}</div><h3>${j[2]}</h3><p>${j[3]}</p><small>Explorar ${j[0]} →</small></div>`).join('');$('featured').innerHTML=tools.filter(t=>t.featured).slice(0,8).map(toolCard).join('')}
 function renderTools(q=''){let s=q.toLowerCase();$('filters').innerHTML=categories.map(c=>`<button class="${state.category===c?'active':''}" onclick="state.category='${c}';renderTools(document.getElementById('toolSearch').value)">${c}</button>`).join('');let arr=tools.filter(t=>(state.category==='Todas'||t.cat===state.category)&&(!s||(t.title+' '+t.desc+' '+t.cat).toLowerCase().includes(s)));if($('toolCount'))$('toolCount').textContent=arr.length;$('toolLibrary').innerHTML=arr.length?arr.map(toolCard).join(''):`<div class="emptyState"><span>0 resultados</span><h3>Nenhuma decisão encontrada.</h3><p>Tente outro termo ou volte para “Todas”.</p><button onclick="state.category='Todas';document.getElementById('toolSearch').value='';renderTools('')">Limpar filtros →</button></div>`}
 function renderAskExamples(){let ex=[['Tenho R$ 100 mil e um financiamento. Amortizo ou invisto?','amortizar-investir'],['LCI 92% do CDI ou CDB 110%?','gross-up'],['Comprar imóvel ou continuar alugando?','comprar-alugar'],['Quanto preciso para aposentar recebendo R$ 10 mil?','aposentadoria']];$('askSuggestions').innerHTML=ex.map(x=>`<div class="askSuggestion" onclick="document.getElementById('askText').value='${x[0]}';openTool('${x[1]}')"><b>${x[0]}</b><p>Abrir análise relacionada →</p></div>`).join('')}
-function askAmarelo(q){q=(q||'').toLowerCase();let id='quanto-rende';const map=[['financiamento-consorcio',['consórc','consorc','financiar ou']],['comprar-alugar',['alugar','aluguel']],['amortizar-investir',['amort','quitar financiamento']],['aposentadoria',['aposent','previd']],['viver-renda',['viver de renda','renda mensal']],['salario-liquido',['salário','salario','quanto cai']],['gross-up',['lci','lca','gross','cdb']],['plano-dividas',['dívida','divida','cartão','cartao']],['avista-parcelado',['à vista','a vista','parcelado']],['meta-financeira',['meta','chegar em']]];for(const [i,words] of map)if(words.some(w=>q.includes(w))){id=i;break}openTool(id)}
+function parseMoneyBR(raw){
+  if(!raw)return null;
+  let s=String(raw).toLowerCase().trim(),mult=1;
+  if(/milh|milhão|milhões|\bmi\b/.test(s))mult=1e6;
+  else if(/\bmil\b|\bk\b/.test(s))mult=1e3;
+  s=s.replace(/[^\d,.\-]/g,'');
+  if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');
+  else if((s.match(/\./g)||[]).length&&/\.\d{3}(?:\.|$)/.test(s))s=s.replace(/\./g,'');
+  let n=parseFloat(s);
+  return Number.isFinite(n)?n*mult:null;
+}
+function parseRateBR(raw){
+  if(raw==null)return null;
+  let n=parseFloat(String(raw).replace(',','.'));
+  return Number.isFinite(n)?n:null;
+}
+function moneyPattern(){return '(?:R\\$\\s*)?([\\d.]+(?:,\\d+)?\\s*(?:milh(?:ão|ões|oes)|mil|mi|k)?)'}
+function firstMoney(text,patterns){
+  const token=moneyPattern();
+  for(const source of patterns){
+    let re=new RegExp(source.replace('MONEY',token),'i'),m=text.match(re);
+    if(m){
+      let raw=m.slice(1).find(v=>v&&/\d/.test(v)),n=parseMoneyBR(raw);
+      if(n!==null)return n;
+    }
+  }
+  return null;
+}
+function firstRate(text,patterns){
+  for(const re of patterns){let m=text.match(re);if(m){let n=parseRateBR(m[1]);if(n!==null)return n}}
+  return null;
+}
+function firstInt(text,patterns){
+  for(const re of patterns){let m=text.match(re);if(m)return parseInt(m[1],10)}
+  return null;
+}
+function detectAskTool(text){
+  const rules=[
+    ['financiamento-consorcio',['consórc','consorc','financiar ou','financiamento ou investir','dar entrada']],
+    ['comprar-alugar',['comprar ou alugar','alugar ou comprar','aluguel','continuar alugando']],
+    ['amortizar-investir',['amort','quitar financiamento','abater financiamento','reduzir saldo']],
+    ['aposentadoria',['aposent','parar de trabalhar','previdência','previdencia']],
+    ['viver-renda',['viver de renda','renda mensal com patrimônio','renda mensal com patrimonio']],
+    ['salario-liquido',['salário','salario','quanto cai']],
+    ['gross-up',['lci','lca','gross','cdb']],
+    ['plano-dividas',['dívida','divida','cartão','cartao']],
+    ['avista-parcelado',['à vista','a vista','parcelado']],
+    ['meta-financeira',['meta','chegar em']]
+  ];
+  let best=['quanto-rende',0];
+  for(const [id,words] of rules){
+    let score=words.reduce((s,w)=>s+(text.includes(w)?1:0),0);
+    if(score>best[1])best=[id,score];
+  }
+  return best[0];
+}
+function interpretAsk(raw){
+  let text=String(raw||'').toLowerCase(),toolId=detectAskTool(text),values={},understood=[],missing=[];
+  const add=(id,value,label,display)=>{
+    if(value===null||value===undefined||!Number.isFinite(value))return;
+    values[id]=String(value);understood.push([label,display||BRL(value)]);
+  };
+  if(toolId==='aposentadoria'){
+    let age=firstInt(text,[/tenho\s+(\d{1,2})\s+anos/]);
+    let ret=firstInt(text,[/(?:aposentar|aposentadoria|parar de trabalhar).*?(?:aos|com)\s+(\d{1,2})\s+anos/,/(?:aos|com)\s+(\d{1,2})\s+anos.*?(?:aposent|parar)/]);
+    let current=firstMoney(text,['MONEY\\s+(?:investid|aplicad|guardad)','(?:patrimônio|patrimonio|tenho investido|tenho aplicado)(?:\\s+de)?\\s+MONEY']);
+    let pmt=firstMoney(text,['(?:guardo|guardar|aporto|aportar|invisto|investir)(?:\\s+por mês|\\s+por mes|\\s+mensalmente)?\\s+MONEY','MONEY\\s+(?:por mês|por mes|mensais).*?(?:guardar|aportar|investir)']);
+    let income=firstMoney(text,['(?:receber|recebendo|renda desejada|renda de)(?:\\s+de)?\\s+MONEY','MONEY\\s+(?:por mês|por mes).*?(?:aposent|renda)']);
+    add('age',age,'Idade atual',age?age+' anos':null);
+    add('ret',ret,'Aposentadoria',ret?ret+' anos':null);
+    add('current',current,'Patrimônio atual',current?BRL(current):null);
+    add('pmt',pmt,'Aporte mensal',pmt?BRL(pmt)+'/mês':null);
+    add('income',income,'Renda desejada',income?BRL(income)+'/mês':null);
+    if(age===null)missing.push('idade atual');
+    if(ret===null)missing.push('idade de aposentadoria');
+    if(current===null)missing.push('patrimônio atual');
+    if(pmt===null)missing.push('aporte mensal');
+    if(income===null)missing.push('renda desejada');
+  }else if(toolId==='amortizar-investir'){
+    let bal=firstMoney(text,['(?:saldo devedor|financiamento|devo)(?:\\s+de)?\\s+MONEY']);
+    let cash=firstMoney(text,['MONEY\\s+(?:disponível|disponivel|para amortizar)','(?:tenho|capital disponível|capital disponivel)(?:\\s+de)?\\s+MONEY']);
+    let debt=firstRate(text,[/(?:taxa|custo|cet).*?(\d+(?:[.,]\d+)?)%\s*(?:ao ano|a\.a\.)/,/(\d+(?:[.,]\d+)?)%\s*(?:ao ano|a\.a\.).*?(?:financiamento|dívida|divida)/]);
+    let inv=firstRate(text,[/(?:rende|rendimento|retorno).*?(\d+(?:[.,]\d+)?)%/]);
+    let months=firstInt(text,[/(\d+)\s+meses?\s+(?:restantes?|de prazo)/,/(\d+)\s+parcelas?\s+(?:restantes?)/]);
+    add('balance',bal,'Saldo devedor',bal?BRL(bal):null);
+    add('cash',cash,'Capital disponível',cash?BRL(cash):null);
+    add('debtA',debt,'Custo da dívida',debt!==null?PCT(debt)+' a.a.':null);
+    add('invGross',inv,'Retorno esperado',inv!==null?PCT(inv)+' a.a.':null);
+    add('months',months,'Prazo restante',months?months+' meses':null);
+    if(bal===null)missing.push('saldo devedor');
+    if(debt===null)missing.push('custo/taxa anual da dívida');
+    if(months===null)missing.push('prazo restante');
+    if(cash===null)missing.push('capital disponível');
+    if(inv===null)missing.push('retorno esperado do investimento');
+  }else if(toolId==='comprar-alugar'){
+    let asset=firstMoney(text,['(?:imóvel|imovel|apartamento|casa)(?:\\s+(?:de|vale|custa))?\\s+MONEY','MONEY\\s+(?:de imóvel|de imovel|de apartamento|de casa)']);
+    let down=firstMoney(text,['entrada(?:\\s+de)?\\s+MONEY']);
+    let rent=firstMoney(text,['aluguel(?:\\s+de|\\s+por)?\\s+MONEY']);
+    let fin=firstRate(text,[/(?:financiamento|crédito|credito).*?(\d+(?:[.,]\d+)?)%\s*(?:a\.m\.|ao mês|ao mes)/]);
+    let inv=firstRate(text,[/(?:retorno|rende|investimento).*?(\d+(?:[.,]\d+)?)%\s*(?:a\.a\.|ao ano)?/]);
+    let years=firstInt(text,[/(\d+)\s+anos?\s+(?:de horizonte|comparando|para comparar)/]);
+    add('asset',asset,'Valor do imóvel',asset?BRL(asset):null);
+    add('down',down,'Entrada',down?BRL(down):null);
+    add('rent',rent,'Aluguel',rent?BRL(rent)+'/mês':null);
+    add('finM',fin,'Taxa do financiamento',fin!==null?PCT(fin)+' a.m.':null);
+    add('inv',inv,'Retorno investido',inv!==null?PCT(inv)+' a.a.':null);
+    add('years',years,'Horizonte',years?years+' anos':null);
+    if(asset===null)missing.push('valor do imóvel');
+    if(rent===null)missing.push('aluguel mensal');
+    if(inv===null)missing.push('retorno do investimento');
+    if(years===null)missing.push('horizonte da comparação');
+  }else if(toolId==='financiamento-consorcio'){
+    let asset=firstMoney(text,['(?:imóvel|imovel|bem|carro)(?:\\s+(?:de|vale|custa))?\\s+MONEY','MONEY\\s+(?:de imóvel|de imovel|de bem|de carro)']);
+    let cash=firstMoney(text,['(?:entrada|capital disponível|capital disponivel|tenho)(?:\\s+de)?\\s+MONEY']);
+    let fin=firstRate(text,[/(?:financiamento|crédito|credito).*?(\d+(?:[.,]\d+)?)%\s*(?:a\.m\.|ao mês|ao mes)/]);
+    let cont=firstInt(text,[/(?:contemplação|contemplacao|contemplado).*?(\d+)\s+mes/]);
+    let inv=firstRate(text,[/(?:retorno|rende|investimento).*?(\d+(?:[.,]\d+)?)%\s*(?:a\.a\.|ao ano)?/]);
+    add('asset',asset,'Valor do bem',asset?BRL(asset):null);
+    add('cash',cash,'Capital/entrada',cash?BRL(cash):null);
+    add('finM',fin,'Taxa do financiamento',fin!==null?PCT(fin)+' a.m.':null);
+    add('cont',cont,'Contemplação simulada',cont?cont+' meses':null);
+    add('inv',inv,'Retorno alternativo',inv!==null?PCT(inv)+' a.a.':null);
+    if(asset===null)missing.push('valor do bem');
+    if(cash===null)missing.push('capital disponível/entrada');
+    if(fin===null)missing.push('taxa do financiamento');
+    if(inv===null)missing.push('retorno alternativo');
+  }
+  return{raw:String(raw||''),toolId,values,understood,missing};
+}
+function renderAskContext(ctx){
+  const box=$('askContextBanner');
+  if(!ctx||ctx.toolId!==state.current?.id){box.classList.add('hidden');return}
+  $('askContextTitle').textContent=ctx.understood.length?'Transformei parte da sua pergunta em premissas.':'Encontrei o motor mais adequado para sua pergunta.';
+  $('askUnderstood').innerHTML=ctx.understood.length?ctx.understood.map(x=>'<span><small>'+x[0]+'</small><b>'+x[1]+'</b></span>').join(''):'<span><small>ROTEAMENTO</small><b>'+state.current.title+'</b></span>';
+  $('askMissing').innerHTML=ctx.missing.length?'<b>Ainda falta:</b> '+ctx.missing.join(' · '):'<b>Dados principais identificados.</b> Revise as premissas antes de calcular.';
+  box.classList.remove('hidden');
+}
+function applyPendingAsk(){
+  if(!state.pendingAsk||state.pendingAsk.toolId!==state.current?.id){state.askContext=null;renderAskContext(null);return}
+  state.askContext=state.pendingAsk;state.pendingAsk=null;
+  setAssumptions(state.askContext.values);
+  renderAskContext(state.askContext);
+}
+function askAmarelo(q){
+  let ctx=interpretAsk(q);
+  state.pendingAsk=ctx;
+  openTool(ctx.toolId);
+}
 function planAllows(t){return t.tier==='free'||state.plan!=='free'}
 function setDemoPlan(p){state.plan=p;storage.set('amarelo_plan',p);toast('Plano de demonstração: '+p.toUpperCase());if(state.current)openCurrentTool();renderDashboard()}
+
+const scenarioDecisionIds=new Set(['financiamento-consorcio','comprar-alugar','amortizar-investir','aposentadoria']);
+const scenarioNames={base:'Base',conservative:'Conservador',optimistic:'Otimista'};
+const scenarioNotes={
+ base:'Suas premissas atuais. Este é o ponto de partida da comparação.',
+ conservative:'Premissas mais prudentes para testar a resistência da decisão. Não é previsão.',
+ optimistic:'Premissas mais favoráveis para testar a folga do plano. Não é previsão.'
+};
+const cloneData=x=>JSON.parse(JSON.stringify(x));
+function scenarioEnabled(){return !!state.current&&scenarioDecisionIds.has(state.current.id)}
+function setAssumptions(values){Object.entries(values||{}).forEach(([id,v])=>{let el=$(id);if(el)el.value=v})}
+function scenarioNumber(obj,id){let v=parseFloat(obj[id]);return Number.isFinite(v)?v:0}
+function setScenarioNumber(obj,id,value,min=-Infinity,max=Infinity){obj[id]=String(Math.min(max,Math.max(min,value)))}
+function buildScenarioPreset(base,type){
+ let a=cloneData(base),stress=type==='conservative',opti=type==='optimistic';
+ if(!stress&&!opti)return a;
+ const e=state.current.engine;
+ if(e==='buyPaths'){
+   setScenarioNumber(a,'finM',scenarioNumber(a,'finM')+(stress?.15:-.15),0);
+   setScenarioNumber(a,'cont',Math.round(scenarioNumber(a,'cont')*(stress?1.45:.75)),1,scenarioNumber(a,'consN')||1200);
+   setScenarioNumber(a,'reaj',scenarioNumber(a,'reaj')+(stress?1.5:-1),0);
+   setScenarioNumber(a,'inv',scenarioNumber(a,'inv')+(stress?-2:2),0);
+   setScenarioNumber(a,'rent',scenarioNumber(a,'rent')*(stress?1.1:.95),0);
+ }else if(e==='buyRent'){
+   setScenarioNumber(a,'app',scenarioNumber(a,'app')+(stress?-2:2),-20,30);
+   setScenarioNumber(a,'inv',scenarioNumber(a,'inv')+(stress?-2:2),0);
+   setScenarioNumber(a,'rentGrow',scenarioNumber(a,'rentGrow')+(stress?1:-1),0);
+   setScenarioNumber(a,'finM',scenarioNumber(a,'finM')+(stress?.1:-.1),0);
+   setScenarioNumber(a,'maintenance',scenarioNumber(a,'maintenance')+(stress?.25:-.2),0);
+ }else if(e==='amortInvest'){
+   setScenarioNumber(a,'invGross',scenarioNumber(a,'invGross')+(stress?-2:2),0);
+   setScenarioNumber(a,'fee',scenarioNumber(a,'fee')+(stress?.25:-.25),0);
+   setScenarioNumber(a,'months',Math.round(scenarioNumber(a,'months')+(stress?12:-12)),1);
+ }else if(e==='retirement'){
+   setScenarioNumber(a,'real',scenarioNumber(a,'real')+(stress?-1:1),-10,30);
+   setScenarioNumber(a,'fee',scenarioNumber(a,'fee')+(stress?.25:-.25),0);
+   setScenarioNumber(a,'inflation',scenarioNumber(a,'inflation')+(stress?1:-.5),0);
+ }
+ return a;
+}
+function scenarioWhatIfConfig(){
+ const e=state.current?.engine;
+ if(e==='buyPaths')return[
+   {id:'finM',label:'Taxa do crédito',step:.1,suffix:'% a.m.',min:0},
+   {id:'cont',label:'Contemplação',step:6,suffix:' meses',min:1},
+   {id:'inv',label:'Retorno alternativo',step:1,suffix:'% a.a.',min:0}
+ ];
+ if(e==='buyRent')return[
+   {id:'app',label:'Valorização do imóvel',step:1,suffix:'% a.a.',min:-20},
+   {id:'inv',label:'Retorno investido',step:1,suffix:'% a.a.',min:0},
+   {id:'rent',label:'Aluguel mensal',step:250,prefix:'R$ ',min:0}
+ ];
+ if(e==='amortInvest')return[
+   {id:'invGross',label:'Retorno do investimento',step:1,suffix:'% a.a.',min:0},
+   {id:'cash',label:'Capital disponível',step:10000,prefix:'R$ ',min:0},
+   {id:'months',label:'Prazo restante',step:12,suffix:' meses',min:1}
+ ];
+ if(e==='retirement')return[
+   {id:'real',label:'Retorno real',step:.5,suffix:'% a.a.',min:-10},
+   {id:'pmt',label:'Aporte mensal',step:250,prefix:'R$ ',min:0},
+   {id:'ret',label:'Idade de aposentadoria',step:1,suffix:' anos',min:num('age')+1}
+ ];
+ return[];
+}
+function formatScenarioValue(cfg,value){
+ let n=parseFloat(value)||0;
+ if(cfg.prefix==='R$ ')return BRL(n);
+ let decimals=Math.abs(cfg.step)<1?2:0;
+ return n.toLocaleString('pt-BR',{maximumFractionDigits:decimals,minimumFractionDigits:decimals})+(cfg.suffix||'');
+}
+function getScenarioLabel(id){
+ if(scenarioNames[id])return scenarioNames[id];
+ return state.scenario?.labels?.[id]||'Cenário';
+}
+function initScenarioLab(){
+ state.scenario=null;
+ const lab=$('scenarioLab');
+ if(!scenarioEnabled()){lab.classList.add('hidden');$('saveDecisionBtn').textContent='Salvar decisão';$('scenarioActiveBadge').classList.add('hidden');return}
+ const base=captureAssumptions();
+ state.scenario={
+   active:'base',
+   sets:{base:cloneData(base),conservative:buildScenarioPreset(base,'conservative'),optimistic:buildScenarioPreset(base,'optimistic')},
+   labels:{},
+   dirty:{base:false,conservative:false,optimistic:false},
+   snapshots:{base:state.last?cloneData(state.last):null},
+   customCount:0
+ };
+ lab.classList.remove('hidden');
+ $('saveDecisionBtn').textContent='Salvar versão';
+ renderScenarioLab();
+ recordScenarioSnapshot();
+}
+function persistActiveScenario(){
+ if(!state.scenario||state.scenarioBusy)return;
+ const id=state.scenario.active,vals=captureAssumptions();
+ state.scenario.sets[id]=cloneData(vals);
+ if(id==='base'){
+   if(!state.scenario.dirty.conservative)state.scenario.sets.conservative=buildScenarioPreset(vals,'conservative');
+   if(!state.scenario.dirty.optimistic)state.scenario.sets.optimistic=buildScenarioPreset(vals,'optimistic');
+ }else{
+   state.scenario.dirty[id]=true;
+ }
+}
+function renderScenarioLab(){
+ if(!state.scenario)return;
+ const ids=Object.keys(state.scenario.sets);
+ $('scenarioActiveBadge').textContent=getScenarioLabel(state.scenario.active);
+ $('scenarioActiveBadge').classList.remove('hidden');
+ $('scenarioTabs').innerHTML=ids.map(id=>`<button class="scenarioTab ${state.scenario.active===id?'active':''}" onclick="switchScenario('${id}')"><small>${id.startsWith('custom')?'CENÁRIO LIVRE':'CENÁRIO'}</small><b>${getScenarioLabel(id)}</b><span>${id==='base'?'premissas atuais':id==='conservative'?'mais prudente':id==='optimistic'?'mais favorável':'editável'}</span></button>`).join('');
+ $('scenarioDescription').textContent=scenarioNotes[state.scenario.active]||'Cópia independente para testar outra hipótese.';
+ renderWhatIfQuick();
+}
+function renderWhatIfQuick(){
+ if(!state.scenario)return;
+ const cfgs=scenarioWhatIfConfig();
+ $('whatIfQuick').innerHTML=cfgs.map(cfg=>{let el=$(cfg.id),v=el?.value??0;return`<div class="whatIfControl"><button aria-label="Reduzir ${cfg.label}" onclick="adjustWhatIf('${cfg.id}',${-cfg.step},${Number.isFinite(cfg.min)?cfg.min:'null'},${Number.isFinite(cfg.max)?cfg.max:'null'})">−</button><div class="whatIfValue"><small>${cfg.label}</small><b>${formatScenarioValue(cfg,v)}</b></div><button aria-label="Aumentar ${cfg.label}" onclick="adjustWhatIf('${cfg.id}',${cfg.step},${Number.isFinite(cfg.min)?cfg.min:'null'},${Number.isFinite(cfg.max)?cfg.max:'null'})">+</button></div>`}).join('');
+}
+function adjustWhatIf(id,delta,min=null,max=null){
+ let el=$(id);if(!el)return;
+ let v=(parseFloat(el.value)||0)+delta;
+ if(min!==null)v=Math.max(min,v);if(max!==null)v=Math.min(max,v);
+ el.value=String(Math.round(v*10000)/10000);
+ calculateTool();
+ renderScenarioLab();
+}
+function switchScenario(id){
+ if(!state.scenario||!state.scenario.sets[id])return;
+ persistActiveScenario();
+ state.scenario.active=id;
+ state.scenarioBusy=true;
+ setAssumptions(state.scenario.sets[id]);
+ calculateTool();
+ state.scenarioBusy=false;
+ renderScenarioLab();
+}
+function duplicateScenario(){
+ if(!state.scenario)return;
+ persistActiveScenario();
+ const id='custom'+(++state.scenario.customCount);
+ state.scenario.labels[id]='Cópia '+state.scenario.customCount;
+ state.scenario.sets[id]=cloneData(state.scenario.sets[state.scenario.active]);
+ state.scenario.dirty[id]=true;
+ state.scenario.active=id;
+ state.scenarioBusy=true;
+ setAssumptions(state.scenario.sets[id]);
+ calculateTool();
+ state.scenarioBusy=false;
+ renderScenarioLab();
+ toast('Cenário duplicado. Ajuste as premissas livremente.');
+}
+function recordScenarioSnapshot(){
+ if(!state.scenario||!state.last)return;
+ state.scenario.snapshots[state.scenario.active]={...cloneData(state.last),assumptions:captureAssumptions()};
+}
+function renderScenarioCompare(){
+ if(!state.scenario)return;
+ const ids=Object.keys(state.scenario.sets),snaps=ids.map(id=>({id,s:state.scenario.snapshots[id]})).filter(x=>x.s);
+ const metricLabels=[...new Set(snaps.flatMap(x=>(x.s.metrics||[]).slice(0,5).map(m=>m[0])))].slice(0,6);
+ const matrix=`<div class="scenarioMatrixWrap"><table class="scenarioMatrix"><thead><tr><th>Métrica</th>${snaps.map(x=>`<th>${getScenarioLabel(x.id)}</th>`).join('')}</tr></thead><tbody>${metricLabels.map(label=>`<tr><td>${label}</td>${snaps.map(x=>{let m=(x.s.metrics||[]).find(v=>v[0]===label);return`<td>${m?m[1]:'—'}</td>`}).join('')}</tr>`).join('')}</tbody></table></div>`;
+ $('scenarioCompare').innerHTML=`<div class="scenarioCompareHead"><div><span>LEITURA LADO A LADO</span><h4>Comparação de cenários</h4></div><button onclick="document.getElementById('scenarioCompare').classList.add('hidden')">Fechar ×</button></div><div class="scenarioCompareGrid">${snaps.map(({id,s})=>{let metrics=(s.metrics||[]).slice(0,3);return`<article class="scenarioSnapshot ${state.scenario.active===id?'active':''}"><span>${getScenarioLabel(id)}</span><h5>${state.current.title}</h5><div class="snapshotPrimary">${s.primary}</div><div class="snapshotSubtitle">${s.subtitle||''}</div><div class="snapshotMetrics">${metrics.map(m=>`<div><span>${m[0]}</span><b>${m[1]}</b></div>`).join('')}</div></article>`}).join('')}</div>${matrix}`;
+ $('scenarioCompare').classList.remove('hidden');
+}
+function compareScenarios(){
+ if(!state.scenario)return;
+ persistActiveScenario();
+ const original=state.scenario.active,originalValues=cloneData(state.scenario.sets[original]);
+ state.scenarioBusy=true;
+ for(const id of Object.keys(state.scenario.sets)){
+   state.scenario.active=id;
+   setAssumptions(state.scenario.sets[id]);
+   calculateTool();
+ }
+ state.scenario.active=original;
+ setAssumptions(originalValues);
+ calculateTool();
+ state.scenarioBusy=false;
+ renderScenarioLab();
+ renderScenarioCompare();
+}
+function decisionDrivers(){
+ if(!scenarioEnabled())return[];
+ const e=state.current.engine;
+ if(e==='buyPaths')return[
+   ['Taxa do financiamento',PCT(num('finM'))+' a.m.','mexe no custo do crédito'],
+   ['Contemplação simulada',Math.round(num('cont'))+' meses','mexe no tempo de espera'],
+   ['Retorno alternativo',PCT(num('inv'))+' a.a.','mexe no custo de oportunidade'],
+   ['Reajuste da carta',PCT(num('reaj'))+' a.a.','mexe no fluxo do consórcio']
+ ];
+ if(e==='buyRent')return[
+   ['Valorização do imóvel',PCT(num('app'))+' a.a.','mexe no patrimônio do proprietário'],
+   ['Retorno investido',PCT(num('inv'))+' a.a.','mexe no patrimônio do inquilino'],
+   ['Aluguel inicial',BRL(num('rent')),'mexe no caixa mensal'],
+   ['Taxa do financiamento',PCT(num('finM'))+' a.m.','mexe no custo de comprar']
+ ];
+ if(e==='amortInvest')return[
+   ['Custo da dívida',PCT(num('debtA'))+' a.a.','define a economia potencial'],
+   ['Retorno do investimento',PCT(num('invGross'))+' a.a.','define o ganho alternativo'],
+   ['Capital disponível',BRL(num('cash')),'define o tamanho da decisão'],
+   ['Prazo restante',Math.round(num('months'))+' meses','define por quanto tempo o efeito se acumula']
+ ];
+ if(e==='retirement')return[
+   ['Retorno real líquido',PCT(num('real')-num('fee'))+' a.a.','mexe na acumulação e na fase de renda'],
+   ['Aporte mensal',BRL(num('pmt')),'mexe na velocidade de formação'],
+   ['Tempo até aposentar',Math.max(0,num('ret')-num('age')).toFixed(1).replace('.',',')+' anos','mexe no tempo de capitalização'],
+   ['Renda desejada',BRL(num('income'))+'/mês','mexe no capital necessário']
+ ];
+ return[];
+}
+function renderDecisionDrivers(){
+ const drivers=decisionDrivers();
+ if(!drivers.length){$('driverBox').classList.add('hidden');return}
+ $('decisionDrivers').innerHTML=drivers.map(d=>`<div class="driverChip"><small>${d[0]}</small><b>${d[1]}</b><span>${d[2]}</span></div>`).join('');
+ $('driverBox').classList.remove('hidden');
+}
+function exportScenarioState(){
+ if(!state.scenario)return null;
+ persistActiveScenario();
+ return cloneData({active:state.scenario.active,sets:state.scenario.sets,labels:state.scenario.labels,dirty:state.scenario.dirty,customCount:state.scenario.customCount});
+}
+function restoreScenarioState(savedState){
+ if(!state.scenario||!savedState?.sets)return false;
+ state.scenario.sets=cloneData(savedState.sets);
+ state.scenario.labels=cloneData(savedState.labels||{});
+ state.scenario.dirty=cloneData(savedState.dirty||{});
+ state.scenario.customCount=savedState.customCount||0;
+ state.scenario.active=savedState.active&&state.scenario.sets[savedState.active]?savedState.active:'base';
+ state.scenario.snapshots={};
+ state.scenarioBusy=true;
+ setAssumptions(state.scenario.sets[state.scenario.active]);
+ calculateTool();
+ state.scenarioBusy=false;
+ renderScenarioLab();
+ return true;
+}
+
 function openTool(id){state.current=tools.find(t=>t.id===id);navigate('tool');openCurrentTool()}
-function openCurrentTool(){const t=state.current;$('toolTitle').textContent=t.title;$('toolDescription').textContent=t.desc;$('toolCategory').textContent=t.cat.toUpperCase();$('toolTier').textContent=t.tier==='decision'?'DECISÃO PRO':t.tier==='pro'?'PRO':'GRÁTIS';$('toolTier').className='tier '+t.tier;$('toolForm').innerHTML=buildForm(t.engine);$('methodology').textContent=method(t.engine);state.mode='simple';setMode('simple');updateFav();state.last=null;clearResult();let allowed=planAllows(t);$('paywall').classList.toggle('hidden',allowed);$('calculator').classList.toggle('hidden',!allowed);if(allowed)calculateTool()}
+function openCurrentTool(){const t=state.current;state.scenario=null;state.scenarioBusy=false;$('scenarioLab').classList.add('hidden');$('scenarioCompare').classList.add('hidden');$('toolTitle').textContent=t.title;$('toolDescription').textContent=t.desc;$('toolCategory').textContent=t.cat.toUpperCase();$('toolTier').textContent=t.tier==='decision'?'DECISÃO PRO':t.tier==='pro'?'PRO':'GRÁTIS';$('toolTier').className='tier '+t.tier;$('toolForm').innerHTML=buildForm(t.engine);$('methodology').textContent=method(t.engine);applyPendingAsk();state.mode='simple';setMode('simple');updateFav();state.last=null;clearResult();let allowed=planAllows(t);$('paywall').classList.toggle('hidden',allowed);$('calculator').classList.toggle('hidden',!allowed);if(allowed){calculateTool();initScenarioLab()}}
 function updateFav(){$('favoriteBtn').textContent=(isFav(state.current.id)?'★':'☆')+' Favoritar'}function toggleFavoriteCurrent(){toggleFav(state.current.id);updateFav()}
 function setMode(m){state.mode=m;$('simpleMode').classList.toggle('active',m==='simple');$('advancedMode').classList.toggle('active',m==='advanced');$('toolForm').classList.toggle('advanced',m==='advanced')}
-function clearResult(){$('resultPrimary').textContent='Calculando...';$('resultSubtitle').textContent='';$('resultMetrics').innerHTML='';['resultInsight','breakEvenBox','sensitivityBox','chartBox','assumptionBox'].forEach(id=>$(id).classList.add('hidden'));$('nextTools').innerHTML=''}
+function clearResult(){$('resultPrimary').textContent='Calculando...';$('resultSubtitle').textContent='';$('resultMetrics').innerHTML='';['resultInsight','breakEvenBox','sensitivityBox','chartBox','assumptionBox','driverBox'].forEach(id=>$(id).classList.add('hidden'));$('nextTools').innerHTML=''}
 function F(id,label,value,adv=false){return `<div class="field ${adv?'advancedField':''}"><label>${label}<input id="${id}" type="number" step="any" value="${value}"></label></div>`}
 function S(id,label,opts,adv=false){return `<div class="field ${adv?'advancedField':''}"><label>${label}<select id="${id}">${opts.map(o=>`<option value="${o[0]}">${o[1]}</option>`).join('')}</select></label></div>`}
 function G(title,html){return `<div class="groupTitle">${title}</div><div class="formGrid">${html}</div>`}
@@ -771,10 +1241,10 @@ function taxLots(P,pmt,a,N){let m=monthly(a),gross=P*Math.pow(1+m,N),tax=(gross-
 function solveRate(fn,target,lo=-.99,hi=3){for(let i=0;i<70;i++){let mid=(lo+hi)/2;if(fn(mid)>target)hi=mid;else lo=mid}return(lo+hi)/2}
 function metric(a,b){return `<div class="metric"><small>${a}</small><b>${b}</b></div>`}
 function renderAssumptions(){let items=[...document.querySelectorAll('#toolForm .field')].map(w=>{let el=w.querySelector('input,select'),label=w.querySelector('label');if(!el||!label)return null;let name=[...label.childNodes].filter(n=>n.nodeType===3).map(n=>n.textContent).join(' ').trim()||el.id;let value=el.tagName==='SELECT'?(el.options[el.selectedIndex]?.text||el.value):el.value;return{name,value,advanced:w.classList.contains('advancedField')}}).filter(Boolean);if(!items.length){$('assumptionBox').classList.add('hidden');return}$('assumptionList').innerHTML=items.map(x=>`<div class="assumptionChip ${x.advanced?'advancedAssumption':''}"><small>${x.name}</small><b>${x.value}</b></div>`).join('');$('assumptionBox').classList.remove('hidden')}
-function setResult(primary,subtitle,metrics=[],insight='',be=null,sens=null,series=null,label=''){state.last={primary,subtitle,metrics,insight,be};renderAssumptions();$('resultPrimary').textContent=primary;$('resultSubtitle').textContent=subtitle;$('resultMetrics').innerHTML=metrics.map(x=>metric(x[0],x[1])).join('');if(insight){$('resultInsight').classList.remove('hidden');$('insightText').innerHTML=insight}else $('resultInsight').classList.add('hidden');if(be){$('breakEvenBox').classList.remove('hidden');$('breakEven').innerHTML=be}else $('breakEvenBox').classList.add('hidden');if(sens?.length){$('sensitivityBox').classList.remove('hidden');$('sensitivity').innerHTML=sens.map(x=>`<div class="sens"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('')}else $('sensitivityBox').classList.add('hidden');if(series?.length){$('chartBox').classList.remove('hidden');$('chartLabel').textContent=label;drawChart(series)}else $('chartBox').classList.add('hidden');renderNext()}
+function setResult(primary,subtitle,metrics=[],insight='',be=null,sens=null,series=null,label=''){state.last={primary,subtitle,metrics,insight,be};renderAssumptions();renderDecisionDrivers();recordScenarioSnapshot();$('resultPrimary').textContent=primary;$('resultSubtitle').textContent=subtitle;$('resultMetrics').innerHTML=metrics.map(x=>metric(x[0],x[1])).join('');if(insight){$('resultInsight').classList.remove('hidden');$('insightText').innerHTML=insight}else $('resultInsight').classList.add('hidden');if(be){$('breakEvenBox').classList.remove('hidden');$('breakEven').innerHTML=be}else $('breakEvenBox').classList.add('hidden');if(sens?.length){$('sensitivityBox').classList.remove('hidden');$('sensitivity').innerHTML=sens.map(x=>`<div class="sens"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('')}else $('sensitivityBox').classList.add('hidden');if(series?.length){$('chartBox').classList.remove('hidden');$('chartLabel').textContent=label;drawChart(series)}else $('chartBox').classList.add('hidden');renderNext()}
 function drawChart(series){const w=720,h=220,pad=28,all=series.flatMap(s=>s.data.map(x=>x.y)),min=Math.min(0,...all),max=Math.max(...all,1),span=max-min||1,colors=['#f3c62e','#7ed3af','#8fb5ff','#ff9a82'],maxLen=Math.max(...series.map(s=>s.data.length)),sx=i=>pad+(w-2*pad)*(maxLen<=1?0:i/(maxLen-1)),sy=y=>h-pad-(h-2*pad)*((y-min)/span);let grid='';for(let k=0;k<5;k++){let y=pad+(h-2*pad)*k/4;grid+=`<line x1="${pad}" y1="${y}" x2="${w-pad}" y2="${y}" stroke="#303029" stroke-width="1"/>`}let paths=series.map((s,si)=>`<path d="${s.data.map((p,i)=>(i?'L':'M')+sx(i)+' '+sy(p.y)).join(' ')}" fill="none" stroke="${colors[si%colors.length]}" stroke-width="3" stroke-linecap="round"/>`).join('');$('chart').innerHTML=`<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">${grid}${paths}</svg>`;$('legend').innerHTML=series.map((s,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${s.name}</span>`).join('')}
 function renderNext(){let map={'financiamento-consorcio':['comprar-alugar','amortizar-investir'],'comprar-alugar':['financiamento-consorcio','amortizar-investir'],'amortizar-investir':['renda-fixa','meta-financeira'],'renda-fixa':['gross-up','meta-financeira'],'gross-up':['renda-fixa'],'aposentadoria':['viver-renda','meta-financeira'],'reserva':['quanto-rende'],'salario-liquido':['reserva','quanto-guardar']};let ids=map[state.current.id]||[];$('nextTools').innerHTML=ids.length?'<h4>Próximas análises relacionadas</h4>'+ids.map(id=>{let t=tools.find(x=>x.id===id);return t?`<button onclick="openTool('${id}')">${t.title} →</button>`:''}).join(''):''}
-function calculateTool(){const e=state.current.engine;try{
+function calculateTool(){if(state.scenario&&!state.scenarioBusy)persistActiveScenario();const e=state.current.engine;try{
  if(e==='compound'){let P=num('p'),pmt=num('pmt'),years=num('years'),r=num('rate')/100,inf=num('inflation')/100,tax=num('tax')/100,N=years*12,gross=fv(P,pmt,r,N),invested=P+pmt*N,gain=gross-invested,net=gross-gain*tax,real=net/Math.pow(1+inf,years);let sens=[Math.max(0,r-.02),r,r+.02].map(rr=>[PCT(rr*100)+' a.a.',BRL(fv(P,pmt,rr,N))]),series=[],b=P,mi=monthly(r);for(let m=1;m<=N;m++){b=b*(1+mi)+pmt;if(m%12===0)series.push({y:b})}setResult(BRL(net),'Patrimônio líquido nominal estimado.',[['Total aportado',BRL(invested)],['Ganho líquido',BRL(net-invested)],['Em dinheiro de hoje',BRL(real)]],`Tempo e aportes são os grandes motores. A inflação reduz o poder de compra do valor nominal.`,`Para preservar poder de compra, o retorno precisa superar <b>${PCT(inf*100)}</b> antes de custos e impostos.`,sens,[{name:'Patrimônio',data:series}],'saldo')}
  else if(e==='fixedIncome'){
   let P=num('p'),pmt=num('pmt'),N=Math.max(1,Math.round(num('months'))),cdi=num('cdi')/100,cdbPct=num('cdb')/100,lciPct=num('lci')/100,third=num('third')/100,fee=num('fee')/100,cdb=taxLots(P,pmt,cdi*cdbPct,N),lciNet=fv(P,pmt,cdi*lciPct,N),thirdCalc=taxLots(P,pmt,Math.max(-.99,third-fee),N),thirdNet=thirdCalc.net,arr=[['CDB',cdb.net],['LCI/LCA',lciNet],['Alternativa 3',thirdNet]].sort((a,b)=>b[1]-a[1]),tax=irDays(N*30),eqConventional=lciPct/(1-tax),eqExact=solveRate(mult=>taxLots(P,pmt,cdi*mult,N).net,lciNet,0,4),invested=P+pmt*N,sc=[],sl=[],st=[];
@@ -902,11 +1372,41 @@ function calculateTool(){const e=state.current.engine;try{
  else if(e==='diagnostic'){let inc=num('income'),debt=inc?num('debt')/inc*100:0,save=inc?num('saving')/inc*100:0,months=num('ess')?num('reserve')/num('ess'):0;setResult('Diagnóstico pronto','Três sinais principais.',[['Dívidas/renda',PCT(debt)],['Taxa de poupança',PCT(save)],['Reserva',months.toFixed(1)+' meses']])}
 }catch(err){console.error(err);toast('Revise os dados da simulação.')}}
 function captureAssumptions(){return [...document.querySelectorAll('#toolForm input,#toolForm select')].reduce((a,el)=>{a[el.id]=el.value;return a},{})}
-function saveDecision(){if(!state.last)return toast('Calcule primeiro.');let d=saved();let limit=state.plan==='free'?3:100;if(state.plan==='free'&&d.length>=limit)return toast('No Free você pode salvar até 3 decisões.');d.unshift({id:Date.now(),toolId:state.current.id,title:state.current.title,primary:state.last.primary,subtitle:state.last.subtitle,metrics:state.last.metrics||[],assumptions:captureAssumptions(),mode:state.mode,date:new Date().toISOString()});storage.set('amarelo_decisions',d.slice(0,100));toast('Decisão e premissas salvas.');renderDashboard()}
-function openSavedDecision(id){let d=saved().find(x=>x.id===id);if(!d)return toast('Decisão não encontrada.');openTool(d.toolId);if(d.assumptions){Object.entries(d.assumptions).forEach(([k,v])=>{let el=$(k);if(el)el.value=v})}if(d.mode==='advanced')setMode('advanced');calculateTool();toast('Premissas restauradas.')}
-function deleteDecision(id){storage.set('amarelo_decisions',saved().filter(x=>x.id!==id));renderDashboard();toast('Decisão removida deste navegador.')}
-function copyResult(){if(!state.last)return;navigator.clipboard?.writeText(`${state.current.title}\n${state.last.primary}\n${state.last.subtitle}\n${state.last.metrics.map(x=>x[0]+': '+x[1]).join('\n')}`);toast('Resumo copiado.')}
-function renderDashboard(){let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0}),months=p.essentials?p.reserve/p.essentials:0;$('profileSummary').innerHTML=[['Renda líquida',BRL(p.income)],['Patrimônio financeiro',BRL(p.wealth)],['Reserva',months?months.toFixed(1)+' meses':'—'],['Investimento mensal',BRL(p.monthly)]].map(x=>`<div class="profileStat"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('');let d=saved();$('savedDecisions').innerHTML=d.length?d.slice(0,8).map(x=>`<div class="decisionRow"><div><h4>${x.title}</h4><p>${new Date(x.date).toLocaleString('pt-BR')} · premissas salvas</p></div><div class="decisionValue"><strong>${x.primary}</strong><div class="decisionActions"><button onclick="openSavedDecision(${x.id})">Reabrir</button><button onclick="deleteDecision(${x.id})">Excluir</button></div></div></div>`).join(''):'<div class="dashEmpty"><span>01</span><h4>Seu histórico começa na primeira decisão.</h4><p>Faça uma simulação e salve as premissas para voltar depois.</p><button onclick="navigate(\'tools\')">Abrir biblioteca →</button></div>';let f=favs().map(id=>tools.find(t=>t.id===id)).filter(Boolean);$('favoriteTools').innerHTML=f.length?f.slice(0,6).map(t=>`<div class="miniTool" onclick="openTool('${t.id}')"><i>${t.icon}</i><b>${t.title}</b></div>`).join(''):'<div class="dashEmpty compact"><span>☆</span><h4>Fixe o que você usa mais.</h4><p>Seus favoritos aparecem aqui.</p></div>';let next=p.reserve<p.essentials*6&&p.essentials>0?['reserva','Sua reserva está abaixo de 6 meses.']:p.monthly>0?['meta-financeira','Transforme seu aporte mensal em uma meta.']:['diagnostico','Comece pelo diagnóstico financeiro.'];$('nextDecision').innerHTML=`<div class="miniTool" onclick="openTool('${next[0]}')"><i>→</i><div><b>${tools.find(t=>t.id===next[0])?.title||'Próxima análise'}</b><p class="muted">${next[1]}</p></div></div>`}
+function saveDecision(){
+ if(!state.last)return toast('Calcule primeiro.');
+ let d=saved(),limit=state.plan==='free'?3:100;
+ if(state.plan==='free'&&d.length>=limit)return toast('No Free você pode salvar até 3 decisões.');
+ let previous=d.filter(x=>x.toolId===state.current.id),version=(previous.reduce((m,x)=>Math.max(m,x.version||1),0)||0)+1;
+ let scenarioState=exportScenarioState(),scenarioId=scenarioState?.active||null,scenarioLabel=scenarioId?getScenarioLabel(scenarioId):null;
+ d.unshift({
+   id:Date.now(),toolId:state.current.id,title:state.current.title,version,
+   scenarioLabel,primary:state.last.primary,subtitle:state.last.subtitle,metrics:state.last.metrics||[],
+   assumptions:captureAssumptions(),scenarioState,mode:state.mode,date:new Date().toISOString()
+ });
+ storage.set('amarelo_decisions',d.slice(0,100));
+ toast(scenarioEnabled()?`Versão ${version} salva com cenários.`:'Decisão e premissas salvas.');
+ renderDashboard();
+}
+function openSavedDecision(id){
+ let d=saved().find(x=>x.id===id);if(!d)return toast('Decisão não encontrada.');
+ openTool(d.toolId);
+ let restored=false;
+ if(d.scenarioState&&state.scenario)restored=restoreScenarioState(d.scenarioState);
+ if(!restored&&d.assumptions){setAssumptions(d.assumptions);calculateTool()}
+ if(d.mode==='advanced')setMode('advanced');
+ toast(`Versão ${d.version||1} restaurada.`);
+}
+function deleteDecision(id){storage.set('amarelo_decisions',saved().filter(x=>x.id!==id));renderDashboard();toast('Versão removida deste navegador.')}
+function closeVersionCompare(){$('versionModal').classList.add('hidden')}
+function openVersionCompare(toolId){
+ let versions=saved().filter(x=>x.toolId===toolId).sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,4);
+ if(versions.length<2)return toast('Salve pelo menos duas versões desta decisão.');
+ $('versionModalTitle').textContent=(versions[0]?.title||'Decisão')+' — versões';
+ $('versionCompareGrid').innerHTML=versions.map((v,i)=>`<article class="versionCard ${i===0?'latest':''}"><div class="versionCardTop"><span>VERSÃO ${v.version||versions.length-i}</span><b>${new Date(v.date).toLocaleDateString('pt-BR')}</b></div><h3>${v.scenarioLabel||'Cenário salvo'}</h3><div class="versionPrimary">${v.primary}</div><p>${v.subtitle||''}</p><div class="versionMetrics">${(v.metrics||[]).slice(0,4).map(m=>`<div><span>${m[0]}</span><b>${m[1]}</b></div>`).join('')}</div><button onclick="closeVersionCompare();openSavedDecision(${v.id})">Reabrir esta versão →</button></article>`).join('');
+ $('versionModal').classList.remove('hidden');
+}
+function copyResult(){if(!state.last)return;navigator.clipboard?.writeText(`${state.current.title}\n${state.scenario?getScenarioLabel(state.scenario.active)+'\n':''}${state.last.primary}\n${state.last.subtitle}\n${state.last.metrics.map(x=>x[0]+': '+x[1]).join('\n')}`);toast('Resumo copiado.')}
+function renderDashboard(){let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0}),months=p.essentials?p.reserve/p.essentials:0;$('profileSummary').innerHTML=[['Renda líquida',BRL(p.income)],['Patrimônio financeiro',BRL(p.wealth)],['Reserva',months?months.toFixed(1)+' meses':'—'],['Investimento mensal',BRL(p.monthly)]].map(x=>`<div class="profileStat"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('');let d=saved();$('savedDecisions').innerHTML=d.length?d.slice(0,8).map(x=>{let count=d.filter(y=>y.toolId===x.toolId).length;return`<div class="decisionRow"><div><div class="decisionTitleLine"><h4>${x.title}</h4><span>V${x.version||1}</span></div><p>${new Date(x.date).toLocaleString('pt-BR')}${x.scenarioLabel?' · '+x.scenarioLabel:''}</p></div><div class="decisionValue"><strong>${x.primary}</strong><div class="decisionActions"><button onclick="openSavedDecision(${x.id})">Reabrir</button>${count>1?`<button onclick="openVersionCompare('${x.toolId}')">Comparar versões</button>`:''}<button onclick="deleteDecision(${x.id})">Excluir</button></div></div></div>`}).join(''):'<div class="dashEmpty"><span>01</span><h4>Seu histórico começa na primeira decisão.</h4><p>Faça uma simulação e salve as premissas para voltar depois.</p><button onclick="navigate(\'tools\')">Abrir biblioteca →</button></div>';let f=favs().map(id=>tools.find(t=>t.id===id)).filter(Boolean);$('favoriteTools').innerHTML=f.length?f.slice(0,6).map(t=>`<div class="miniTool" onclick="openTool('${t.id}')"><i>${t.icon}</i><b>${t.title}</b></div>`).join(''):'<div class="dashEmpty compact"><span>☆</span><h4>Fixe o que você usa mais.</h4><p>Seus favoritos aparecem aqui.</p></div>';let next=p.reserve<p.essentials*6&&p.essentials>0?['reserva','Sua reserva está abaixo de 6 meses.']:p.monthly>0?['meta-financeira','Transforme seu aporte mensal em uma meta.']:['diagnostico','Comece pelo diagnóstico financeiro.'];$('nextDecision').innerHTML=`<div class="miniTool" onclick="openTool('${next[0]}')"><i>→</i><div><b>${tools.find(t=>t.id===next[0])?.title||'Próxima análise'}</b><p class="muted">${next[1]}</p></div></div>`}
 function openProfile(){let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0});for(const k in p){let el=$('profile'+k[0].toUpperCase()+k.slice(1));if(el)el.value=p[k]}$('profileModal').classList.remove('hidden')}
 function closeProfile(){$('profileModal').classList.add('hidden')}
 function saveProfile(){let p={income:num('profileIncome'),wealth:num('profileWealth'),essentials:num('profileEssentials'),reserve:num('profileReserve'),monthly:num('profileMonthly'),age:num('profileAge')};storage.set('amarelo_profile',p);closeProfile();renderDashboard();toast('Perfil salvo neste navegador.')}
