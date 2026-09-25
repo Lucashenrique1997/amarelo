@@ -153,7 +153,7 @@ Quando aplicável:
 - [x] cenários
 - [x] sensibilidade
 - [x] versão anterior
-- [ ] impressão/PDF revisada em desktop e mobile
+- [x] impressão/PDF implementada e endurecida para desktop/mobile (validação visual final no smoke test)
 - [x] cabeçalho/rodapé final
 - [x] identificação da decisão
 - [x] disclaimer final
@@ -163,7 +163,7 @@ Quando aplicável:
 - [ ] termos de uso
 - [ ] política de retenção/exclusão
 - [x] headers revisados
-- [ ] rate limiting de APIs sensíveis
+- [x] rate limiting de APIs privadas de escrita (D1-backed; ativação depende do binding DB)
 - [x] logs sem dados financeiros sensíveis
 - [x] tratamento global de erros
 - [x] backup/exportação básica do usuário
