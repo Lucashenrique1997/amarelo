@@ -7,6 +7,18 @@ function renderDashboard(){
     text.textContent=synced?'Suas decisões e versões estão persistidas na sua conta AMARELO.':'Exporte um backup enquanto a sincronização online não está ativa.';
   }
   let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0}),months=p.essentials?p.reserve/p.essentials:0;
+  const onboarding=$('onboardingPath'),hasProfile=Object.values(p).some(v=>Number(v)>0||String(v||'').trim()),hasDecision=saved().length>0,hasGoal=goals().length>0;
+  const completed=[hasProfile,hasDecision,hasGoal].filter(Boolean).length;
+  if(onboarding){
+    onboarding.classList.toggle('complete',completed===3);
+    onboarding.innerHTML=completed===3?
+      `<div class="onboardingComplete"><span>✓</span><div><small>MEU AMARELO CONFIGURADO</small><b>Seu painel já tem contexto para acompanhar decisões.</b></div></div>`:
+      `<div class="onboardingHead"><div><span class="kicker">COMECE POR AQUI</span><h3>Monte seu painel em três passos.</h3></div><b>${completed}/3</b></div><div class="onboardingSteps">
+        <button class="${hasProfile?'done':''}" onclick="openProfile()"><i>${hasProfile?'✓':'01'}</i><span><b>Seu contexto</b><small>Renda, patrimônio e reserva.</small></span></button>
+        <button class="${hasDecision?'done':''}" onclick="navigate('tools')"><i>${hasDecision?'✓':'02'}</i><span><b>Primeira decisão</b><small>Salve um caso que importa para você.</small></span></button>
+        <button class="${hasGoal?'done':''}" onclick="openGoalModal()"><i>${hasGoal?'✓':'03'}</i><span><b>Primeira meta</b><small>Defina valor atual, alvo e prazo.</small></span></button>
+      </div>`;
+  }
   $('profileSummary').innerHTML=[['Renda líquida',BRL(p.income)],['Patrimônio financeiro',BRL(p.wealth)],['Reserva',months?months.toFixed(1)+' meses':'—'],['Investimento mensal',BRL(p.monthly)]].map(x=>`<div class="profileStat"><small>${x[0]}</small><b>${x[1]}</b></div>`).join('');
   let d=saved(),groups=groupSavedDecisions(d),now=Date.now(),day=86400000,review=groups.filter(g=>(now-new Date(g.versions[0].date).getTime())/day>=45),multi=groups.filter(g=>g.versions.length>1),recent=groups.filter(g=>(now-new Date(g.versions[0].date).getTime())/day<30);
   $('decisionPulse').innerHTML=[
