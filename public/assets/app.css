@@ -532,3 +532,10 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
  .reportFooter{break-inside:avoid;margin-top:28px}
  .reportDocId{color:#777!important}
 }
+
+/* AMARELO 1.0 — tracked goals */
+.goalsCard{background:linear-gradient(150deg,#fffdf8,#fff9df)}
+.goalSummary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:10px 0 16px}.goalSummary>div{border:1px solid #e2dac8;border-radius:14px;padding:11px;background:rgba(255,255,255,.65)}.goalSummary small{display:block;font-size:6px;letter-spacing:.1em;color:#8d8679}.goalSummary b{display:block;font-size:14px;margin-top:4px}
+.goalList{display:grid;grid-template-columns:1fr 1fr;gap:10px}.goalItem{border:1px solid #dfd7c5;border-radius:18px;padding:15px;background:#fff}.goalTop{display:flex;justify-content:space-between;gap:15px}.goalTop span{font-size:6px;letter-spacing:.1em;color:#9a8524;font-weight:900}.goalTop h4{font-size:12px;margin:4px 0 0}.goalTop>b{font-size:16px}.goalBar{height:7px;border-radius:999px;background:#ece6d8;overflow:hidden;margin:14px 0}.goalBar i{display:block;height:100%;background:#f3c62e;border-radius:inherit}.goalNumbers{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.goalNumbers small{display:block;font-size:6px;color:#918a7c}.goalNumbers b{font-size:8px}.goalActions{display:flex;gap:7px;margin-top:12px}.goalActions button{border:0;background:#f4f0e7;border-radius:999px;padding:7px 10px;font-size:7px;font-weight:850;cursor:pointer}
+.goalModalCard{max-width:620px}
+@media(max-width:760px){.goalSummary{grid-template-columns:1fr 1fr}.goalList{grid-template-columns:1fr}}
