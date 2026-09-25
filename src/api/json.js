@@ -14,3 +14,10 @@ export async function readJson(request) {
 export function jsonError(error, status = 400, detail = undefined) {
   return Response.json({ ok: false, error, ...(detail ? { detail } : {}) }, { status });
 }
+
+export function mutationOriginAllowed(request) {
+  if (["GET", "HEAD", "OPTIONS"].includes(request.method)) return true;
+  const origin = request.headers.get("Origin");
+  if (!origin) return false;
+  return origin === new URL(request.url).origin;
+}
