@@ -33,11 +33,14 @@ const privateApi = read("src/api/private.js");
 const security = read("src/http/security.js");
 const rateLimit = read("src/security/rate-limit.js");
 const requestSecurity = read("src/security/request.js");
+const identitiesRepo = read("src/db/identities.js");
+const billingEventsRepo = read("src/db/billing-events.js");
 const migration1 = read("migrations/0001_initial.sql");
 const migration2 = read("migrations/0002_commercial_readiness.sql");
 const migration3 = read("migrations/0003_sync_safety.sql");
 const migration4 = read("migrations/0004_goals_sync.sql");
 const migration5 = read("migrations/0005_api_rate_limits.sql");
+const migration6 = read("migrations/0006_identity_billing_foundation.sql");
 const migration3 = read("migrations/0003_sync_safety.sql");
 const migration4 = read("migrations/0004_goals_sync.sql");
 
