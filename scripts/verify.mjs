@@ -31,8 +31,13 @@ const subscriptionsRepo = read("src/db/subscriptions.js");
 const authSession = read("src/auth/session.js");
 const privateApi = read("src/api/private.js");
 const security = read("src/http/security.js");
+const rateLimit = read("src/security/rate-limit.js");
+const requestSecurity = read("src/security/request.js");
 const migration1 = read("migrations/0001_initial.sql");
 const migration2 = read("migrations/0002_commercial_readiness.sql");
+const migration3 = read("migrations/0003_sync_safety.sql");
+const migration4 = read("migrations/0004_goals_sync.sql");
+const migration5 = read("migrations/0005_api_rate_limits.sql");
 const migration3 = read("migrations/0003_sync_safety.sql");
 const migration4 = read("migrations/0004_goals_sync.sql");
 
@@ -106,6 +111,7 @@ if (!apiClient.includes("const amareloApi=")) throw new Error("Authenticated API
 if (!syncService.includes("syncAccountIfAvailable") || !syncService.includes("clientVersionId")) throw new Error("Account synchronization layer is incomplete.");
 if (!scenarioSystem.includes("function compareScenarios(")) throw new Error("Scenario system is missing.");
 if (!decisionHistory.includes("function openDecisionReport(")) throw new Error("Decision history/report layer is missing.");
+if (!decisionHistory.includes("function printDecisionReport(")) throw new Error("Controlled report print flow is missing.");
 if (!goals.includes("function renderGoals(") || !goals.includes("function saveGoal(")) throw new Error("Tracked goals module is incomplete.");
 if (!dashboard.includes("function renderDashboard(")) throw new Error("Dashboard layer is missing.");
 
