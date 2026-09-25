@@ -449,6 +449,8 @@ input:focus,select:focus,textarea:focus{border-color:#c9af37!important;box-shado
 .askMissing{margin-top:9px;font-size:8px;color:#796f5e;line-height:1.5}.askMissing b{color:#4f493f}
 @media(max-width:600px){.askContextBanner{grid-template-columns:1fr}.askContextIcon{width:32px;height:32px}}
 
+
+.askMissing em{display:block;margin-top:5px;font-style:normal;color:#9a7420;font-weight:750}
 </style>
 </head>
 <body>
@@ -935,7 +937,7 @@ function renderAskContext(ctx){
   if(!ctx||ctx.toolId!==state.current?.id){box.classList.add('hidden');return}
   $('askContextTitle').textContent=ctx.understood.length?'Transformei parte da sua pergunta em premissas.':'Encontrei o motor mais adequado para sua pergunta.';
   $('askUnderstood').innerHTML=ctx.understood.length?ctx.understood.map(x=>'<span><small>'+x[0]+'</small><b>'+x[1]+'</b></span>').join(''):'<span><small>ROTEAMENTO</small><b>'+state.current.title+'</b></span>';
-  $('askMissing').innerHTML=ctx.missing.length?'<b>Ainda falta:</b> '+ctx.missing.join(' · '):'<b>Dados principais identificados.</b> Revise as premissas antes de calcular.';
+  $('askMissing').innerHTML=ctx.missing.length?'<b>Ainda falta:</b> '+ctx.missing.join(' · ')+'<br><em>Os campos não identificados continuam com valores de exemplo. Revise-os antes de considerar o resultado.</em>':'<b>Dados principais identificados.</b> Revise as premissas antes de considerar o resultado.';
   box.classList.remove('hidden');
 }
 function applyPendingAsk(){
