@@ -17,3 +17,12 @@ run_worker_first = ["/api/*"]
 # database_name = "amarelo"
 # database_id = "<DATABASE_ID>"
 # migrations_dir = "migrations"
+
+# Feature flags for the 1.0 rollout.
+# Keep disabled until the corresponding server-side capability is production-ready.
+#
+# [vars]
+# PRODUCT_PHASE = "beta"
+# AUTH_ENABLED = "false"
+# BILLING_ENABLED = "false"
+# AI_ENABLED = "false"
