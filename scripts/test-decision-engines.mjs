@@ -120,3 +120,38 @@ assert.ok(cashInstallment.metrics.length >= 2);
 assert.ok(cashInstallment.be);
 
 console.log("AMARELO priority decision-engine reference tests passed (12 engines).");
+
+
+// Edge cases for release hardening.
+const zeroRateLoan = run("loanCompare", {
+  cmpPrice:100000,cmpDown:0,cmpHorizon:12,cmpDiscount:0,
+  cmpASystem:"price",cmpARate:0,cmpAN:12,cmpAUpfront:0,cmpAMonthly:0,
+  cmpBSystem:"sac",cmpBRate:0,cmpBN:12,cmpBUpfront:0,cmpBMonthly:0
+});
+assert.ok(zeroRateLoan.metrics.some(m=>m[0]==="A · total nominal"));
+
+const shortFixed = run("fixedIncome", {
+  p:10000,pmt:0,months:1,cdi:10,fiInflation:4,
+  fiAType:"cdi-taxed",fiARate:100,fiAFee:0,fiALock:0,
+  fiBType:"cdi-exempt",fiBRate:90,fiBFee:0,fiBLock:360,
+  fiCType:"prefix-taxed",fiCRate:9,fiCFee:0,fiCLock:0
+});
+assert.ok(shortFixed.primary);
+
+const negativeRetirement = run("retirement", {
+  age:40,ret:41,current:10000,pmt:0,extra:0,real:-2,fee:0,inflation:5,income:1000,endAge:45
+});
+assert.ok(negativeRetirement.metrics.some(m=>m[0]==="Gap na aposentadoria"));
+
+const zeroReturnIndependence = run("financialIndependence", {
+  fiExpenses:5000,fiCoverage:100,fiCurrent:100000,fiPmt:1000,fiReal:0,fiYears:10,fiExtra:0
+});
+assert.ok(zeroReturnIndependence.metrics.some(m=>m[0]==="Capital-alvo" && m[1]==="não finito"));
+
+const emptyDebtPlan = run("debtPlan", {
+  aBal:0,aRate:0,aMin:0,bBal:0,bRate:0,bMin:0,cBal:0,cRate:0,cMin:0,
+  extra:0,debtLump:0,debtExtraGrow:0
+});
+assert.ok(emptyDebtPlan.metrics.length >= 3);
+
+console.log("AMARELO decision-engine edge cases passed.");
