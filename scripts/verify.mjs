@@ -37,9 +37,11 @@ for (const marker of required) {
   if (!html.includes(marker)) throw new Error(`Missing required marker: ${marker}`);
 }
 
-const ids = [...html.matchAll(/\{id:'([^']+)'/g)].map(m => m[1]);
+const toolsBlock = html.match(/const tools=\[([\s\S]*?)\];\s*const deepIds/);
+if (!toolsBlock) throw new Error("Could not isolate the financial tools catalog.");
+const ids = [...toolsBlock[1].matchAll(/\{id:'([^']+)'/g)].map(m => m[1]);
 if (ids.length < 30) throw new Error(`Expected at least 30 financial tools, found ${ids.length}.`);
-if (new Set(ids).size !== ids.length) throw new Error("Duplicate tool ids found.");
+if (new Set(ids).size !== ids.length) throw new Error("Duplicate tool ids found inside the tools catalog.");
 
 for (const id of [
   "financiamento-consorcio",
@@ -66,4 +68,4 @@ for (const forbidden of ["azul-planejamento", "verde-market", "dourado"]) {
   if (productionSurface.includes(forbidden)) throw new Error(`Cross-project reference detected: ${forbidden}`);
 }
 
-console.log(`AMARELO verification passed: ${ids.length} tools, V9 UI, isolated Worker.`);
+console.log(`AMARELO verification passed: ${ids.length} tools, V12 decision system, isolated Worker.`);
