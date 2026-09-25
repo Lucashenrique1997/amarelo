@@ -4,45 +4,97 @@
 
 > Antes de decidir, coloque na conta.
 
-O AMARELO não é uma coleção de calculadoras. A proposta é transformar dúvidas financeiras reais em cenários comparáveis, com premissas visíveis, ponto de equilíbrio, sensibilidade e histórico.
+O AMARELO transforma dúvidas financeiras reais em cenários comparáveis, com premissas visíveis, ponto de equilíbrio, sensibilidade, versões e acompanhamento.
 
 ## Arquitetura
 - GitHub: código, branches, pull requests e histórico
 - Cloudflare Workers + Static Assets: frontend e APIs
-- Cloudflare D1: banco SQL planejado
-- Domínio planejado: `oamarelo.com.br`
+- Cloudflare D1: banco planejado e schema versionado
+- Worker de produção: `amarelo` no ambiente Cloudflare LUCAS DEV
+- Domínio definitivo planejado: `oamarelo.com.br`
 
 ## Regra de isolamento
 O AMARELO é isolado de Azul, Verde e Dourado. Nenhum banco, deploy, variável, domínio, segredo ou recurso deve ser compartilhado entre os projetos.
 
 ## Fluxo de desenvolvimento
-`branch -> commits -> pull request -> CI -> revisão -> merge em main`
+`branch -> commits -> pull request -> CI -> merge em main -> publicação Cloudflare -> verificação`
 
-Não afirmar deploy sem verificar o estado real do Cloudflare ou do workflow de publicação.
+Nunca considerar um deploy concluído apenas porque houve merge. Produção deve ser verificada.
 
-## Produto
-A experiência é organizada em três níveis:
+## Produto atual
 
-1. **Ferramentas rápidas** — contas simples e gratuitas.
-2. **Motores PRO** — decisões com cenários, break-even, sensibilidade e evolução.
-3. **Meu AMARELO** — decisões salvas, premissas, favoritos, metas e continuidade.
+### Free
+- ferramentas rápidas;
+- simulações básicas;
+- até 3 decisões salvas localmente;
+- biblioteca de decisões.
 
-A IA deve interpretar a intenção e explicar o resultado; a matemática deve permanecer em motores determinísticos e testáveis.
+### PRO Preview
+Durante a beta, o PRO está liberado sem cobrança:
+- motores de decisão;
+- Base / Conservador / Otimista;
+- break-even;
+- sensibilidade;
+- “E se?”;
+- versões;
+- fila de revisão;
+- relatórios;
+- comparação de versões.
+
+Preço-alvo de lançamento: **R$ 24,90/mês**, condicionado à persistência e conta online.
+
+### Família e Professional
+Estão em desenvolvimento e **não devem ser vendidos como produtos ativos**.
+
+## Persistência
+Hoje:
+- decisões, perfil e preferências ficam no navegador;
+- `/api/health` informa se o D1 está vinculado;
+- `/api/capabilities` expõe o estado real das capacidades da beta.
+
+Preparado no schema:
+- usuários;
+- sessões;
+- decisões;
+- versões;
+- workspaces;
+- membros;
+- perfis financeiros;
+- clientes;
+- metas;
+- assinaturas.
+
+Ainda não ativo:
+- autenticação;
+- persistência/sincronização D1;
+- cobrança;
+- IA interpretativa real.
+
+## IA
+A matemática deve permanecer determinística e testável.
+
+“Pergunte ao AMARELO” atualmente faz roteamento e extração estruturada em beta. Uma camada de IA interpretativa real só deve ser anunciada quando estiver conectada e validada.
 
 ## Direção visual
-- Amarelo como assinatura, não como preenchimento excessivo
-- Fundo quente, preto suave e alto contraste
-- Linguagem editorial e de decisão
-- Menos “dashboard genérico”; mais contexto, consequência e comparação
-- Mobile first sem sacrificar a experiência desktop
+- amarelo como assinatura;
+- fundo quente e preto suave;
+- linguagem editorial;
+- decisões antes de ferramentas;
+- resultado como workspace;
+- mobile first.
 
-## Estado atual
-- Worker `amarelo` já foi publicado manualmente no Cloudflare
-- O deploy automático GitHub -> Cloudflare ainda não está ativo
-- O frontend V9 está sendo desenvolvido no PR #1
-- Decisões podem ser salvas localmente com as premissas e reabertas
-- D1 ainda não foi criado/aplicado
-- Autenticação, pagamento e IA real ainda não estão ativos
+## Guardrails comerciais
+- não anunciar funcionalidade inexistente;
+- não cobrar durante a beta atual;
+- não ativar Família/Professional antes dos respectivos workspaces;
+- não afirmar sincronização enquanto os dados estiverem em localStorage;
+- não chamar roteamento local de “IA real”;
+- não integrar processador de pagamento sem aprovação explícita;
+- regras tributárias e regulatórias precisam de baseline atualizada antes do lançamento comercial.
 
-## Guardrails para lançamento
-Regras tributárias, trabalhistas, previdenciárias e parâmetros regulados não devem ser tratados como definitivos sem validação atualizada antes de produção comercial.
+## Documentos principais
+- `docs/PRODUCT_NORTH_STAR.md`
+- `docs/VISUAL_SYSTEM_V11.md`
+- `docs/DECISION_ENGINES_V10.md`
+- `docs/V16_PRO_DEPTH_RETENTION.md`
+- `docs/COMMERCIAL_READINESS_V17.md`

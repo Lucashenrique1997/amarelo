@@ -2,6 +2,21 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
+    if (url.pathname === "/api/capabilities") {
+      return Response.json({
+        ok: true,
+        app: "amarelo",
+        phase: "beta",
+        database: env.DB ? "bound" : "not-bound-yet",
+        persistence: false,
+        authentication: false,
+        billing: false,
+        ai_interpretation: false,
+        local_decisions: true,
+        pro_beta: true
+      });
+    }
+
     if (url.pathname === "/api/health") {
       if (!env.DB) {
         return Response.json({

@@ -3,6 +3,7 @@ import { readFileSync, existsSync } from "node:fs";
 const html = readFileSync("public/index.html", "utf8");
 const wrangler = readFileSync("wrangler.toml", "utf8");
 const worker = readFileSync("src/worker.js", "utf8");
+const commercialMigration = readFileSync("migrations/0002_commercial_readiness.sql", "utf8");
 
 const required = [
   "<title>AMARELO",
@@ -63,7 +64,13 @@ const required = [
   "decisionPulse",
   "reviewQueue",
   "reportSensitivity",
-  "Desde a última versão"
+  "Desde a última versão",
+  "SEM COBRANÇA NESTA FASE",
+  "PRO PREVIEW",
+  "Preço-alvo no lançamento",
+  "EM DESENVOLVIMENTO",
+  "function showFuturePlan",
+  "pricingToolCount"
 ];
 
 for (const marker of required) {
@@ -101,10 +108,17 @@ for (const code of scripts) new Function(code);
 if (!/name\s*=\s*"amarelo"/.test(wrangler)) throw new Error("Cloudflare Worker must remain named amarelo.");
 if (!/main\s*=\s*"src\/worker\.js"/.test(wrangler)) throw new Error("Unexpected Worker entrypoint.");
 if (!worker.includes("/api/health")) throw new Error("Health endpoint is missing.");
+if (!worker.includes("/api/capabilities")) throw new Error("Capabilities endpoint is missing.");
+for (const marker of ["decision_versions","workspaces","workspace_members","financial_profiles","clients"]) {
+  if (!commercialMigration.includes(marker)) throw new Error(`Commercial D1 migration missing: ${marker}`);
+}
+if (html.includes("setDemoPlan('family')") || html.includes("setDemoPlan('professional')")) {
+  throw new Error("Unbuilt paid tiers must not be activatable.");
+}
 
 const productionSurface = [html, wrangler, worker].join("\n").toLowerCase();
 for (const forbidden of ["azul-planejamento", "verde-market", "dourado"]) {
   if (productionSurface.includes(forbidden)) throw new Error(`Cross-project reference detected: ${forbidden}`);
 }
 
-console.log(`AMARELO verification passed: ${ids.length} tools, V16 PRO depth, retention, reports and isolated Worker.`);
+console.log(`AMARELO verification passed: ${ids.length} tools, V17 commercial truth, beta gates and isolated Worker.`);
