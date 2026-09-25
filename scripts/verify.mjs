@@ -36,7 +36,14 @@ const required = [
   "debtPortability",
   "carDecision",
   "Portabilidade de Dívida",
-  "Trocar de Carro x Manter o Atual"
+  "Trocar de Carro x Manter o Atual",
+  "decisionNameInput",
+  "RELATÓRIO AMARELO",
+  "function openDecisionReport",
+  "function groupSavedDecisions",
+  "function currentDecisionName",
+  "reportContent",
+  "decisionIdentity"
 ];
 
 for (const marker of required) {
@@ -76,4 +83,4 @@ for (const forbidden of ["azul-planejamento", "verde-market", "dourado"]) {
   if (productionSurface.includes(forbidden)) throw new Error(`Cross-project reference detected: ${forbidden}`);
 }
 
-console.log(`AMARELO verification passed: ${ids.length} tools, V13 product expansion, isolated Worker.`);
+console.log(`AMARELO verification passed: ${ids.length} tools, V14 reports and grouped decision histories, isolated Worker.`);
