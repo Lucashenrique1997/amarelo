@@ -1,0 +1,11 @@
+name = "amarelo"
+compatibility_date = "2026-09-24"
+pages_build_output_dir = "."
+
+# Após criar o D1 exclusivo do AMARELO no Cloudflare, adicione:
+#
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "amarelo"
+# database_id = "<DATABASE_ID>"
+# migrations_dir = "migrations"
