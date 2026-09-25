@@ -5,6 +5,8 @@ import { listDecisions, listDecisionVersions, upsertDecisionWithVersion, deleteD
 import { listWorkspaces } from "../db/workspaces.js";
 import { listGoals, upsertGoal, deleteGoal } from "../db/goals.js";
 import { getEntitlements } from "../db/subscriptions.js";
+import { consumeRateLimit } from "../security/rate-limit.js";
+import { sameOriginAllowed } from "../security/request.js";
 import { proBetaEnabled } from "../config/product.js";
 
 function databaseRequired(env) {
@@ -19,6 +21,25 @@ export async function handlePrivateApi(request, env, url) {
 
   const userId = await authenticatedUserId(request, env);
   if (!userId) return jsonError("authentication_required", 401);
+
+  if (!sameOriginAllowed(request)) return jsonError("origin_not_allowed", 403);
+
+  if (!["GET", "HEAD", "OPTIONS"].includes(request.method)) {
+    const rate = await consumeRateLimit(env.DB, `private-write:${userId}`, { limit: 90, windowSeconds: 60 });
+    if (!rate.allowed) {
+      return Response.json(
+        { ok: false, error: "rate_limited", retryAt: new Date(rate.resetAt).toISOString() },
+        {
+          status: 429,
+          headers: {
+            "Retry-After": String(Math.max(1, Math.ceil((rate.resetAt - Date.now()) / 1000))),
+            "X-RateLimit-Limit": String(rate.limit),
+            "X-RateLimit-Remaining": String(rate.remaining)
+          }
+        }
+      );
+    }
+  }
 
   if (!mutationOriginAllowed(request)) {
     return jsonError("origin_not_allowed", 403);
