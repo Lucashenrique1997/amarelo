@@ -11,6 +11,7 @@ const decisionConfig = read("public/assets/decision-config.js");
 const scenarioSystem = read("public/assets/scenario-system.js");
 const decisionEngines = read("public/assets/decision-engines.js");
 const dataStore = read("public/assets/data-store.js");
+const runtimeCapabilities = read("public/assets/runtime-capabilities.js");
 const decisionHistory = read("public/assets/decision-history.js");
 const dashboard = read("public/assets/dashboard.js");
 const app = read("public/assets/app.js");
@@ -22,11 +23,16 @@ const productConfig = read("src/config/product.js");
 const decisionsRepo = read("src/db/decisions.js");
 const profilesRepo = read("src/db/profiles.js");
 const workspacesRepo = read("src/db/workspaces.js");
+const goalsRepo = read("src/db/goals.js");
+const subscriptionsRepo = read("src/db/subscriptions.js");
+const authSession = read("src/auth/session.js");
+const privateApi = read("src/api/private.js");
+const security = read("src/http/security.js");
 const migration1 = read("migrations/0001_initial.sql");
 const migration2 = read("migrations/0002_commercial_readiness.sql");
 
-const frontend = [html, css, catalog, financeCore, decisionConfig, scenarioSystem, decisionEngines, dataStore, decisionHistory, dashboard, app].join("\n");
-const backend = [worker, apiRouter, apiHealth, productConfig, decisionsRepo, profilesRepo, workspacesRepo, wrangler, migration1, migration2].join("\n");
+const frontend = [html, css, catalog, financeCore, decisionConfig, scenarioSystem, decisionEngines, dataStore, runtimeCapabilities, decisionHistory, dashboard, app].join("\n");
+const backend = [worker, apiRouter, apiHealth, privateApi, productConfig, decisionsRepo, profilesRepo, workspacesRepo, goalsRepo, subscriptionsRepo, authSession, security, wrangler, migration1, migration2].join("\n");
 const runtimeSurface = [frontend, worker, apiRouter, apiHealth, productConfig, decisionsRepo, profilesRepo, workspacesRepo, wrangler].join("\n").toLowerCase();
 
 if (html !== rootHtml) throw new Error("Root preview and public application shell are out of sync.");
@@ -41,6 +47,7 @@ const requiredAssets = [
   "/assets/scenario-system.js",
   "/assets/decision-engines.js",
   "/assets/data-store.js",
+  "/assets/runtime-capabilities.js",
   "/assets/decision-history.js",
   "/assets/dashboard.js",
   "/assets/app.js"
@@ -60,6 +67,7 @@ for (const [name, code] of [
   ["scenario-system.js", scenarioSystem],
   ["decision-engines.js", decisionEngines],
   ["data-store.js", dataStore],
+  ["runtime-capabilities.js", runtimeCapabilities],
   ["decision-history.js", decisionHistory],
   ["dashboard.js", dashboard],
   ["app.js", app]
@@ -82,6 +90,7 @@ if (app.includes("const scenarioDecisionIds=")) throw new Error("Scenario system
 if (app.includes("function saveDecision(")) throw new Error("Decision history leaked back into app.js.");
 if (app.includes("function renderDashboard(")) throw new Error("Dashboard leaked back into app.js.");
 if (!dataStore.includes("const storage=")) throw new Error("Client data adapter contract is missing.");
+if (!runtimeCapabilities.includes("refreshRuntimeCapabilities")) throw new Error("Runtime capability layer is missing.");
 if (!scenarioSystem.includes("function compareScenarios(")) throw new Error("Scenario system is missing.");
 if (!decisionHistory.includes("function openDecisionReport(")) throw new Error("Decision history/report layer is missing.");
 if (!dashboard.includes("function renderDashboard(")) throw new Error("Dashboard layer is missing.");
@@ -149,6 +158,11 @@ if (!productConfig.includes('phase: "beta"')) throw new Error("Product capabilit
 if (!decisionsRepo.includes("upsertDecisionWithVersion")) throw new Error("Decision repository is missing version persistence.");
 if (!profilesRepo.includes("upsertProfile")) throw new Error("Profile repository is missing.");
 if (!workspacesRepo.includes("createPersonalWorkspace")) throw new Error("Workspace repository is missing.");
+if (!goalsRepo.includes("upsertGoal")) throw new Error("Goals repository is missing.");
+if (!subscriptionsRepo.includes("getEntitlements")) throw new Error("Entitlement repository is missing.");
+if (!authSession.includes("authenticatedUserId")) throw new Error("Session guard is missing.");
+if (!privateApi.includes("/api/v1/decisions") || !privateApi.includes("/api/v1/entitlements")) throw new Error("Private API contract is incomplete.");
+if (!security.includes("X-Content-Type-Options")) throw new Error("Security header middleware is missing.");
 
 for (const marker of ["users", "sessions", "decisions", "subscriptions"]) {
   if (!migration1.includes(marker)) throw new Error(`Initial D1 schema missing: ${marker}`);
