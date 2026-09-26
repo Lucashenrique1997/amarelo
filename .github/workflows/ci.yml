@@ -16,8 +16,10 @@ jobs:
           node-version: 22
       - run: node --check public/assets/app.js
       - run: node --check public/assets/cloud.js
+      - run: node --check public/assets/finance-core.js
       - run: node --check src/worker.js
       - run: node --check src/api.js
       - run: node --check src/lib/security.js
       - run: node scripts/test-security.mjs
+      - run: node scripts/test-finance-core.mjs
       - run: node scripts/verify.mjs
