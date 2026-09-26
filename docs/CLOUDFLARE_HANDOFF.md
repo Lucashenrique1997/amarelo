@@ -15,6 +15,7 @@ O código de conta, autenticação e sincronização está preparado. Esta etapa
    - `0001_initial.sql`
    - `0002_commercial_readiness.sql`
    - `0003_cloud_core.sql`
+   - `0004_observability.sql`
 5. Confirmar no GitHub Actions os secrets:
    - `CLOUDFLARE_API_TOKEN`
    - `CLOUDFLARE_ACCOUNT_ID`
@@ -37,7 +38,8 @@ O código de conta, autenticação e sincronização está preparado. Esta etapa
 - migração inicial dos dados locais para a conta;
 - fallback integral para localStorage quando D1 não está disponível;
 - backup JSON local;
-- verificação de schema antes de anunciar nuvem como ativa.
+- verificação de schema antes de anunciar nuvem como ativa;
+- telemetria agregada de uso sem valores financeiros, perguntas ou premissas.
 
 ## Dependências que continuam externas
 
