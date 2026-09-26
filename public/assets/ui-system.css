@@ -1,0 +1,164 @@
+/* ===== AMARELO 1.0 — visual organization v2 =====
+   Regra: nenhum controle de navegação/aba depende de microtexto.
+   A interface prioriza leitura confortável a 100% de zoom. */
+
+:root{
+  --ui-nav:16px;
+  --ui-tab:14px;
+  --ui-label:13px;
+  --ui-copy:15px;
+}
+
+/* Top navigation: tabs must read like navigation */
+.topbar .nav{height:86px}
+.topbar .nav nav{gap:6px}
+.topbar .navitem{
+  min-height:46px;
+  padding:0 15px;
+  border-radius:999px;
+  font-size:var(--ui-nav);
+  font-weight:780;
+  letter-spacing:-.01em;
+  color:#4f4b42;
+}
+.topbar .navitem:hover{background:rgba(255,255,255,.65);color:#17160f}
+.topbar .navitem.active{background:#fff;color:#17160f;box-shadow:0 4px 16px rgba(30,27,12,.07)}
+.topbar .brand{font-size:16px;letter-spacing:.13em}
+.betaBadge{font-size:11px!important;padding:6px 8px!important}
+
+/* All pill-style tabs / filters */
+.filters{gap:10px;margin:0;overflow-x:auto;flex-wrap:nowrap;padding:2px 2px 12px;scrollbar-width:thin}
+.filters button,
+.quick button,
+.modeToggle button,
+.scenarioLabActions button,
+.nextTools button{
+  font-size:var(--ui-tab)!important;
+  line-height:1.2;
+  min-height:44px;
+  padding:10px 15px;
+  font-weight:780;
+}
+.filters button{white-space:nowrap;border-radius:13px}
+.filters button.active{box-shadow:0 5px 14px rgba(22,21,15,.12)}
+.libraryBar{align-items:center;margin:20px 0 8px}
+.libraryBar .filters{margin-bottom:0}
+.libraryCount{font-size:12px;padding-top:0}
+.libraryCount span{font-size:15px}
+
+/* Library: fewer columns, more breathing room */
+.library{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.libraryGroup{grid-column:1/-1;margin:14px 0 24px}
+.libraryGroup:first-child{margin-top:2px}
+.libraryGroupHead{display:flex;justify-content:space-between;align-items:end;gap:20px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.libraryGroupHead>div{max-width:780px}
+.libraryGroupHead span{font-size:12px;font-weight:900;letter-spacing:.09em;color:#967f20}
+.libraryGroupHead h2{font-size:27px;line-height:1.15;letter-spacing:-.035em;margin:4px 0 3px}
+.libraryGroupHead p{font-size:14px;line-height:1.55;color:var(--muted);margin:0}
+.libraryGroupCount{font-size:13px!important;letter-spacing:0!important;color:#6f695e!important;white-space:nowrap}
+.libraryGroupGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.toolCard{min-height:230px;padding:22px}
+.toolCard .cat{font-size:13px!important}
+.toolCard h3{font-size:19px!important;line-height:1.3;margin:8px 0}
+.toolCard p{font-size:14px!important;line-height:1.58}
+.toolCardFoot b{font-size:13px!important}
+.tierTag{font-size:12px!important;padding:7px 10px!important}
+
+/* Tool workspace navigation and tabs */
+.toolWorkspaceMeta{gap:9px;flex-wrap:wrap}
+.toolWorkspaceMeta span{font-size:12px!important;padding:8px 11px}
+.modeToggle{padding:5px;margin-bottom:20px}
+.modeToggle button{font-size:14px!important}
+.groupTitle{font-size:13px!important;margin:18px 0 12px}
+.field label,.modalCard label{font-size:13px!important;letter-spacing:.035em!important}
+.methodology{font-size:13px!important}
+.decisionRibbon span,.decisionRibbon b{font-size:12px!important}
+.resultGuide{gap:9px;margin-bottom:22px}
+.resultGuide div{font-size:12px!important;padding:10px 12px}
+.resultHero>span,.boxHead span{font-size:12px!important}
+.boxHead h3{font-size:16px!important}
+.metric small,.sens small{font-size:12px!important}
+.metric b,.sens b{font-size:15px!important}
+
+/* Scenario tabs: these were the worst offenders */
+.scenarioLabHead p{font-size:13px!important}
+.scenarioLabActions{gap:9px}
+.scenarioLabActions button{font-size:13px!important}
+.scenarioTabs{gap:10px;padding:0 23px 20px}
+.scenarioTab{min-width:176px;padding:15px 16px;border-radius:17px}
+.scenarioTab small{font-size:11px!important;margin-bottom:5px}
+.scenarioTab b{font-size:15px!important;line-height:1.25}
+.scenarioTab span{font-size:12px!important;line-height:1.35;margin-top:5px}
+.whatIfBlock{grid-template-columns:210px 1fr;gap:22px;padding:20px 23px}
+.whatIfHead span{font-size:12px!important}
+.whatIfHead p{font-size:13px!important}
+.whatIfValue small{font-size:11px!important}
+.whatIfValue b{font-size:14px!important}
+.scenarioCompareHead h4{font-size:16px!important}
+.scenarioCompareHead button{font-size:13px!important}
+
+/* Dashboard/actions */
+.cardHead h3{font-size:18px!important}
+.decisionRow h4{font-size:15px!important}
+.decisionRow p{font-size:13px!important}
+.decisionActions button{font-size:12px!important;min-height:36px}
+.reviewRule,.reviewDecision span,.pulseStat>span{font-size:12px!important}
+.reviewDecision h4{font-size:15px!important}
+.reviewDecision p{font-size:13px!important}
+.reviewDecision button{font-size:13px!important}
+
+/* Pricing and Ask */
+.pricingEyebrow>b{font-size:12px!important}
+.plan>span{font-size:13px!important}
+.plan p,.plan li{font-size:14px!important}
+.recommended{font-size:11px!important}
+.askPage>p{font-size:15px!important}
+.askSuggestion b{font-size:15px!important}
+.askSuggestion p{font-size:13px!important}
+
+/* On-screen reports: readable without zoom */
+.reportToolbar span{font-size:11px!important}
+.reportToolbar b,.reportToolbar button{font-size:12px!important}
+.reportMeta,.reportKicker{font-size:10px!important}
+.reportSubtitle{font-size:12px!important}
+.reportScenario{font-size:10px!important}
+.reportHero small{font-size:10px!important}
+.reportHero p{font-size:11px!important}
+.reportSectionHead span{font-size:10px!important}
+.reportMetric small,.reportDriver small{font-size:10px!important}
+.reportDriver p{font-size:10px!important}
+.reportAssumption,.reportAssumption b{font-size:10px!important}
+.reportText{font-size:11px!important}
+.reportScenarioTable th,.reportScenarioTable td{font-size:10px!important}
+.reportMethod{font-size:10px!important}
+.reportFooter{font-size:9px!important}
+
+/* Mobile navigation */
+@media(max-width:760px){
+  body{padding-bottom:94px}
+  .topbar .nav{height:72px}
+  .topbar .nav nav .navitem{display:none}
+  .mobileNav{
+    left:8px;right:8px;bottom:8px;
+    padding:8px;
+    border-radius:20px;
+  }
+  .mobileNav button{padding:10px 4px;min-height:62px}
+  .mobileNav button span{font-size:20px!important}
+  .mobileNav button b{font-size:12px!important;line-height:1.15}
+  .libraryGroupGrid,.library{grid-template-columns:1fr}
+  .libraryGroup{margin-bottom:28px}
+  .libraryGroupHead{align-items:flex-start}
+  .libraryGroupHead h2{font-size:24px}
+  .libraryGroupCount{display:none}
+  .toolCard{min-height:0}
+  .scenarioTabs{padding-left:18px;padding-right:18px}
+  .scenarioTab{min-width:168px}
+  .whatIfBlock{grid-template-columns:1fr}
+  .resultGuide div{font-size:11px!important}
+}
+
+@media(min-width:761px) and (max-width:1080px){
+  .libraryGroupGrid,.library{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .topbar .navitem{font-size:14px;padding:0 10px}
+}

@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="/public/assets/account.css">
 <link rel="stylesheet" href="/public/assets/product.css">
 <link rel="stylesheet" href="/public/assets/accessibility.css">
+<link rel="stylesheet" href="/public/assets/ui-system.css">
 </head>
 <body>
 <a class="skipLink" href="#app">Pular para o conteúdo principal</a>
@@ -108,19 +109,6 @@
       <div id="journeys" class="journeys"></div>
     </section>
 
-    <section class="shell homeManifesto">
-      <div class="manifestoLabel"><span class="kicker">COMO O AMARELO PENSA</span><h2>Uma boa conta precisa sobreviver ao “e se?”.</h2></div>
-      <div class="manifestoStack">
-        <div class="manifestoRow"><span>01</span><div><h3>Primeiro, a resposta direta.</h3><p>Você não precisa decifrar uma planilha para saber o que o cenário atual está dizendo.</p></div></div>
-        <div class="manifestoRow"><span>02</span><div><h3>Depois, o que move o resultado.</h3><p>Retorno, inflação, CET, prazo, entrada, valorização e outras premissas aparecem como direcionadores — não como letras miúdas.</p></div></div>
-        <div class="manifestoRow"><span>03</span><div><h3>Por fim, o ponto de equilíbrio.</h3><p>Em vez de “A é melhor que B”, mostramos em que taxa, prazo ou preço a resposta muda de lado.</p></div></div>
-      </div>
-    </section>
-
-    <section class="shell section">
-      <div class="sectionHead"><div><span class="kicker">MOTORES DE DECISÃO</span><h2>Decisões que merecem mais do que uma calculadora.</h2><p>Os motores mais completos cruzam fluxo de caixa, custo de oportunidade, prazo e patrimônio.</p></div></div>
-      <div id="featured" class="toolGrid"></div>
-    </section>
 
     <section class="shell proBand">
       <div>
@@ -142,9 +130,9 @@
 
   <section id="route-tools" class="route hidden shell page">
     <div class="pageHead">
-      <div><span class="kicker">BIBLIOTECA DE DECISÕES</span><h1>Uma conta para cada decisão. Não o contrário.</h1><p>Use as ferramentas rápidas quando a pergunta for simples. Quando a decisão envolver patrimônio, crédito, tempo ou risco, entre nos motores completos.</p></div>
+      <div><span class="kicker">CENTRAL DE DECISÕES</span><h1>42 ferramentas. Agora organizadas para você encontrar rápido.</h1><p>Escolha um tema nas abas abaixo ou pesquise pela sua dúvida. Dentro de cada grupo, os motores de decisão mais completos aparecem primeiro.</p></div>
     </div>
-    <div class="searchbar"><input id="toolSearch" placeholder="Buscar: férias, CDB, consórcio, salário..." oninput="renderTools(this.value)"></div>
+    <div class="searchbar"><input id="toolSearch" placeholder="Buscar uma dúvida, ferramenta ou tema..." oninput="renderTools(this.value)"></div>
     <div class="libraryBar"><div id="filters" class="filters"></div><div class="libraryCount"><span id="toolCount">0</span> decisões</div></div>
     <div id="toolLibrary" class="toolGrid library"></div>
   </section>

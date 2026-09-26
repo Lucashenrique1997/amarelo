@@ -13,12 +13,13 @@ const intentCore = readFileSync("public/assets/intent-core.js", "utf8");
 const financeCore = readFileSync("public/assets/finance-core.js", "utf8");
 const telemetry = readFileSync("public/assets/telemetry.js", "utf8");
 const accessibility = readFileSync("public/assets/accessibility.css", "utf8");
+const uiSystem = readFileSync("public/assets/ui-system.css", "utf8");
 const accountStyles = readFileSync("public/assets/account.css", "utf8");
 const productStyles = readFileSync("public/assets/product.css", "utf8");
 const commercialMigration = readFileSync("migrations/0002_commercial_readiness.sql", "utf8");
 const cloudMigration = readFileSync("migrations/0003_cloud_core.sql", "utf8");
 const observabilityMigration = readFileSync("migrations/0004_observability.sql", "utf8");
-const surface = [html, app, styles, accountStyles, productStyles, accessibility, cloud, catalog, intentCore, financeCore, telemetry].join("\n");
+const surface = [html, app, styles, accountStyles, productStyles, accessibility, uiSystem, cloud, catalog, intentCore, financeCore, telemetry].join("\n");
 
 const required = [
   "<title>AMARELO",
@@ -135,6 +136,7 @@ if (/<style>[\s\S]*<\/style>/.test(html)) {
 if (/<script>[\s\S]*<\/script>/.test(html)) {
   throw new Error("Public shell must not contain the application runtime inline.");
 }
+if (!html.includes("/assets/ui-system.css")) throw new Error("Final readability UI system is not wired.");
 if (!html.includes("/assets/styles.css") || !html.includes("/assets/app.js") || !html.includes("/assets/cloud.js") || !html.includes("/assets/account.css") || !html.includes("/assets/product.css") || !html.includes("/assets/accessibility.css") || !html.includes("/assets/catalog.js") || !html.includes("/assets/intent-core.js") || !html.includes("/assets/finance-core.js") || !html.includes("/assets/telemetry.js")) {
   throw new Error("Modular public assets are not wired.");
 }
@@ -173,7 +175,7 @@ if (app.includes("setDemoPlan('family')") || app.includes("setDemoPlan('professi
   throw new Error("Unbuilt paid tiers must not be activatable.");
 }
 
-const productionSurface = [html, app, styles, accountStyles, productStyles, accessibility, cloud, catalog, intentCore, financeCore, telemetry, wrangler, worker, api, security].join("\n").toLowerCase();
+const productionSurface = [html, app, styles, accountStyles, productStyles, accessibility, uiSystem, cloud, catalog, intentCore, financeCore, telemetry, wrangler, worker, api, security].join("\n").toLowerCase();
 for (const forbidden of ["azul-planejamento", "verde-market", "dourado"]) {
   if (productionSurface.includes(forbidden)) throw new Error(`Cross-project reference detected: ${forbidden}`);
 }

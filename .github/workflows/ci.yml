@@ -26,4 +26,5 @@ jobs:
       - run: node scripts/test-security.mjs
       - run: node scripts/test-finance-core.mjs
       - run: node scripts/test-intent-core.mjs
+      - run: node scripts/test-ui-baseline.mjs
       - run: node scripts/verify.mjs
