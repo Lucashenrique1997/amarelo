@@ -15,7 +15,19 @@ if(!['free','pro'].includes(state.plan)){state.plan='pro';storage.set('amarelo_p
 const {journeys,tools}=AmareloCatalog;
 
 const deepIds=new Set(['renda-fixa','gross-up','financiamento-consorcio','comprar-alugar','avista-parcelado','amortizar-investir','plano-dividas','portabilidade-divida','trocar-carro','comparar-financiamentos','meta-financeira','viver-renda','aposentadoria','salario-liquido','quanto-rende']);
-const categories=['Todas',...new Set(tools.map(t=>t.cat))];
+const categoryOrder=['Decidir','Comprar','Investir','Dívidas','Planejar','Previdência','Trabalho','Vida financeira','Ferramentas rápidas'];
+const categoryDescriptions={
+  'Decidir':'Compare caminhos quando existe mais de uma alternativa razoável.',
+  'Comprar':'Imóvel, carro, crédito, consórcio e decisões de aquisição.',
+  'Investir':'Renda fixa, juros, inflação, retorno e crescimento de patrimônio.',
+  'Dívidas':'Organize, compare, quite ou troque dívidas com as premissas abertas.',
+  'Planejar':'Reserva, metas e decisões que dependem de prazo.',
+  'Previdência':'Acumulação e renda futura em horizontes longos.',
+  'Trabalho':'Salário, férias, 13º e cálculos ligados à renda do trabalho.',
+  'Vida financeira':'Diagnóstico, capacidade de guardar e visão geral.',
+  'Ferramentas rápidas':'Contas objetivas para dúvidas simples do dia a dia.'
+};
+const categories=['Todas',...categoryOrder.filter(c=>tools.some(t=>t.cat===c))];
 
 function navigate(route){state.route=route;document.querySelectorAll('.route').forEach(x=>x.classList.add('hidden'));let target=$('route-'+route);target.classList.remove('hidden');target.classList.remove('routeEnter');void target.offsetWidth;target.classList.add('routeEnter');let activeRoute=route==='tool'?'tools':route;document.querySelectorAll('.mobileNav button,.topbar [data-route]').forEach(b=>b.classList.toggle('active',b.dataset.route===activeRoute));window.scrollTo({top:0,behavior:'smooth'});if(route==='home')renderHome();if(route==='tools')renderTools('');if(route==='dashboard')renderDashboard();if(route==='pricing')renderPricing();if(route==='ask')renderAskExamples()}
 document.addEventListener('click',e=>{const b=e.target.closest('[data-route]');if(b)navigate(b.dataset.route)});
@@ -25,7 +37,27 @@ function isFav(id){return favs().includes(id)}
 function toggleFav(id){let f=favs();f=f.includes(id)?f.filter(x=>x!==id):[...f,id];storage.set('amarelo_favs',f);renderHome();renderTools($('toolSearch')?.value||'');if(state.current?.id===id)updateFav()}
 function toolCard(t){return `<article class="toolCard ${t.tier==='decision'?'decisionCard':''}" onclick="openTool('${t.id}')"><button class="favStar ${isFav(t.id)?'on':''}" onclick="event.stopPropagation();toggleFav('${t.id}')">${isFav(t.id)?'★':'☆'}</button>${t.new?'<span class="newToolTag">NOVO</span>':''}<div class="toolIcon">${t.icon}</div><div class="cat">${t.cat}</div><h3>${t.title}</h3><p>${t.desc}</p><div class="toolCardFoot"><span class="tierTag ${t.tier}">${t.tier==='decision'?'Decisão PRO':t.tier==='pro'?'PRO':'Grátis'}</span><b>Colocar na conta →</b></div></article>`}
 function renderHome(){$('journeys').innerHTML=journeys.map(j=>`<div class="journey" onclick="state.category='${j[0]}';navigate('tools')"><div class="jicon">${j[1]}</div><h3>${j[2]}</h3><p>${j[3]}</p><small>Explorar ${j[0]} →</small></div>`).join('');$('featured').innerHTML=tools.filter(t=>t.featured).slice(0,8).map(toolCard).join('')}
-function renderTools(q=''){let s=q.toLowerCase();$('filters').innerHTML=categories.map(c=>`<button class="${state.category===c?'active':''}" onclick="state.category='${c}';renderTools(document.getElementById('toolSearch').value)">${c}</button>`).join('');let arr=tools.filter(t=>(state.category==='Todas'||t.cat===state.category)&&(!s||(t.title+' '+t.desc+' '+t.cat).toLowerCase().includes(s)));if($('toolCount'))$('toolCount').textContent=arr.length;$('toolLibrary').innerHTML=arr.length?arr.map(toolCard).join(''):`<div class="emptyState"><span>0 resultados</span><h3>Nenhuma decisão encontrada.</h3><p>Tente outro termo ou volte para “Todas”.</p><button onclick="state.category='Todas';document.getElementById('toolSearch').value='';renderTools('')">Limpar filtros →</button></div>`}
+function toolRank(t){return (t.featured?100:0)+(t.tier==='decision'?30:t.tier==='pro'?20:10)}
+function sortedTools(list){return [...list].sort((a,b)=>toolRank(b)-toolRank(a)||a.title.localeCompare(b.title,'pt-BR'))}
+function renderTools(q=''){
+  let s=String(q||'').trim().toLowerCase();
+  $('filters').innerHTML=categories.map(c=>`<button class="${state.category===c?'active':''}" onclick="state.category='${c}';renderTools(document.getElementById('toolSearch').value)">${c}</button>`).join('');
+  let arr=tools.filter(t=>(state.category==='Todas'||t.cat===state.category)&&(!s||(t.title+' '+t.desc+' '+t.cat).toLowerCase().includes(s)));
+  if($('toolCount'))$('toolCount').textContent=arr.length;
+  if(!arr.length){
+    $('toolLibrary').innerHTML=`<div class="emptyState"><span>0 resultados</span><h3>Nenhuma decisão encontrada.</h3><p>Tente outro termo ou volte para “Todas”.</p><button onclick="state.category='Todas';document.getElementById('toolSearch').value='';renderTools('')">Limpar filtros →</button></div>`;
+    return;
+  }
+  if(state.category==='Todas'&&!s){
+    $('toolLibrary').innerHTML=categoryOrder.map(cat=>{
+      const group=sortedTools(arr.filter(t=>t.cat===cat));
+      if(!group.length)return '';
+      return `<section class="libraryGroup"><div class="libraryGroupHead"><div><span>${cat.toUpperCase()}</span><h2>${cat}</h2><p>${categoryDescriptions[cat]||''}</p></div><span class="libraryGroupCount">${group.length} ${group.length===1?'ferramenta':'ferramentas'}</span></div><div class="libraryGroupGrid">${group.map(toolCard).join('')}</div></section>`;
+    }).join('');
+    return;
+  }
+  $('toolLibrary').innerHTML=sortedTools(arr).map(toolCard).join('');
+}
 function renderPricing(){let el=$('pricingToolCount');if(el)el.textContent=tools.length}
 function renderAskExamples(){let ex=[['Tenho R$ 100 mil e um financiamento. Amortizo ou invisto?','amortizar-investir'],['LCI 92% do CDI ou CDB 110%?','gross-up'],['Comprar imóvel ou continuar alugando?','comprar-alugar'],['Quanto preciso para aposentar recebendo R$ 10 mil?','aposentadoria'],['Me ofereceram portabilidade com taxa menor. A troca reduz meu custo?','portabilidade-divida'],['Tenho duas propostas de financiamento. Qual tem menor custo econômico?','comparar-financiamentos'],['Troco meu carro agora ou continuo com o atual?','trocar-carro']];$('askSuggestions').innerHTML=ex.map(x=>`<div class="askSuggestion" onclick="document.getElementById('askText').value='${x[0]}';openTool('${x[1]}')"><b>${x[0]}</b><p>Abrir análise relacionada →</p></div>`).join('')}
 function parseMoneyBR(raw){return AmareloIntent.parseMoneyBR(raw)}
