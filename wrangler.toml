@@ -1,6 +1,6 @@
 name = "amarelo"
 main = "src/worker.js"
-compatibility_date = "2026-09-24"
+compatibility_date = "2026-09-26"
 workers_dev = true
 preview_urls = true
 
