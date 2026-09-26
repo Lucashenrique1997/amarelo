@@ -1,0 +1,30 @@
+
+/* ===== AMARELO 1.0 — decision-first product surface ===== */
+.decisionLaunchpad{padding-top:20px;padding-bottom:36px}
+.launchpadHead{display:grid;grid-template-columns:.75fr 1.25fr;gap:28px;align-items:end;margin-bottom:18px}
+.launchpadHead span{font-size:12px;font-weight:950;letter-spacing:.1em;color:#927b1f}
+.launchpadHead h2{font-size:36px;line-height:1.08;letter-spacing:-.045em;margin:7px 0 0}
+.launchpadHead p{font-size:15px;line-height:1.65;color:var(--muted);margin:0;max-width:680px}
+.launchpadGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.launchCard{border:1px solid var(--line);background:var(--paper);border-radius:24px;padding:24px;min-height:220px;display:grid;grid-template-columns:1fr auto;gap:20px;cursor:pointer;text-align:left;transition:.2s;position:relative;overflow:hidden}
+.launchCard:hover{transform:translateY(-3px);box-shadow:0 20px 48px rgba(45,39,18,.10)}
+.launchCard.dark{background:#171713;color:#fff;border-color:#171713}
+.launchCard>div:first-child{display:flex;flex-direction:column;align-items:flex-start}
+.launchCard small{font-size:12px;font-weight:900;letter-spacing:.08em;color:#9b8421}
+.launchCard.dark small{color:var(--yellow)}
+.launchCard h3{font-size:24px;line-height:1.15;letter-spacing:-.035em;margin:28px 0 8px;max-width:430px}
+.launchCard p{font-size:14px;line-height:1.55;color:var(--muted);margin:0;max-width:470px}
+.launchCard.dark p{color:#aaa99f}
+.launchCard b{font-size:13px;margin-top:auto;padding-top:24px}
+.launchNumber{font-size:56px;font-weight:950;letter-spacing:-.06em;color:#e5decc;line-height:.8}
+.launchCard.dark .launchNumber{color:#34342d}
+.launchProof{display:flex;gap:7px;flex-wrap:wrap;margin-top:14px}
+.launchProof span{font-size:11px;border:1px solid var(--line);border-radius:99px;padding:6px 8px;color:#6d695f}
+.launchCard.dark .launchProof span{border-color:#34342d;color:#aaa99f}
+@media(max-width:760px){
+  .launchpadHead,.launchpadGrid{grid-template-columns:1fr}
+  .launchpadHead h2{font-size:31px}
+  .launchCard{min-height:200px;padding:20px}
+  .launchCard h3{font-size:21px;margin-top:22px}
+  .launchNumber{font-size:42px}
+}
