@@ -17,6 +17,7 @@ jobs:
       - run: node --check public/assets/app.js
       - run: node --check public/assets/cloud.js
       - run: node --check public/assets/catalog.js
+      - run: node --check public/assets/intent-core.js
       - run: node --check public/assets/finance-core.js
       - run: node --check public/assets/telemetry.js
       - run: node --check src/worker.js
@@ -24,4 +25,5 @@ jobs:
       - run: node --check src/lib/security.js
       - run: node scripts/test-security.mjs
       - run: node scripts/test-finance-core.mjs
+      - run: node scripts/test-intent-core.mjs
       - run: node scripts/verify.mjs
