@@ -4,7 +4,10 @@ const PCT=x=>(Number.isFinite(x)?x:0).toLocaleString('pt-BR',{minimumFractionDig
 const monthly=a=>Math.pow(1+a,1/12)-1, irDays=d=>d<=180?.225:d<=360?.20:d<=720?.175:.15;
 const storage={
  get(k,f){try{return JSON.parse(localStorage.getItem(k))??f}catch{return f}},
- set(k,v){localStorage.setItem(k,JSON.stringify(v))}
+ set(k,v){
+   localStorage.setItem(k,JSON.stringify(v));
+   window.dispatchEvent(new CustomEvent('amarelo:local-change',{detail:{key:k}}));
+ }
 };
 let state={route:'home',category:'Todas',current:null,mode:'simple',last:null,plan:storage.get('amarelo_plan','free'),scenario:null,scenarioBusy:false,pendingAsk:null,askContext:null};
 if(!['free','pro'].includes(state.plan)){state.plan='pro';storage.set('amarelo_plan','pro')}
@@ -1035,7 +1038,7 @@ function openSavedDecision(id){
   if(d.mode==='advanced')setMode('advanced');
   toast(`Versão ${d.version||1} restaurada.`);
 }
-function deleteDecision(id){storage.set('amarelo_decisions',saved().filter(x=>x.id!==id));renderDashboard();toast('Versão removida deste navegador.')}
+function deleteDecision(id){storage.set('amarelo_decisions',saved().filter(x=>x.id!==id));renderDashboard();toast(window.AmareloCloud?.isAuthenticated()?'Versão removida e sincronizando.':'Versão removida deste navegador.')}
 function closeVersionCompare(){$('versionModal').classList.add('hidden')}
 function openVersionCompare(decisionKey){
   let versions=saved().filter(x=>savedDecisionKey(x)===decisionKey).sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,6);
@@ -1108,5 +1111,5 @@ function renderDashboard(){
 }
 function openProfile(){let p=storage.get('amarelo_profile',{income:0,wealth:0,essentials:0,reserve:0,monthly:0,age:0});for(const k in p){let el=$('profile'+k[0].toUpperCase()+k.slice(1));if(el)el.value=p[k]}$('profileModal').classList.remove('hidden')}
 function closeProfile(){$('profileModal').classList.add('hidden')}
-function saveProfile(){let p={income:num('profileIncome'),wealth:num('profileWealth'),essentials:num('profileEssentials'),reserve:num('profileReserve'),monthly:num('profileMonthly'),age:num('profileAge')};storage.set('amarelo_profile',p);closeProfile();renderDashboard();toast('Perfil salvo neste navegador.')}
+function saveProfile(){let p={income:num('profileIncome'),wealth:num('profileWealth'),essentials:num('profileEssentials'),reserve:num('profileReserve'),monthly:num('profileMonthly'),age:num('profileAge')};storage.set('amarelo_profile',p);closeProfile();renderDashboard();toast(window.AmareloCloud?.isAuthenticated()?'Perfil salvo e sincronizando.':'Perfil salvo neste navegador.')}
 renderHome();renderAskExamples();navigate('home');

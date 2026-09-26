@@ -64,10 +64,17 @@ Preparado no schema:
 - metas;
 - assinaturas.
 
-Ainda não ativo:
-- autenticação;
+Preparado no código, mas dependente do D1 externo:
+- autenticação por e-mail e senha;
+- sessão segura;
+- persistência/sincronização de perfil, favoritos, decisões e versões;
+- migração inicial de dados locais para a conta.
+
+Ainda não ativo em produção enquanto o D1 não estiver vinculado e migrado:
+- autenticação online;
 - persistência/sincronização D1;
 - cobrança;
+- recuperação de senha por e-mail;
 - IA interpretativa real.
 
 ## IA
@@ -105,3 +112,5 @@ A matemática deve permanecer determinística e testável.
 O ciclo atual deixa de priorizar novas versões numeradas e passa a priorizar a fundação 1.0: arquitetura, legibilidade, persistência, autenticação, testes e prontidão de produção.
 
 Documento: `docs/AMARELO_1_0.md`
+
+- `docs/CLOUDFLARE_HANDOFF.md`

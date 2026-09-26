@@ -6,11 +6,14 @@
 <meta name="theme-color" content="#f3c62e">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="AMARELO">\n<link rel="manifest" href="/public/manifest.webmanifest">\n<meta name="color-scheme" content="light">
+<meta name="apple-mobile-web-app-title" content="AMARELO">
+<link rel="manifest" href="/public/manifest.webmanifest">
+<meta name="color-scheme" content="light">
 <title>AMARELO — Antes de decidir, coloque na conta.</title>
 <meta name="description" content="Sua central de decisões financeiras: ferramentas, comparações, metas e planejamento em um só lugar.">
 
 <link rel="stylesheet" href="/public/assets/styles.css">
+<link rel="stylesheet" href="/public/assets/account.css">
 </head>
 <body>
 <header class="topbar">
@@ -20,6 +23,7 @@
       <button class="naked navitem" data-route="tools">Decisões</button>
       <button class="naked navitem" data-route="dashboard">Meu AMARELO</button>
       <button class="naked navitem" data-route="pricing">Planos</button>
+      <button class="naked navitem accountNav" data-route="account"><span id="accountNavLabel">Conta</span></button>
       <button class="btn black" data-route="ask">Pergunte →</button>
     </nav>
   </div>
@@ -121,10 +125,11 @@
 
   <section id="route-dashboard" class="route hidden shell page">
     <div class="dashHead">
-      <div><span class="kicker">MEU AMARELO</span><h1>Sua vida financeira, organizada por decisões.</h1><p>Salve análises, acompanhe premissas e volte quando sua realidade mudar. Nesta fase, os dados ficam somente neste navegador.</p></div>
-      <button class="btn yellow" onclick="openProfile()">Editar meu perfil</button>
+      <div><span class="kicker">MEU AMARELO</span><h1>Sua vida financeira, organizada por decisões.</h1><p id="dashboardStorageNote">Salve análises, acompanhe premissas e volte quando sua realidade mudar. Sem conta conectada, os dados permanecem somente neste navegador.</p></div>
+      <div class="accountActions"><button class="btn light" data-route="account">Conta e sincronização</button><button class="btn yellow" onclick="openProfile()">Editar meu perfil</button></div>
     </div>
     <div class="dashboardSignal"><span><i></i> Visão pessoal</span><p>Seu contexto muda. Suas decisões também. Volte, ajuste premissas e compare versões.</p></div>
+    <div id="cloudDashboardBanner" class="cloudDashboardBanner"><div><span>MODO LOCAL</span><b>O AMARELO continua funcionando normalmente.</b><p>Conecte sua conta quando a nuvem estiver disponível.</p></div><button data-route="account">Ver status →</button></div>
     <div id="profileSummary" class="profileSummary"></div>
     <div id="decisionPulse" class="decisionPulse"></div>
     <div class="dashGrid">
@@ -230,6 +235,84 @@
     <div id="askSuggestions" class="askSuggestions"></div>
   </section>
 
+  <section id="route-account" class="route hidden shell page accountPage">
+    <div class="accountIntro">
+      <span class="kicker">CONTA / SINCRONIZAÇÃO</span>
+      <h1>Suas decisões não deveriam morar em um único aparelho.</h1>
+      <p>A base 1.0 já está preparada para conta, sessão segura e sincronização. Enquanto o D1 não estiver conectado, o AMARELO continua operando localmente sem bloquear nenhuma ferramenta atual.</p>
+    </div>
+
+    <section class="cloudStatusCard">
+      <div>
+        <span id="cloudStatusBadge">VERIFICANDO</span>
+        <h2 id="cloudStatusTitle">Verificando a infraestrutura de nuvem.</h2>
+        <p id="cloudStatusText">O AMARELO está checando se banco, migrations e autenticação estão disponíveis.</p>
+      </div>
+      <div class="statusOrb">A</div>
+    </section>
+
+    <div id="accountAuth" class="accountGrid hidden" data-cloud-only>
+      <article class="accountCard">
+        <span class="accountEyebrow">CRIAR CONTA</span>
+        <h2>Comece com e-mail e senha.</h2>
+        <p>Ao criar a conta, as decisões que já estão neste navegador são preservadas e incorporadas à primeira sincronização.</p>
+        <form class="accountForm" onsubmit="return AmareloCloud.register(event)">
+          <label>E-mail<input id="registerEmail" type="email" autocomplete="email" required placeholder="voce@exemplo.com"></label>
+          <label>Senha<input id="registerPassword" type="password" autocomplete="new-password" minlength="10" maxlength="128" required placeholder="Mínimo de 10 caracteres"></label>
+          <button class="btn yellow wide" type="submit">Criar conta e sincronizar</button>
+        </form>
+        <p class="accountFineprint">A sessão usa cookie HttpOnly, Secure e SameSite. Recuperação por e-mail ainda depende da conexão de um provedor transacional e não é anunciada como ativa.</p>
+      </article>
+
+      <article class="accountCard">
+        <span class="accountEyebrow">JÁ TENHO CONTA</span>
+        <h2>Entrar no Meu AMARELO.</h2>
+        <p>O primeiro login combina o que existe neste navegador com o histórico já salvo na sua conta.</p>
+        <form class="accountForm" onsubmit="return AmareloCloud.login(event)">
+          <label>E-mail<input id="loginEmail" type="email" autocomplete="email" required placeholder="voce@exemplo.com"></label>
+          <label>Senha<input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Sua senha"></label>
+          <button class="btn black wide" type="submit">Entrar e sincronizar</button>
+        </form>
+      </article>
+    </div>
+
+    <div id="accountSession" class="accountGrid hidden" data-cloud-only>
+      <article class="accountCard">
+        <span class="accountEyebrow">CONTA CONECTADA</span>
+        <div class="accountSessionHero"><small>E-MAIL</small><b id="accountEmail">—</b></div>
+        <p>Perfil, favoritos, decisões e versões podem ser retomados em outro dispositivo com a mesma conta.</p>
+        <div class="accountActions">
+          <button id="accountSyncButton" class="btn yellow" onclick="AmareloCloud.syncNow()">Sincronizar agora</button>
+          <button class="btn light" onclick="AmareloCloud.logout()">Sair da conta</button>
+        </div>
+        <p class="accountFineprint">Última sincronização: <span id="accountLastSync">Ainda não sincronizado</span>.</p>
+      </article>
+
+      <article class="accountCard">
+        <span class="accountEyebrow">O QUE SINCRONIZA</span>
+        <div class="accountFeatureList">
+          <div class="accountFeature"><i>01</i><div><b>Perfil financeiro</b><p>Renda, patrimônio, reserva e capacidade mensal de investimento.</p></div></div>
+          <div class="accountFeature"><i>02</i><div><b>Decisões e versões</b><p>Premissas, resultados, cenários e histórico de cada caso.</p></div></div>
+          <div class="accountFeature"><i>03</i><div><b>Favoritos e experiência</b><p>Ferramentas fixadas e estado do PRO Beta.</p></div></div>
+        </div>
+      </article>
+    </div>
+
+    <div class="accountGrid" style="margin-top:16px">
+      <article class="accountCard">
+        <span class="accountEyebrow">BACKUP LOCAL</span>
+        <h2>Seus dados continuam portáveis.</h2>
+        <p>Mesmo com nuvem, você pode gerar um arquivo JSON com o conteúdo local deste aparelho.</p>
+        <button class="btn light" onclick="AmareloCloud.exportLocal()">Exportar backup local</button>
+      </article>
+      <article class="accountCard">
+        <span class="accountEyebrow">PRIVACIDADE / BETA</span>
+        <h2>Sem promessa antes da infraestrutura.</h2>
+        <p>Pagamento, recuperação de senha por e-mail e IA interpretativa continuam desativados até as integrações externas serem configuradas e verificadas.</p>
+      </article>
+    </div>
+  </section>
+
   <section id="route-tool" class="route hidden shell page">
     <button class="back naked" onclick="navigate('tools')">← Biblioteca de decisões</button>
     <div class="toolHeader">
@@ -319,7 +402,7 @@
       <label>Idade<input id="profileAge" type="number" value="0"></label>
     </div>
     <button class="btn yellow wide" onclick="saveProfile()">Salvar perfil</button>
-    <p class="privacy">Nesta versão os dados ficam somente neste navegador.</p>
+    <p id="profilePrivacy" class="privacy">Sem conta conectada, estes dados ficam somente neste navegador.</p>
   </div>
 </div>
 
@@ -347,6 +430,7 @@
 <footer><div class="shell footer"><div><b>AMARELO</b><br>Antes de decidir, coloque na conta.</div><div>Simulações educacionais. Premissas, regras tributárias e parâmetros regulados precisam ser mantidos atualizados antes do lançamento comercial.</div></div></footer>
 <div id="toast" class="toast"></div>
 <script src="/public/assets/app.js" defer></script>
+<script src="/public/assets/cloud.js" defer></script>
 
 </body>
 </html>
