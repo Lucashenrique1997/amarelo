@@ -60,7 +60,7 @@ jobs:
         run: |
           for attempt in 1 2 3 4 5 6 7 8; do
             body="$(curl -fsS https://amarelo.lucas-dev-260.workers.dev/api/version || true)"
-            if echo "$body" | grep -q '"product":"1.0-foundation"'; then
+            if echo "$body" | grep -q '"product":"1.0-cloud-core"'; then
               echo "Production verified."
               exit 0
             fi
