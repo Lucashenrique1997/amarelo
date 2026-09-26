@@ -647,7 +647,7 @@ function restoreScenarioState(savedState){
  return true;
 }
 
-function openTool(id){state.current=tools.find(t=>t.id===id);navigate('tool');openCurrentTool()}
+function openTool(id){state.current=tools.find(t=>t.id===id);window.dispatchEvent(new CustomEvent('amarelo:tool-open',{detail:{toolId:id}}));navigate('tool');openCurrentTool()}
 function openCurrentTool(){const t=state.current;state.scenario=null;state.scenarioBusy=false;$('decisionNameInput').value='';$('decisionNameInput').placeholder='Ex.: '+t.title+' — meu caso';$('scenarioLab').classList.add('hidden');$('scenarioCompare').classList.add('hidden');$('toolTitle').textContent=t.title;$('toolDescription').textContent=t.desc;$('toolCategory').textContent=t.cat.toUpperCase();$('toolTier').textContent=t.tier==='decision'?'DECISÃO PRO':t.tier==='pro'?'PRO':'GRÁTIS';$('toolTier').className='tier '+t.tier;$('toolForm').innerHTML=buildForm(t.engine);$('methodology').textContent=method(t.engine);applyPendingAsk();state.mode='simple';setMode('simple');updateFav();state.last=null;clearResult();let allowed=planAllows(t);$('paywall').classList.toggle('hidden',allowed);$('calculator').classList.toggle('hidden',!allowed);if(allowed){calculateTool();initScenarioLab()}}
 function updateFav(){$('favoriteBtn').textContent=(isFav(state.current.id)?'★':'☆')+' Favoritar'}function toggleFavoriteCurrent(){toggleFav(state.current.id);updateFav()}
 function setMode(m){state.mode=m;$('simpleMode').classList.toggle('active',m==='simple');$('advancedMode').classList.toggle('active',m==='advanced');$('toolForm').classList.toggle('advanced',m==='advanced')}
@@ -961,6 +961,7 @@ function saveDecision(){
   let scenarioState=exportScenarioState(),scenarioId=scenarioState?.active||null,scenarioLabel=scenarioId?getScenarioLabel(scenarioId):null;
   d.unshift({id:Date.now(),toolId:state.current.id,title:state.current.title,decisionName,decisionKey,version,scenarioLabel,primary:state.last.primary,subtitle:state.last.subtitle,metrics:state.last.metrics||[],sensitivity:state.last.sens||[],assumptions:captureAssumptions(),scenarioState,mode:state.mode,date:new Date().toISOString()});
   storage.set('amarelo_decisions',d.slice(0,100));
+  window.dispatchEvent(new CustomEvent('amarelo:decision-saved',{detail:{toolId:state.current.id}}));
   toast((scenarioEnabled()?`Versão ${version} salva`:'Decisão salva')+' · '+decisionName);
   renderDashboard();
 }
