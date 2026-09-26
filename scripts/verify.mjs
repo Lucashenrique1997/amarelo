@@ -1,9 +1,12 @@
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync } from "node:fs";
 
-const html = readFileSync("public/index.html", "utf8");\nconst app = readFileSync("public/assets/app.js", "utf8");\nconst styles = readFileSync("public/assets/styles.css", "utf8");\nconst surface = [html, app, styles].join("\\n");
+const html = readFileSync("public/index.html", "utf8");
+const app = readFileSync("public/assets/app.js", "utf8");
+const styles = readFileSync("public/assets/styles.css", "utf8");
 const wrangler = readFileSync("wrangler.toml", "utf8");
 const worker = readFileSync("src/worker.js", "utf8");
 const commercialMigration = readFileSync("migrations/0002_commercial_readiness.sql", "utf8");
+const surface = [html, app, styles].join("\n");
 
 const required = [
   "<title>AMARELO",
@@ -101,18 +104,31 @@ for (const id of [
   if (!ids.includes(id)) throw new Error(`Missing priority decision engine: ${id}`);
 }
 
-const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
-if (!scripts.length) throw new Error("No inline application script found.");
-for (const code of scripts) new Function(code);
+new Function(app);
+
+if (/<style>[\s\S]*<\/style>/.test(html)) {
+  throw new Error("Public shell must not contain the application stylesheet inline.");
+}
+if (/<script>[\s\S]*<\/script>/.test(html)) {
+  throw new Error("Public shell must not contain the application runtime inline.");
+}
+if (!html.includes("/assets/styles.css") || !html.includes("/assets/app.js")) {
+  throw new Error("Modular public assets are not wired.");
+}
+if (!styles.includes("AMARELO 1.0 — legibility + visual hierarchy baseline")) {
+  throw new Error("AMARELO 1.0 legibility baseline is missing.");
+}
 
 if (!/name\s*=\s*"amarelo"/.test(wrangler)) throw new Error("Cloudflare Worker must remain named amarelo.");
 if (!/main\s*=\s*"src\/worker\.js"/.test(wrangler)) throw new Error("Unexpected Worker entrypoint.");
 if (!worker.includes("/api/health")) throw new Error("Health endpoint is missing.");
 if (!worker.includes("/api/capabilities")) throw new Error("Capabilities endpoint is missing.");
+if (!worker.includes("/api/version")) throw new Error("Version endpoint is missing.");
+
 for (const marker of ["decision_versions","workspaces","workspace_members","financial_profiles","clients"]) {
   if (!commercialMigration.includes(marker)) throw new Error(`Commercial D1 migration missing: ${marker}`);
 }
-if (html.includes("setDemoPlan('family')") || html.includes("setDemoPlan('professional')")) {
+if (app.includes("setDemoPlan('family')") || app.includes("setDemoPlan('professional')")) {
   throw new Error("Unbuilt paid tiers must not be activatable.");
 }
 
