@@ -207,6 +207,7 @@
       cloudState.hydrated = true;
       cloudState.lastSync = new Date();
       cloudState.error = null;
+      window.dispatchEvent(new CustomEvent("amarelo:account-event",{detail:{name:"sync_manual"}}));
       notify("AMARELO sincronizado.");
     } catch (err) {
       cloudState.error = err.message;
@@ -226,6 +227,7 @@
       cloudState.user = result.user;
       render();
       await initialSync();
+      window.dispatchEvent(new CustomEvent("amarelo:account-event",{detail:{name:"account_created"}}));
       notify("Conta criada e dados sincronizados.");
     } catch (err) { notify(err.message); }
     return false;
@@ -240,6 +242,7 @@
       cloudState.user = result.user;
       render();
       await initialSync();
+      window.dispatchEvent(new CustomEvent("amarelo:account-event",{detail:{name:"account_login"}}));
       notify("Conta conectada.");
     } catch (err) { notify(err.message); }
     return false;
