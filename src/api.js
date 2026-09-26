@@ -43,10 +43,10 @@ async function getSchemaState(db) {
   if (!db) return { bound: false, ready: false };
   try {
     const rows = await db.prepare(
-      "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('users','sessions','decisions','decision_versions','workspaces','user_preferences')"
+      "SELECT name FROM sqlite_master WHERE type='table' AND name IN ('users','sessions','decisions','decision_versions','workspaces','user_preferences','auth_rate_limits','product_events')"
     ).all();
     const names = new Set((rows.results || []).map(row => row.name));
-    const required = ["users","sessions","decisions","decision_versions","workspaces","user_preferences"];
+    const required = ["users","sessions","decisions","decision_versions","workspaces","user_preferences","auth_rate_limits","product_events"];
     return { bound: true, ready: required.every(name => names.has(name)), tables: [...names] };
   } catch {
     return { bound: true, ready: false, tables: [] };
