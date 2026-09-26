@@ -14,6 +14,7 @@
 
 <link rel="stylesheet" href="/assets/styles.css">
 <link rel="stylesheet" href="/assets/account.css">
+<link rel="stylesheet" href="/assets/product.css">
 </head>
 <body>
 <header class="topbar">
@@ -73,6 +74,29 @@
       <div class="trustItem"><span>02</span><b>Cenários comparáveis</b><p>Olhe o custo, o tempo e o patrimônio do mesmo jeito.</p></div>
       <div class="trustItem"><span>03</span><b>Decisão é sua</b><p>O AMARELO explica consequências; não escolhe por você.</p></div>
     </div>
+
+
+    <section class="shell decisionLaunchpad">
+      <div class="launchpadHead">
+        <div><span>ENTRE PELA SITUAÇÃO</span><h2>Você não precisa saber o nome da calculadora.</h2></div>
+        <p>Escolha o contexto mais parecido com o seu. O AMARELO abre o motor adequado e deixa as premissas, os cenários e o ponto de equilíbrio na mesma leitura.</p>
+      </div>
+      <div class="launchpadGrid">
+        <button class="launchCard dark" onclick="openTool('financiamento-consorcio')">
+          <div><small>COMPRA GRANDE</small><h3>Tenho capital, mas não sei se uso agora ou preservo liquidez.</h3><p>Coloque financiamento, consórcio e investimento no mesmo horizonte.</p><div class="launchProof"><span>fluxo de caixa</span><span>valor presente</span><span>cenários</span></div><b>Abrir decisão →</b></div><span class="launchNumber">01</span>
+        </button>
+        <button class="launchCard" onclick="openTool('amortizar-investir')">
+          <div><small>DÍVIDA x PATRIMÔNIO</small><h3>Tenho dinheiro investido e uma dívida. Onde esse capital trabalha melhor?</h3><p>Compare amortização e investimento no mesmo prazo, sem misturar horizontes.</p><div class="launchProof"><span>juros evitados</span><span>retorno líquido</span><span>break-even</span></div><b>Abrir decisão →</b></div><span class="launchNumber">02</span>
+        </button>
+        <button class="launchCard" onclick="openTool('viver-renda')">
+          <div><small>RENDA FUTURA</small><h3>Quanto meu patrimônio consegue sustentar sem esconder a premissa de retorno?</h3><p>Simule renda, duração do patrimônio, legado e sensibilidade.</p><div class="launchProof"><span>renda real</span><span>duração</span><span>legado</span></div><b>Abrir decisão →</b></div><span class="launchNumber">03</span>
+        </button>
+        <button class="launchCard dark" onclick="openTool('comparar-financiamentos')">
+          <div><small>DUAS PROPOSTAS</small><h3>Recebi dois financiamentos e a menor parcela não conta a história toda.</h3><p>Compare SAC/Price, taxas, tarifas, seguros, saldo e valor presente.</p><div class="launchProof"><span>custo total</span><span>saldo futuro</span><span>taxa de equilíbrio</span></div><b>Abrir decisão →</b></div><span class="launchNumber">04</span>
+        </button>
+      </div>
+    </section>
+
 
     <section class="shell section">
       <div class="sectionHead">
@@ -429,6 +453,7 @@
 
 <footer><div class="shell footer"><div><b>AMARELO</b><br>Antes de decidir, coloque na conta.</div><div>Simulações educacionais. Premissas, regras tributárias e parâmetros regulados precisam ser mantidos atualizados antes do lançamento comercial.</div></div></footer>
 <div id="toast" class="toast"></div>
+<script src="/assets/finance-core.js" defer></script>
 <script src="/assets/app.js" defer></script>
 <script src="/assets/cloud.js" defer></script>
 
