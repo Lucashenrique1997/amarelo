@@ -8,10 +8,12 @@ const worker = readFileSync("src/worker.js", "utf8");
 const api = readFileSync("src/api.js", "utf8");
 const security = readFileSync("src/lib/security.js", "utf8");
 const cloud = readFileSync("public/assets/cloud.js", "utf8");
+const financeCore = readFileSync("public/assets/finance-core.js", "utf8");
 const accountStyles = readFileSync("public/assets/account.css", "utf8");
+const productStyles = readFileSync("public/assets/product.css", "utf8");
 const commercialMigration = readFileSync("migrations/0002_commercial_readiness.sql", "utf8");
 const cloudMigration = readFileSync("migrations/0003_cloud_core.sql", "utf8");
-const surface = [html, app, styles, accountStyles, cloud].join("\n");
+const surface = [html, app, styles, accountStyles, productStyles, cloud, financeCore].join("\n");
 
 const required = [
   "<title>AMARELO",
@@ -82,7 +84,9 @@ const required = [
   "route-account",
   "cloudDashboardBanner",
   "accountSyncButton",
-  "Conta e sincronização"
+  "Conta e sincronização",
+  "decisionLaunchpad",
+  "Você não precisa saber o nome da calculadora."
 ];
 
 for (const marker of required) {
@@ -113,6 +117,7 @@ for (const id of [
   if (!ids.includes(id)) throw new Error(`Missing priority decision engine: ${id}`);
 }
 
+new Function(financeCore);
 new Function(app);
 new Function(cloud);
 
@@ -122,8 +127,11 @@ if (/<style>[\s\S]*<\/style>/.test(html)) {
 if (/<script>[\s\S]*<\/script>/.test(html)) {
   throw new Error("Public shell must not contain the application runtime inline.");
 }
-if (!html.includes("/assets/styles.css") || !html.includes("/assets/app.js") || !html.includes("/assets/cloud.js") || !html.includes("/assets/account.css")) {
+if (!html.includes("/assets/styles.css") || !html.includes("/assets/app.js") || !html.includes("/assets/cloud.js") || !html.includes("/assets/account.css") || !html.includes("/assets/product.css") || !html.includes("/assets/finance-core.js")) {
   throw new Error("Modular public assets are not wired.");
+}
+if (!financeCore.includes("loanFlow") || !financeCore.includes("fixedIncomeProduct") || !app.includes("AmareloFinance")) {
+  throw new Error("Production finance core is not wired.");
 }
 if (!styles.includes("AMARELO 1.0 — legibility + visual hierarchy baseline")) {
   throw new Error("AMARELO 1.0 legibility baseline is missing.");
@@ -147,9 +155,9 @@ if (app.includes("setDemoPlan('family')") || app.includes("setDemoPlan('professi
   throw new Error("Unbuilt paid tiers must not be activatable.");
 }
 
-const productionSurface = [html, app, styles, accountStyles, cloud, wrangler, worker, api, security].join("\n").toLowerCase();
+const productionSurface = [html, app, styles, accountStyles, productStyles, cloud, financeCore, wrangler, worker, api, security].join("\n").toLowerCase();
 for (const forbidden of ["azul-planejamento", "verde-market", "dourado"]) {
   if (productionSurface.includes(forbidden)) throw new Error(`Cross-project reference detected: ${forbidden}`);
 }
 
-console.log(`AMARELO verification passed: ${ids.length} tools, cloud account core, secure auth primitives, sync client and 1.0 visual baseline.`);
+console.log(`AMARELO verification passed: ${ids.length} tools, tested finance core, decision-first home, cloud account core and 1.0 visual baseline.`);
