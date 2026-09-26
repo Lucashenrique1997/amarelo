@@ -1,0 +1,43 @@
+
+/* ===== AMARELO 1.0 — account + cloud sync ===== */
+.accountNav{display:inline-flex;align-items:center;gap:7px}
+.cloudDashboardBanner{margin:18px 0 22px;padding:18px 20px;border:1px solid var(--line);border-radius:20px;background:rgba(255,255,255,.62);display:flex;justify-content:space-between;align-items:center;gap:20px}
+.cloudDashboardBanner.cloudActive{background:#171713;color:#fff;border-color:#171713}
+.cloudDashboardBanner span,.cloudStatusCard span,.accountEyebrow{display:block;font-size:12px;font-weight:900;letter-spacing:.09em;color:#9b8421;margin-bottom:5px}
+.cloudDashboardBanner.cloudActive span{color:var(--yellow)}
+.cloudDashboardBanner b{font-size:16px}
+.cloudDashboardBanner p{font-size:13px;line-height:1.55;color:var(--muted);margin:4px 0 0}
+.cloudDashboardBanner.cloudActive p{color:#aaa99f}
+.cloudDashboardBanner button{border:0;background:var(--yellow);color:var(--ink);border-radius:999px;padding:11px 14px;font-size:13px;font-weight:850;cursor:pointer;white-space:nowrap}
+.accountPage{max-width:1050px}
+.accountIntro{max-width:760px;margin-bottom:28px}
+.accountIntro h1{font-size:48px;line-height:1.05;letter-spacing:-.045em;margin:8px 0 12px}
+.accountIntro p{font-size:16px;line-height:1.65;color:var(--muted)}
+.cloudStatusCard{padding:24px;border-radius:24px;background:#171713;color:#fff;margin-bottom:16px;display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center}
+.cloudStatusCard h2{font-size:25px;letter-spacing:-.03em;margin:4px 0 7px}
+.cloudStatusCard p{font-size:14px;line-height:1.6;color:#aaa99f;margin:0;max-width:720px}
+.cloudStatusCard .statusOrb{width:50px;height:50px;border-radius:50%;background:var(--yellow);display:grid;place-items:center;color:#171713;font-weight:950;font-size:18px}
+.accountGrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.accountCard{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:23px}
+.accountCard h2{font-size:22px;margin:5px 0 8px;letter-spacing:-.025em}
+.accountCard>p{font-size:14px;line-height:1.6;color:var(--muted);margin:0 0 18px}
+.accountForm{display:grid;gap:12px}
+.accountForm label{font-size:12px;font-weight:850;color:#5e594e}
+.accountForm input{width:100%;margin-top:6px;min-height:48px;padding:12px 13px;border:1px solid #d8d2c3;background:#fbfaf6;border-radius:12px;font-size:16px;outline:0}
+.accountForm input:focus{border-color:#b69a24;box-shadow:0 0 0 3px rgba(243,198,46,.18)}
+.accountSessionHero{background:#fff6ce;border:1px solid #e5d58a;border-radius:17px;padding:17px;margin-bottom:14px}
+.accountSessionHero small{font-size:12px;color:#7f744c}.accountSessionHero b{display:block;font-size:17px;margin-top:4px;word-break:break-word}
+.accountActions{display:flex;gap:9px;flex-wrap:wrap}
+.accountActions button{min-height:44px}
+.accountFineprint{font-size:12px;line-height:1.6;color:var(--muted);margin-top:15px}
+.accountFeatureList{display:grid;gap:10px;margin-top:15px}
+.accountFeature{padding:13px 0;border-top:1px solid var(--line);display:grid;grid-template-columns:30px 1fr;gap:10px}
+.accountFeature:first-child{border-top:0}.accountFeature i{font-style:normal;width:28px;height:28px;border-radius:9px;background:var(--soft);display:grid;place-items:center;font-weight:900}
+.accountFeature b{font-size:14px}.accountFeature p{font-size:12px;color:var(--muted);margin:3px 0 0;line-height:1.5}
+@media(max-width:760px){
+  .cloudDashboardBanner,.cloudStatusCard{grid-template-columns:1fr}
+  .cloudDashboardBanner{align-items:flex-start}
+  .accountGrid{grid-template-columns:1fr}
+  .accountIntro h1{font-size:36px}
+  .cloudStatusCard .statusOrb{display:none}
+}
