@@ -1,0 +1,10 @@
+{
+  "name": "AMARELO — Central de decisões financeiras",
+  "short_name": "AMARELO",
+  "description": "Antes de decidir, coloque na conta.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f1e7",
+  "theme_color": "#f3c62e",
+  "lang": "pt-BR"
+}
