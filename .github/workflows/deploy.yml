@@ -1,36 +1,70 @@
 name: Deploy AMARELO
 
-# Deploy automático está intencionalmente pausado até a autenticação
-# GitHub -> Cloudflare ser configurada e validada.
-# CI continua rodando separadamente em pull requests.
 on:
   workflow_dispatch:
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+    branches:
+      - main
 
 permissions:
   contents: read
 
 jobs:
   deploy:
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v6
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-      - name: Validate Cloudflare secrets
-        shell: bash
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          test -n "$CLOUDFLARE_API_TOKEN" || (echo "CLOUDFLARE_API_TOKEN is not configured" && exit 1)
-          test -n "$CLOUDFLARE_ACCOUNT_ID" || (echo "CLOUDFLARE_ACCOUNT_ID is not configured" && exit 1)
+    steps:
+      - name: Checkout verified main commit
+        if: ${{ github.event_name == 'workflow_run' }}
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Checkout main for manual deploy
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        uses: actions/checkout@v6
+        with:
+          ref: main
 
       - name: Verify application
         run: node scripts/verify.mjs
 
+      - name: Cloudflare credentials status
+        run: |
+          if [ -n "$CLOUDFLARE_API_TOKEN" ] && [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "Cloudflare credentials are configured."
+          else
+            echo "Cloudflare credentials are not configured; production deploy will be skipped."
+          fi
+
       - name: Deploy to Cloudflare Worker
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy
+
+      - name: Verify production health
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        shell: bash
+        run: |
+          for attempt in 1 2 3 4 5 6 7 8; do
+            body="$(curl -fsS https://amarelo.lucas-dev-260.workers.dev/api/version || true)"
+            if echo "$body" | grep -q '"product":"1.0-foundation"'; then
+              echo "Production verified."
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Deployment ran, but production verification did not observe the expected version."
+          exit 1
