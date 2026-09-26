@@ -98,3 +98,10 @@ A matemática deve permanecer determinística e testável.
 - `docs/DECISION_ENGINES_V10.md`
 - `docs/V16_PRO_DEPTH_RETENTION.md`
 - `docs/COMMERCIAL_READINESS_V17.md`
+
+
+## AMARELO 1.0
+
+O ciclo atual deixa de priorizar novas versões numeradas e passa a priorizar a fundação 1.0: arquitetura, legibilidade, persistência, autenticação, testes e prontidão de produção.
+
+Documento: `docs/AMARELO_1_0.md`
