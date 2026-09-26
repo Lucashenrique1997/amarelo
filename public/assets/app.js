@@ -28,22 +28,8 @@ function renderHome(){$('journeys').innerHTML=journeys.map(j=>`<div class="journ
 function renderTools(q=''){let s=q.toLowerCase();$('filters').innerHTML=categories.map(c=>`<button class="${state.category===c?'active':''}" onclick="state.category='${c}';renderTools(document.getElementById('toolSearch').value)">${c}</button>`).join('');let arr=tools.filter(t=>(state.category==='Todas'||t.cat===state.category)&&(!s||(t.title+' '+t.desc+' '+t.cat).toLowerCase().includes(s)));if($('toolCount'))$('toolCount').textContent=arr.length;$('toolLibrary').innerHTML=arr.length?arr.map(toolCard).join(''):`<div class="emptyState"><span>0 resultados</span><h3>Nenhuma decisão encontrada.</h3><p>Tente outro termo ou volte para “Todas”.</p><button onclick="state.category='Todas';document.getElementById('toolSearch').value='';renderTools('')">Limpar filtros →</button></div>`}
 function renderPricing(){let el=$('pricingToolCount');if(el)el.textContent=tools.length}
 function renderAskExamples(){let ex=[['Tenho R$ 100 mil e um financiamento. Amortizo ou invisto?','amortizar-investir'],['LCI 92% do CDI ou CDB 110%?','gross-up'],['Comprar imóvel ou continuar alugando?','comprar-alugar'],['Quanto preciso para aposentar recebendo R$ 10 mil?','aposentadoria'],['Me ofereceram portabilidade com taxa menor. A troca reduz meu custo?','portabilidade-divida'],['Tenho duas propostas de financiamento. Qual tem menor custo econômico?','comparar-financiamentos'],['Troco meu carro agora ou continuo com o atual?','trocar-carro']];$('askSuggestions').innerHTML=ex.map(x=>`<div class="askSuggestion" onclick="document.getElementById('askText').value='${x[0]}';openTool('${x[1]}')"><b>${x[0]}</b><p>Abrir análise relacionada →</p></div>`).join('')}
-function parseMoneyBR(raw){
-  if(!raw)return null;
-  let s=String(raw).toLowerCase().trim(),mult=1;
-  if(/milh|milhão|milhões|\bmi\b/.test(s))mult=1e6;
-  else if(/\bmil\b|\bk\b/.test(s))mult=1e3;
-  s=s.replace(/[^\d,.\-]/g,'');
-  if(s.includes(','))s=s.replace(/\./g,'').replace(',','.');
-  else if((s.match(/\./g)||[]).length&&/\.\d{3}(?:\.|$)/.test(s))s=s.replace(/\./g,'');
-  let n=parseFloat(s);
-  return Number.isFinite(n)?n*mult:null;
-}
-function parseRateBR(raw){
-  if(raw==null)return null;
-  let n=parseFloat(String(raw).replace(',','.'));
-  return Number.isFinite(n)?n:null;
-}
+function parseMoneyBR(raw){return AmareloIntent.parseMoneyBR(raw)}
+function parseRateBR(raw){return AmareloIntent.parseRateBR(raw)}
 function moneyPattern(){return '(?:R\\$\\s*)?([\\d.]+(?:,\\d+)?\\s*(?:milh(?:ão|ões|oes)|mil|mi|k)?)'}
 function firstMoney(text,patterns){
   const token=moneyPattern();
@@ -64,31 +50,7 @@ function firstInt(text,patterns){
   for(const re of patterns){let m=text.match(re);if(m)return parseInt(m[1],10)}
   return null;
 }
-function detectAskTool(text){
-  const rules=[
-    ['comparar-financiamentos',['comparar financiamento','comparar financiamentos','duas propostas','proposta a','proposta b','qual financiamento']],['imovel-na-planta',['na planta','imóvel na planta','imovel na planta','incc','entrega do imóvel','entrega do imovel']],
-    ['bonus-decidir',['13º','décimo terceiro','decimo terceiro','bônus','bonus','plr','dinheiro extra']],
-    ['independencia-financeira',['independência financeira','independencia financeira','liberdade financeira','cobrir meu custo de vida','cobrir meus gastos']],
-    ['financiamento-consorcio',['consórc','consorc','financiar ou','financiamento ou investir','dar entrada']],
-    ['comprar-alugar',['comprar ou alugar','alugar ou comprar','aluguel','continuar alugando']],
-    ['portabilidade-divida',['portabilidade','portar dívida','portar divida','refinanciar','trocar financiamento']],
-    ['trocar-carro',['trocar de carro','manter o carro','manter carro','comprar outro carro']],
-    ['amortizar-investir',['amort','quitar financiamento','abater financiamento','reduzir saldo']],
-    ['aposentadoria',['aposent','parar de trabalhar','previdência','previdencia']],
-    ['viver-renda',['viver de renda','renda mensal com patrimônio','renda mensal com patrimonio']],
-    ['salario-liquido',['salário','salario','quanto cai']],
-    ['gross-up',['lci','lca','gross','cdb']],
-    ['plano-dividas',['dívida','divida','cartão','cartao']],
-    ['avista-parcelado',['à vista','a vista','parcelado']],
-    ['meta-financeira',['meta','chegar em']]
-  ];
-  let best=['quanto-rende',0];
-  for(const [id,words] of rules){
-    let score=words.reduce((s,w)=>s+(text.includes(w)?1:0),0);
-    if(score>best[1])best=[id,score];
-  }
-  return best[0];
-}
+function detectAskTool(text){return AmareloIntent.detectAskTool(text)}
 function interpretAsk(raw){
   let text=String(raw||'').toLowerCase(),toolId=detectAskTool(text),values={},understood=[],missing=[];
   const add=(id,value,label,display)=>{

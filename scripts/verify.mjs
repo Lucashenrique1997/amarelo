@@ -9,14 +9,16 @@ const api = readFileSync("src/api.js", "utf8");
 const security = readFileSync("src/lib/security.js", "utf8");
 const cloud = readFileSync("public/assets/cloud.js", "utf8");
 const catalog = readFileSync("public/assets/catalog.js", "utf8");
+const intentCore = readFileSync("public/assets/intent-core.js", "utf8");
 const financeCore = readFileSync("public/assets/finance-core.js", "utf8");
 const telemetry = readFileSync("public/assets/telemetry.js", "utf8");
+const accessibility = readFileSync("public/assets/accessibility.css", "utf8");
 const accountStyles = readFileSync("public/assets/account.css", "utf8");
 const productStyles = readFileSync("public/assets/product.css", "utf8");
 const commercialMigration = readFileSync("migrations/0002_commercial_readiness.sql", "utf8");
 const cloudMigration = readFileSync("migrations/0003_cloud_core.sql", "utf8");
 const observabilityMigration = readFileSync("migrations/0004_observability.sql", "utf8");
-const surface = [html, app, styles, accountStyles, productStyles, cloud, catalog, financeCore, telemetry].join("\n");
+const surface = [html, app, styles, accountStyles, productStyles, accessibility, cloud, catalog, intentCore, financeCore, telemetry].join("\n");
 
 const required = [
   "<title>AMARELO",
@@ -121,6 +123,7 @@ for (const id of [
 }
 
 new Function(catalog);
+new Function(intentCore);
 new Function(financeCore);
 new Function(app);
 new Function(cloud);
@@ -132,8 +135,14 @@ if (/<style>[\s\S]*<\/style>/.test(html)) {
 if (/<script>[\s\S]*<\/script>/.test(html)) {
   throw new Error("Public shell must not contain the application runtime inline.");
 }
-if (!html.includes("/assets/styles.css") || !html.includes("/assets/app.js") || !html.includes("/assets/cloud.js") || !html.includes("/assets/account.css") || !html.includes("/assets/product.css") || !html.includes("/assets/catalog.js") || !html.includes("/assets/finance-core.js") || !html.includes("/assets/telemetry.js")) {
+if (!html.includes("/assets/styles.css") || !html.includes("/assets/app.js") || !html.includes("/assets/cloud.js") || !html.includes("/assets/account.css") || !html.includes("/assets/product.css") || !html.includes("/assets/accessibility.css") || !html.includes("/assets/catalog.js") || !html.includes("/assets/intent-core.js") || !html.includes("/assets/finance-core.js") || !html.includes("/assets/telemetry.js")) {
   throw new Error("Modular public assets are not wired.");
+}
+if (!intentCore.includes("detectAskTool") || !intentCore.includes("parseMoneyBR") || !app.includes("AmareloIntent")) {
+  throw new Error("Tested intent core is not wired.");
+}
+if (!accessibility.includes("prefers-reduced-motion") || !html.includes("skipLink") || !html.includes('aria-live="polite"')) {
+  throw new Error("Accessibility baseline is incomplete.");
 }
 if (!financeCore.includes("loanFlow") || !financeCore.includes("fixedIncomeProduct") || !app.includes("AmareloFinance")) {
   throw new Error("Production finance core is not wired.");
@@ -164,9 +173,9 @@ if (app.includes("setDemoPlan('family')") || app.includes("setDemoPlan('professi
   throw new Error("Unbuilt paid tiers must not be activatable.");
 }
 
-const productionSurface = [html, app, styles, accountStyles, productStyles, cloud, catalog, financeCore, telemetry, wrangler, worker, api, security].join("\n").toLowerCase();
+const productionSurface = [html, app, styles, accountStyles, productStyles, accessibility, cloud, catalog, intentCore, financeCore, telemetry, wrangler, worker, api, security].join("\n").toLowerCase();
 for (const forbidden of ["azul-planejamento", "verde-market", "dourado"]) {
   if (productionSurface.includes(forbidden)) throw new Error(`Cross-project reference detected: ${forbidden}`);
 }
 
-console.log(`AMARELO verification passed: ${ids.length} catalog tools, tested finance core, cloud account core, privacy-safe telemetry and modular 1.0 shell.`);
+console.log(`AMARELO verification passed: ${ids.length} catalog tools, tested finance + intent cores, cloud account, privacy-safe telemetry and accessibility baseline.`);
