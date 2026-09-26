@@ -1,6 +1,6 @@
 import { readFileSync, existsSync } from "node:fs";
 
-const html = readFileSync("public/index.html", "utf8");
+const html = readFileSync("public/index.html", "utf8");\nconst app = readFileSync("public/assets/app.js", "utf8");\nconst styles = readFileSync("public/assets/styles.css", "utf8");\nconst surface = [html, app, styles].join("\\n");
 const wrangler = readFileSync("wrangler.toml", "utf8");
 const worker = readFileSync("src/worker.js", "utf8");
 const commercialMigration = readFileSync("migrations/0002_commercial_readiness.sql", "utf8");
@@ -74,10 +74,10 @@ const required = [
 ];
 
 for (const marker of required) {
-  if (!html.includes(marker)) throw new Error(`Missing required marker: ${marker}`);
+  if (!surface.includes(marker)) throw new Error(`Missing required marker: ${marker}`);
 }
 
-const toolsBlock = html.match(/const tools=\[([\s\S]*?)\];\s*const deepIds/);
+const toolsBlock = app.match(/const tools=\[([\s\S]*?)\];\s*const deepIds/);
 if (!toolsBlock) throw new Error("Could not isolate the financial tools catalog.");
 const ids = [...toolsBlock[1].matchAll(/\{id:'([^']+)'/g)].map(m => m[1]);
 if (ids.length < 30) throw new Error(`Expected at least 30 financial tools, found ${ids.length}.`);
@@ -116,9 +116,9 @@ if (html.includes("setDemoPlan('family')") || html.includes("setDemoPlan('profes
   throw new Error("Unbuilt paid tiers must not be activatable.");
 }
 
-const productionSurface = [html, wrangler, worker].join("\n").toLowerCase();
+const productionSurface = [html, app, styles, wrangler, worker].join("\n").toLowerCase();
 for (const forbidden of ["azul-planejamento", "verde-market", "dourado"]) {
   if (productionSurface.includes(forbidden)) throw new Error(`Cross-project reference detected: ${forbidden}`);
 }
 
-console.log(`AMARELO verification passed: ${ids.length} tools, V17 commercial truth, beta gates and isolated Worker.`);
+console.log(`AMARELO verification passed: ${ids.length} tools, modular public shell, 1.0 legibility baseline, beta gates and isolated Worker.`);
