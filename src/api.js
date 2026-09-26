@@ -333,6 +333,24 @@ async function handleSync(request, db, user) {
   return error("Método não permitido.", 405, "method_not_allowed");
 }
 
+async function recordTelemetry(request, db) {
+  const payload = await bodyJson(request);
+  const allowed = new Set(["page_view","route_view","tool_open","decision_saved","account_created","account_login","sync_manual"]);
+  const eventName = String(payload?.eventName || "");
+  if (!allowed.has(eventName)) return error("Evento inválido.", 400, "invalid_event");
+
+  const anonymousId = String(payload?.anonymousId || "").slice(0,80) || null;
+  const route = String(payload?.route || "").slice(0,40) || null;
+  const toolId = String(payload?.toolId || "").slice(0,100) || null;
+  const user = await sessionUser(request, db);
+
+  await db.prepare(
+    "INSERT INTO product_events(id,anonymous_id,user_id,event_name,route,tool_id,created_at) VALUES(?,?,?,?,?,?,CURRENT_TIMESTAMP)"
+  ).bind(crypto.randomUUID(), anonymousId, user?.id || null, eventName, route, toolId).run();
+
+  return response({ ok:true }, 202);
+}
+
 export async function handleApi(request, env) {
   const url = new URL(request.url);
   const db = requireDatabase(env);
@@ -374,6 +392,8 @@ export async function handleApi(request, env) {
   if (!db) return error("A nuvem do AMARELO ainda não está conectada.", 503, "database_unavailable");
   const schema = await getSchemaState(db);
   if (!schema.ready) return error("O banco está conectado, mas as migrations ainda não foram aplicadas.", 503, "migrations_required");
+
+  if (url.pathname === "/api/telemetry" && request.method === "POST") return recordTelemetry(request, db);
 
   if (url.pathname === "/api/auth/register" && request.method === "POST") return register(request, db);
   if (url.pathname === "/api/auth/login" && request.method === "POST") return login(request, db);
